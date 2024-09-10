@@ -1,0 +1,11 @@
+{
+  "posts": [
+    { "id": "01J7BAKH37HPG116ZRRFKHBDGB", "title": "first post", "views": 100 },
+    { "id": "01J7BAKH37GE8B688PT4RC7TP4", "title": "second post", "views": 10 }
+  ],
+  "comments": [
+    { "id": "01J7BAKH38CKY69XE3CAP5TE1P", "text": "a comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" },
+    { "id": "01J7BAKH38E0S2GWTDF94EWCGR", "text": "another comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" }
+  ],
+  "profile": { "id": "01J7BAQE1GMD78FN3J0FJCNS8T", "name": "mocks" }
+}
