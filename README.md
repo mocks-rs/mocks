@@ -4,7 +4,13 @@ Get a mock REST APIs with zero coding within seconds.
 
 ## Install
 
-`mocks` can be installed with `cargo`.
+If you're a macOS Homebrew user, then you can install `mocks` from [homebrew-tap](https://github.com/mocks-rs/homebrew-tap).
+
+```shell
+brew install mocks-rs/tap/mocks
+```
+
+If you're a Rust programmer, `mocks` can be installed with `cargo`.
 
 ```shell
 cargo install mocks
