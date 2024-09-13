@@ -32,9 +32,9 @@ pub async fn get_one(
     match data.get(&resource) {
         None => Err(StatusCode::NOT_FOUND),
         Some(value) => {
-            let one = if let Value::Array(vlalues) = value {
+            let one = if let Value::Array(values) = value {
                 let mut result = None;
-                for v in vlalues {
+                for v in values {
                     if let Value::Object(target) = v {
                         for (key, value) in target {
                             if key == "id" && value == &id {
