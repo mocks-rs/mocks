@@ -47,3 +47,5 @@ Temporary Items
 
 # mocks
 *.backup.json
+*.debug.json
+*.test.json
