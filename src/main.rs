@@ -21,6 +21,10 @@ struct Args {
     /// Port
     #[arg(short, long, default_value_t = 3000)]
     port: u16,
+
+    /// No overwrite save to json file
+    #[arg(long, default_value_t = false)]
+    no_overwrite: bool,
 }
 
 #[tokio::main]
@@ -28,7 +32,7 @@ async fn main() {
     let args = Args::parse();
     match init(&args.host, args.port) {
         Ok(socket_addr) => {
-            println!("Mocks started");
+            println!("`mocks` started");
             println!("Press CTRL-C to stop");
 
             let url = format!("http://{}:{}", &args.host, args.port);
@@ -41,10 +45,19 @@ async fn main() {
             println!("Storage files:");
             println!("{}", args.file);
 
-            let storage = Storage::new(&args.file);
+            println!();
+            println!("Overwrite:");
+            println!("{}", if !args.no_overwrite { "YES" } else { "NO" });
 
-            // Run mock api server
-            let _ = Server::startup(socket_addr, &url, storage).await;
+            match Storage::new(&args.file, !args.no_overwrite) {
+                Ok(s) => {
+                    // Run mock api server
+                    let _ = Server::startup(socket_addr, &url, s).await;
+                }
+                Err(e) => {
+                    println!("{}", e);
+                }
+            }
         }
         Err(e) => {
             println!("{}", e);

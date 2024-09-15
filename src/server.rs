@@ -1,11 +1,13 @@
-mod get;
+mod handler;
 mod hc;
 mod state;
 
-use crate::server::get::{get_all, get_one};
+use crate::server::handler::{delete, get_all, get_one, patch, patch_one, post, put, put_one};
 use crate::server::hc::hc;
 use crate::server::state::AppState;
 use crate::storage::Storage;
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 use axum::Router;
 use serde_json::Value;
@@ -21,20 +23,16 @@ impl Server {
             .await
             .unwrap_or_else(|_| panic!("TcpListener cannot bind."));
 
-        let value = storage
-            .read()
-            .unwrap_or_else(|_| panic!("Storage file cannot be read."));
-
         println!();
         println!("Endpoints:");
-        print_endpoints(url, &value);
+        print_endpoints(url, &storage.value);
 
-        let state = AppState::new(value);
+        let state = AppState::new(storage);
 
         let hc_router = Router::new().route("/", get(hc));
         let storage_router = Router::new()
-            .route("/", get(get_all))
-            .route("/:id", get(get_one));
+            .route("/", get(get_all).post(post).put(put_one).patch(patch_one))
+            .route("/:id", get(get_one).put(put).patch(patch).delete(delete));
 
         let app = Router::new()
             .nest("/hc", hc_router)
@@ -53,4 +51,19 @@ fn print_endpoints(url: &str, value: &Value) {
             println!("{}/{}", url, key);
         }
     }
+}
+
+pub fn response(status_code: StatusCode, body: String) -> Result<impl IntoResponse, StatusCode> {
+    match Response::builder()
+        .status(status_code.as_u16())
+        .header("Content-Type", "application/json")
+        .body(body)
+    {
+        Ok(response) => Ok(response),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+    }
+}
+
+pub fn format_err(message: &str) -> String {
+    format!("{{\"error\": \"{}\"}}", message)
 }
