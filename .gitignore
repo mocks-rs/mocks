@@ -49,3 +49,5 @@ Temporary Items
 *.backup.json
 *.debug.json
 *.test.json
+
+*.tar.gz
