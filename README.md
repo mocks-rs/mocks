@@ -29,10 +29,11 @@ Create a `storage.json`.
     { "id": "01J7BAKH37GE8B688PT4RC7TP4", "title": "second post", "views": 10 }
   ],
   "comments": [
-    { "id": "01J7BAKH38CKY69XE3CAP5TE1P", "text": "a comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" },
-    { "id": "01J7BAKH38E0S2GWTDF94EWCGR", "text": "another comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" }
+    { "id": 1, "text": "a comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" },
+    { "id": 2, "text": "another comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" }
   ],
-  "profile": { "id": "01J7BAQE1GMD78FN3J0FJCNS8T", "name": "mocks" }
+  "profile": { "id": "01J7BAQE1GMD78FN3J0FJCNS8T", "name": "mocks" },
+  "friends": []
 }
 ```
 
@@ -58,22 +59,37 @@ Get a REST API with `curl`.
 Based on the example [storage.json](storage.json), you'll get the following routes:
 
 ```
-GET    /posts
-GET    /posts/:id
+GET     /posts
+GET     /posts/:id
+POST    /posts
+PUT     /posts/:id
+PATCH   /posts/:id
+DELETE  /posts/:id
+
+# Same for comments and friends
 ```
 
 ```
-GET    /comments
-GET    /comments/:id
-```
-
-```
-GET    /profile
+GET     /profile
+PUT     /profile
+PATCH   /profile
 ```
 
 ### Options
 
 Run `mocks --help` for a list of options.
+
+### Developer mode
+
+To help with debugging, you can enable a special feature that saves mock data to a separate file. 
+
+To do this, simply set the environment variable called `MOCKS_DEBUG_OVERWRITTEN_FILE`.
+
+```shell
+MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json cargo run -- storage.json
+```
+
+We recommend specifying the filename as `*.debug.json`. For more details, please check [.gitignore](.gitignore) file.
 
 ## LICENSE
 
