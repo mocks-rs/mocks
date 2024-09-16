@@ -26,6 +26,7 @@ impl Server {
         println!();
         println!("Endpoints:");
         print_endpoints(url, &storage.value);
+        println!();
 
         let state = AppState::new(storage);
 
