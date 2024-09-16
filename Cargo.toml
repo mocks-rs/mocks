@@ -1,8 +1,8 @@
 [package]
 name = "mocks"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
-authors = ["codemountains"]
+authors = ["codemountains <codemountains@gmail.com>"]
 description = "Get a mock REST APIs with zero coding within seconds."
 homepage = "https://github.com/mocks-rs/mocks"
 repository = "https://github.com/mocks-rs/mocks"
