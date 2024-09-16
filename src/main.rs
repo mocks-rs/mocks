@@ -55,12 +55,12 @@ async fn main() {
                     let _ = Server::startup(socket_addr, &url, s).await;
                 }
                 Err(e) => {
-                    println!("{}", e);
+                    println_err(&e);
                 }
             }
         }
         Err(e) => {
-            println!("{}", e);
+            println_err(&e);
         }
     }
 }
@@ -78,4 +78,9 @@ fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
             "Host is not an IP address".to_string(),
         )),
     }
+}
+
+fn println_err(e: &MocksError) {
+    println!();
+    println!("ERROR: {}", e);
 }
