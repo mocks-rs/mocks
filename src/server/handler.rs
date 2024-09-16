@@ -19,7 +19,7 @@ pub async fn get_all(
                 StatusCode::NOT_FOUND,
                 format_err(&MocksError::ResourceNotFound().to_string()),
             ),
-            Some(v) => response(StatusCode::OK, format!("{{\"{}\": {}}}", resource, v)),
+            Some(v) => response(StatusCode::OK, format!("{{\"{}\":{}}}", resource, v)),
         },
         Err(e) => response(
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -38,7 +38,7 @@ pub async fn get_one(
                 StatusCode::NOT_FOUND,
                 format_err(&MocksError::ObjectNotFound().to_string()),
             ),
-            Some(v) => response(StatusCode::OK, format!("{{\"{}\": {}}}", resource, v)),
+            Some(v) => response(StatusCode::OK, format!("{{\"{}\":{}}}", resource, v)),
         },
         Err(e) => response(
             StatusCode::INTERNAL_SERVER_ERROR,
