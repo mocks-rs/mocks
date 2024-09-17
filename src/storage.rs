@@ -7,7 +7,6 @@ mod reader;
 mod writer;
 
 /// Storage module
-#[derive(Default)]
 pub struct Storage {
     pub file: String,
     pub overwrite: bool,
