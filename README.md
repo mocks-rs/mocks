@@ -75,6 +75,12 @@ PUT     /profile
 PATCH   /profile
 ```
 
+```
+GET     /_hc
+
+# Health check endpoint returns a 204 response.
+```
+
 ### Options
 
 Run `mocks --help` for a list of options.

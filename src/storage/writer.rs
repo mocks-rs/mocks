@@ -1,5 +1,5 @@
 use crate::error::MocksError;
-use crate::error::MocksError::WriteError;
+use crate::error::MocksError::FailedWriteFile;
 use serde_json::Value;
 use std::env;
 use std::fs::OpenOptions;
@@ -35,11 +35,24 @@ impl Writer {
             Ok(mut file) => match serde_json::to_string_pretty(value) {
                 Ok(json_string) => match file.write_all(json_string.as_bytes()) {
                     Ok(_) => Ok(()),
-                    Err(e) => Err(WriteError(e.to_string())),
+                    Err(e) => Err(FailedWriteFile(e.to_string())),
                 },
-                Err(e) => Err(WriteError(e.to_string())),
+                Err(e) => Err(FailedWriteFile(e.to_string())),
             },
-            Err(e) => Err(WriteError(e.to_string())),
+            Err(e) => Err(FailedWriteFile(e.to_string())),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_read() {
+        let writer = Writer::new("storage.test.json");
+        let value = json!({"posts":[{"id":"test1","title":"first post","views":100}]});
+        assert_eq!(writer.write(&value).is_ok(), true);
     }
 }

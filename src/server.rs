@@ -2,6 +2,7 @@ mod handler;
 mod hc;
 mod state;
 
+use crate::error::MocksError;
 use crate::server::handler::{delete, get_all, get_one, patch, patch_one, post, put, put_one};
 use crate::server::hc::hc;
 use crate::server::state::AppState;
@@ -18,35 +19,41 @@ use tokio::net::TcpListener;
 pub struct Server {}
 
 impl Server {
-    pub async fn startup(socket_addr: SocketAddr, url: &str, storage: Storage) {
-        let listener = TcpListener::bind(socket_addr)
-            .await
-            .unwrap_or_else(|_| panic!("TcpListener cannot bind."));
+    pub async fn startup(
+        socket_addr: SocketAddr,
+        url: &str,
+        storage: Storage,
+    ) -> Result<(), MocksError> {
+        match TcpListener::bind(socket_addr).await {
+            Ok(listener) => {
+                println!();
+                println!("Endpoints:");
+                print_endpoints(url, &storage.data);
 
-        println!();
-        println!("Endpoints:");
-        print_endpoints(url, &storage.value);
-        println!();
+                let state = AppState::new(storage);
 
-        let state = AppState::new(storage);
+                let hc_router = Router::new().route("/", get(hc));
+                let storage_router = Router::new()
+                    .route("/", get(get_all).post(post).put(put_one).patch(patch_one))
+                    .route("/:id", get(get_one).put(put).patch(patch).delete(delete));
 
-        let hc_router = Router::new().route("/", get(hc));
-        let storage_router = Router::new()
-            .route("/", get(get_all).post(post).put(put_one).patch(patch_one))
-            .route("/:id", get(get_one).put(put).patch(patch).delete(delete));
+                let app = Router::new()
+                    .nest("/_hc", hc_router)
+                    .nest("/:resource", storage_router)
+                    .with_state(state);
 
-        let app = Router::new()
-            .nest("/hc", hc_router)
-            .nest("/:resource", storage_router)
-            .with_state(state);
-
-        axum::serve(listener, app)
-            .await
-            .unwrap_or_else(|_| panic!("Server cannot launch."));
+                axum::serve(listener, app)
+                    .await
+                    .map_err(|e| MocksError::Exception(e.to_string()))
+            }
+            Err(e) => Err(MocksError::Exception(e.to_string())),
+        }
     }
 }
 
 fn print_endpoints(url: &str, value: &Value) {
+    println!("{}/{}", url, "_hc");
+
     if let Value::Object(obj) = value {
         for (key, _) in obj {
             println!("{}/{}", url, key);
