@@ -38,7 +38,7 @@ impl Server {
                     .route("/:id", get(get_one).put(put).patch(patch).delete(delete));
 
                 let app = Router::new()
-                    .nest("/hc", hc_router)
+                    .nest("/_hc", hc_router)
                     .nest("/:resource", storage_router)
                     .with_state(state);
 
@@ -52,6 +52,8 @@ impl Server {
 }
 
 fn print_endpoints(url: &str, value: &Value) {
+    println!("{}/{}", url, "_hc");
+
     if let Value::Object(obj) = value {
         for (key, _) in obj {
             println!("{}/{}", url, key);
