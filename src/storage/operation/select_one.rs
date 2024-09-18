@@ -7,35 +7,20 @@ pub fn select_one(
     resource_key: &str,
     search_key: &str,
 ) -> Result<Value, MocksError> {
-    let value = data[resource_key].to_owned();
-
-    match value.as_array() {
-        Some(values) => {
-            for value in values {
-                if !value.is_object() {
-                    break;
+    data.get(resource_key)
+        .and_then(Value::as_array)
+        .ok_or(MocksError::ObjectNotFound)?
+        .iter()
+        .find(|&value| {
+            value.is_object()
+                && match value.get("id") {
+                    Some(Value::Number(key)) => key.to_string() == search_key,
+                    Some(Value::String(key)) => key == search_key,
+                    _ => false,
                 }
-
-                match &value["id"] {
-                    Value::Number(key) => {
-                        if key.to_string() == *search_key {
-                            return Ok(value.to_owned());
-                        }
-                    }
-                    Value::String(key) => {
-                        if key == search_key {
-                            return Ok(value.to_owned());
-                        }
-                    }
-                    _ => {
-                        // Do nothing
-                    }
-                }
-            }
-            Err(MocksError::ObjectNotFound())
-        }
-        None => Err(MocksError::ObjectNotFound()),
-    }
+        })
+        .cloned()
+        .ok_or(MocksError::ObjectNotFound)
 }
 
 #[cfg(test)]
@@ -81,7 +66,7 @@ mod tests {
                 panic!("panic in test_select_one_error")
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
             }
         }
     }

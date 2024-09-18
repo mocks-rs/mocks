@@ -28,48 +28,22 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), MocksError> {
     let args = Args::parse();
-    match init(&args.host, args.port) {
-        Ok(socket_addr) => {
-            println!("`mocks` started");
-            println!("Press CTRL-C to stop");
+    let socket_addr = init(&args.host, args.port)?;
 
-            let url = format!("http://{}:{}", &args.host, args.port);
+    println!("`mocks` started");
+    println!("Press CTRL-C to stop");
 
-            println!();
-            println!("Index:");
-            println!("{}", &url);
+    let url = format!("http://{}:{}", &args.host, args.port);
+    let overwrite = !args.no_overwrite;
 
-            println!();
-            println!("Storage files:");
-            println!("{}", args.file);
+    print_startup_info(&url, &args.file, overwrite);
 
-            println!();
-            println!("Overwrite:");
-            println!("{}", if !args.no_overwrite { "YES" } else { "NO" });
+    let storage = Storage::new(&args.file, overwrite)?;
+    Server::startup(socket_addr, &url, storage).await?;
 
-            match Storage::new(&args.file, !args.no_overwrite) {
-                Ok(s) => {
-                    // Run mock api server
-                    match Server::startup(socket_addr, &url, s).await {
-                        Ok(()) => {
-                            println!();
-                        }
-                        Err(e) => {
-                            println_err(&e);
-                        }
-                    }
-                }
-                Err(e) => {
-                    println_err(&e);
-                }
-            }
-        }
-        Err(e) => {
-            println_err(&e);
-        }
-    }
+    Ok(())
 }
 
 fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
@@ -79,13 +53,15 @@ fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
         host
     };
 
-    match ip_addr.parse::<IpAddr>() {
-        Ok(ip_addr) => Ok(SocketAddr::from((ip_addr, port))),
-        Err(e) => Err(MocksError::InvalidArgs(e.to_string())),
-    }
+    ip_addr
+        .parse::<IpAddr>()
+        .map(|ip| SocketAddr::from((ip, port)))
+        .map_err(|e| MocksError::InvalidArgs(e.to_string()))
 }
 
-fn println_err(e: &MocksError) {
+fn print_startup_info(url: &str, file: &str, overwrite: bool) {
+    println!("\nIndex:\n{}", url);
+    println!("\nStorage files:\n{}", file);
+    println!("\nOverwrite:\n{}", if overwrite { "YES" } else { "NO" });
     println!();
-    println!("ERROR: {}", e);
 }

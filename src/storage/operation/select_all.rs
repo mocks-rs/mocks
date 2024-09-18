@@ -3,13 +3,10 @@ use crate::storage::StorageData;
 use serde_json::Value;
 
 pub fn select_all(data: &StorageData, resource_key: &str) -> Result<Value, MocksError> {
-    let value = data[resource_key].to_owned();
-
-    if value.is_array() || value.is_object() {
-        Ok(value)
-    } else {
-        Err(MocksError::ObjectNotFound())
-    }
+    data.get(resource_key)
+        .filter(|&value| value.is_array() || value.is_object())
+        .cloned()
+        .ok_or(MocksError::ResourceNotFound)
 }
 
 #[cfg(test)]
@@ -61,7 +58,7 @@ mod tests {
                 panic!("panic in test_select_all_error_list");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ResourceNotFound.to_string());
             }
         }
     }
@@ -75,7 +72,7 @@ mod tests {
                 panic!("panic in test_select_all_error_object");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ResourceNotFound.to_string());
             }
         }
     }

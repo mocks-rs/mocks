@@ -7,18 +7,22 @@ pub fn update_one(
     resource_key: &str,
     input: &Input,
 ) -> Result<Value, MocksError> {
-    match data.to_owned()[resource_key] {
-        Value::Object(ref mut map) => {
-            if let Value::Object(m) = input {
-                for (k, v) in m {
-                    map.insert(k.clone(), v.clone());
-                }
+    let resource = data
+        .get_mut(resource_key)
+        .ok_or(MocksError::ObjectNotFound)?;
+
+    match resource {
+        Value::Object(map) => {
+            if let Value::Object(input_map) = input {
+                map.extend(input_map.iter().map(|(k, v)| (k.clone(), v.clone())));
+            } else {
+                // フォーマットエラー
+                return Err(MocksError::Exception("".to_string()));
             }
 
-            data[resource_key] = Value::Object(map.to_owned());
-            Ok(Value::Object(map.to_owned()))
+            Ok(resource.clone())
         }
-        _ => Err(MocksError::ObjectNotFound()),
+        _ => Err(MocksError::ObjectNotFound),
     }
 }
 
@@ -58,7 +62,7 @@ mod tests {
                 panic!("panic in test_update_one_error")
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
             }
         }
     }

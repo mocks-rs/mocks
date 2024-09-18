@@ -8,39 +8,31 @@ pub fn remove(
     resource_key: &str,
     search_key: &str,
 ) -> Result<Value, MocksError> {
-    let value = data[resource_key].to_owned();
+    let values = data
+        .get(resource_key)
+        .and_then(Value::as_array)
+        .ok_or(MocksError::ResourceNotFound)?;
 
-    match value {
-        Value::Array(values) => {
-            select_one(data, resource_key, search_key).inspect(|_| {
-                let mut temp = Vec::new();
-                for value in values {
-                    if !value.is_object() {
-                        break;
-                    }
+    // Get the target to be removed
+    let removed = select_one(data, resource_key, search_key)?;
 
-                    match &value["id"] {
-                        Value::Number(key) => {
-                            if key.to_string() != *search_key {
-                                temp.push(value.to_owned());
-                            }
-                        }
-                        Value::String(key) => {
-                            if key != search_key {
-                                temp.push(value.to_owned());
-                            }
-                        }
-                        _ => {
-                            // Do nothing
-                        }
-                    }
-                }
+    let filtered: Vec<Value> = values
+        .iter()
+        .filter(|&value| {
+            value
+                .get("id")
+                .and_then(|id| match id {
+                    Value::Number(n) => Some(n.to_string() != search_key),
+                    Value::String(s) => Some(s != search_key),
+                    _ => None,
+                })
+                .unwrap_or(true)
+        })
+        .cloned()
+        .collect();
 
-                data[resource_key] = Value::Array(temp);
-            })
-        }
-        _ => Err(MocksError::ObjectNotFound()),
-    }
+    data[resource_key] = Value::Array(filtered);
+    Ok(removed)
 }
 
 #[cfg(test)]
@@ -103,7 +95,7 @@ mod tests {
                 panic!("panic in test_remove_error_resource_not_found");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ResourceNotFound.to_string());
             }
         }
     }
@@ -117,7 +109,7 @@ mod tests {
                 panic!("panic in test_remove_error_object_not_found");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
             }
         }
     }

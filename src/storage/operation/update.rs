@@ -1,5 +1,4 @@
 use crate::error::MocksError;
-use crate::storage::operation::select_one::select_one;
 use crate::storage::{Input, StorageData};
 use serde_json::Value;
 
@@ -9,47 +8,34 @@ pub fn update(
     search_key: &str,
     input: &Input,
 ) -> Result<Value, MocksError> {
-    match data[resource_key] {
-        Value::Array(ref values) => {
-            let mut updated_values: Vec<Value> = Vec::new();
-            for value in values {
-                if let Some(map) = value.to_owned().as_object_mut() {
-                    match &map["id"] {
-                        Value::Number(key) => {
-                            if key.to_string() == *search_key {
-                                if let Value::Object(m) = input {
-                                    for (k, v) in m {
-                                        map.insert(k.clone(), v.clone());
-                                    }
-                                }
-                                updated_values.push(Value::Object(map.to_owned()));
-                            } else {
-                                updated_values.push(value.to_owned());
-                            }
-                        }
-                        Value::String(key) => {
-                            if key == search_key {
-                                if let Value::Object(m) = input {
-                                    for (k, v) in m {
-                                        map.insert(k.clone(), v.clone());
-                                    }
-                                }
-                                updated_values.push(Value::Object(map.to_owned()));
-                            } else {
-                                updated_values.push(value.to_owned());
-                            }
-                        }
-                        _ => {
-                            // Do nothing
-                        }
-                    }
-                }
-            }
+    let values = data
+        .get_mut(resource_key)
+        .and_then(Value::as_array_mut)
+        .ok_or(MocksError::ResourceNotFound)?;
 
-            data[resource_key] = Value::Array(updated_values);
-            select_one(data, resource_key, search_key)
+    let updated = values.iter_mut().find_map(|value| {
+        let obj = value.as_object_mut()?;
+        let id = obj.get("id")?;
+
+        let matches = match id {
+            Value::Number(key) => key.to_string() == search_key,
+            Value::String(key) => key == search_key,
+            _ => false,
+        };
+
+        if matches {
+            if let Value::Object(input_map) = input {
+                obj.extend(input_map.iter().map(|(k, v)| (k.clone(), v.clone())));
+            }
+            Some(value.clone())
+        } else {
+            None
         }
-        _ => Err(MocksError::ObjectNotFound()),
+    });
+
+    match updated {
+        Some(value) => Ok(value),
+        None => Err(MocksError::ObjectNotFound),
     }
 }
 
@@ -110,7 +96,7 @@ mod tests {
                 panic!("panic in test_update_error_resource_not_found")
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ResourceNotFound.to_string());
             }
         }
     }
@@ -125,7 +111,7 @@ mod tests {
                 panic!("panic in test_update_error_object_not_found")
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
             }
         }
     }

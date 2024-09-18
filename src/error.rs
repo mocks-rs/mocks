@@ -8,8 +8,10 @@ pub enum MocksError {
     FailedWriteFile(String),
     InvalidArgs(String),
     Exception(String),
-    ObjectNotFound(),
-    MethodNotAllowed(),
+    ResourceNotFound,
+    ObjectNotFound,
+    MethodNotAllowed,
+    InvalidRequest,
 }
 
 impl std::error::Error for MocksError {
@@ -25,8 +27,10 @@ impl fmt::Display for MocksError {
             Self::FailedWriteFile(err) => write!(fmt, "{err}"),
             Self::InvalidArgs(err) => write!(fmt, "{err}"),
             Self::Exception(err) => write!(fmt, "{err}"),
-            Self::ObjectNotFound() => write!(fmt, "Object not found."),
-            Self::MethodNotAllowed() => write!(fmt, "Method not allowed."),
+            Self::ResourceNotFound => write!(fmt, "Resource not found."),
+            Self::ObjectNotFound => write!(fmt, "Object not found."),
+            Self::MethodNotAllowed => write!(fmt, "Method not allowed."),
+            Self::InvalidRequest => write!(fmt, "Invalid request."),
         }
     }
 }

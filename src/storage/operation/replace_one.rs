@@ -7,13 +7,15 @@ pub fn replace_one(
     resource_key: &str,
     input: &Input,
 ) -> Result<Value, MocksError> {
-    match data[resource_key] {
-        Value::Object(ref _map) => {
-            data[resource_key] = input.to_owned();
-            Ok(input.to_owned())
-        }
-        _ => Err(MocksError::ObjectNotFound()),
-    }
+    let valid_input = input.as_object().ok_or(MocksError::InvalidRequest)?;
+
+    data.get_mut(resource_key)
+        .and_then(Value::as_object_mut)
+        .map(|v| {
+            *v = valid_input.clone();
+            input.clone()
+        })
+        .ok_or(MocksError::ObjectNotFound)
 }
 
 #[cfg(test)]
@@ -55,7 +57,7 @@ mod tests {
                 panic!("panic in test_replace_one_error_not_found")
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
             }
         }
     }

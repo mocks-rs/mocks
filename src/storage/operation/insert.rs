@@ -7,16 +7,19 @@ pub fn insert(
     resource_key: &str,
     input: &Input,
 ) -> Result<Value, MocksError> {
-    match data[resource_key] {
-        Value::Array(ref mut values) => {
-            values.push(input.to_owned());
-
-            data[resource_key] = Value::Array(values.to_owned());
-            Ok(input.to_owned())
-        }
-        Value::Object(_) => Err(MocksError::MethodNotAllowed()),
-        _ => Err(MocksError::ObjectNotFound()),
-    }
+    data.get_mut(resource_key)
+        .and_then(Value::as_array_mut)
+        .map(|values| {
+            values.push(input.clone());
+            input.clone()
+        })
+        .ok_or_else(|| {
+            if data.get(resource_key).map_or(false, Value::is_object) {
+                MocksError::MethodNotAllowed
+            } else {
+                MocksError::ObjectNotFound
+            }
+        })
 }
 
 #[cfg(test)]
@@ -82,7 +85,7 @@ mod tests {
                 panic!("panic in test_insert_error_method_not_allowed");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::MethodNotAllowed().to_string());
+                assert_eq!(e.to_string(), MocksError::MethodNotAllowed.to_string());
             }
         }
     }
@@ -97,7 +100,7 @@ mod tests {
                 panic!("panic in test_insert_error_resource_not_found");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
             }
         }
     }

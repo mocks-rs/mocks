@@ -1,4 +1,5 @@
 use crate::error::MocksError;
+// use crate::storage::operation::select_one::select_one;
 use crate::storage::operation::select_one::select_one;
 use crate::storage::{Input, StorageData};
 use serde_json::Value;
@@ -9,40 +10,30 @@ pub fn replace(
     search_key: &str,
     input: &Input,
 ) -> Result<Value, MocksError> {
-    let value = data[resource_key].to_owned();
+    let values = data
+        .get(resource_key)
+        .and_then(Value::as_array)
+        .ok_or(MocksError::ResourceNotFound)?;
 
-    match value {
-        Value::Array(values) => {
-            select_one(data, resource_key, search_key).map(|_| {
-                let mut replaced: Vec<Value> = Vec::new();
-                for value in values {
-                    match &value["id"] {
-                        Value::Number(key) => {
-                            if key.to_string() == *search_key {
-                                replaced.push(input.to_owned());
-                            } else {
-                                replaced.push(value.to_owned());
-                            }
-                        }
-                        Value::String(key) => {
-                            if key == search_key {
-                                replaced.push(input.to_owned());
-                            } else {
-                                replaced.push(value.to_owned());
-                            }
-                        }
-                        _ => {
-                            // Do nothing
-                        }
-                    }
-                }
+    // Validation to confirm the existence
+    select_one(data, resource_key, search_key)?;
 
-                data[resource_key] = Value::Array(replaced);
-                input.to_owned()
-            })
-        }
-        _ => Err(MocksError::ObjectNotFound()),
-    }
+    let replaced: Vec<Value> = values
+        .iter()
+        .map(|value| {
+            let id = value.get("id");
+            if matches!(id, Some(Value::Number(n)) if n.to_string() == search_key)
+                || matches!(id, Some(Value::String(s)) if s == search_key)
+            {
+                input.clone()
+            } else {
+                value.clone()
+            }
+        })
+        .collect();
+
+    data[resource_key] = Value::Array(replaced);
+    Ok(input.clone())
 }
 
 #[cfg(test)]
@@ -102,7 +93,7 @@ mod tests {
                 panic!("panic in test_replace_error_resource_not_found")
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ResourceNotFound.to_string());
             }
         }
     }
@@ -117,7 +108,7 @@ mod tests {
                 panic!("panic in test_replace_error_object_not_found")
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound().to_string());
+                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
             }
         }
     }

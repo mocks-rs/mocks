@@ -15,7 +15,7 @@ pub async fn get_all(
         Ok(state) => match state.storage.get_all(&resource) {
             None => response(
                 StatusCode::NOT_FOUND,
-                format_err(&MocksError::ObjectNotFound().to_string()),
+                format_err(&MocksError::ObjectNotFound.to_string()),
             ),
             Some(v) => response(StatusCode::OK, format!("{{\"{}\":{}}}", resource, v)),
         },
@@ -34,7 +34,7 @@ pub async fn get_one(
         Ok(state) => match state.storage.get_one(&resource, &id) {
             None => response(
                 StatusCode::NOT_FOUND,
-                format_err(&MocksError::ObjectNotFound().to_string()),
+                format_err(&MocksError::ObjectNotFound.to_string()),
             ),
             Some(v) => response(StatusCode::OK, format!("{{\"{}\":{}}}", resource, v)),
         },
@@ -51,13 +51,13 @@ pub async fn post(
     Json(input): Json<Value>,
 ) -> Result<impl IntoResponse, StatusCode> {
     match state.lock() {
-        Ok(mut state) => match state.storage.upsert(&resource, &input) {
+        Ok(mut state) => match state.storage.insert(&resource, &input) {
             Ok(v) => response(StatusCode::CREATED, format!("{}", v)),
             Err(e) => match e {
-                MocksError::ObjectNotFound() => {
+                MocksError::ObjectNotFound => {
                     response(StatusCode::NOT_FOUND, format_err(&e.to_string()))
                 }
-                MocksError::MethodNotAllowed() => {
+                MocksError::MethodNotAllowed => {
                     response(StatusCode::METHOD_NOT_ALLOWED, format_err(&e.to_string()))
                 }
                 _ => response(
@@ -82,7 +82,7 @@ pub async fn put(
         Ok(mut state) => match state.storage.replace(&resource, &id, &input) {
             Ok(v) => response(StatusCode::OK, format!("{}", v)),
             Err(e) => match e {
-                MocksError::ObjectNotFound() => {
+                MocksError::ObjectNotFound => {
                     response(StatusCode::NOT_FOUND, format_err(&e.to_string()))
                 }
                 _ => response(
@@ -107,7 +107,7 @@ pub async fn put_one(
         Ok(mut state) => match state.storage.replace_one(&resource, &input) {
             Ok(v) => response(StatusCode::OK, format!("{}", v)),
             Err(e) => match e {
-                MocksError::ObjectNotFound() => {
+                MocksError::ObjectNotFound => {
                     response(StatusCode::NOT_FOUND, format_err(&e.to_string()))
                 }
                 _ => response(
@@ -129,10 +129,10 @@ pub async fn patch(
     Json(input): Json<Value>,
 ) -> Result<impl IntoResponse, StatusCode> {
     match state.lock() {
-        Ok(mut state) => match state.storage.patch(&resource, &id, &input) {
+        Ok(mut state) => match state.storage.update(&resource, &id, &input) {
             Ok(v) => response(StatusCode::OK, format!("{}", v)),
             Err(e) => match e {
-                MocksError::ObjectNotFound() => {
+                MocksError::ObjectNotFound => {
                     response(StatusCode::NOT_FOUND, format_err(&e.to_string()))
                 }
                 _ => response(
@@ -154,10 +154,10 @@ pub async fn patch_one(
     Json(input): Json<Value>,
 ) -> Result<impl IntoResponse, StatusCode> {
     match state.lock() {
-        Ok(mut state) => match state.storage.patch_one(&resource, &input) {
+        Ok(mut state) => match state.storage.update_one(&resource, &input) {
             Ok(v) => response(StatusCode::OK, format!("{}", v)),
             Err(e) => match e {
-                MocksError::ObjectNotFound() => {
+                MocksError::ObjectNotFound => {
                     response(StatusCode::NOT_FOUND, format_err(&e.to_string()))
                 }
                 _ => response(
@@ -181,7 +181,7 @@ pub async fn delete(
         Ok(mut state) => match state.storage.delete(&resource, &id) {
             Ok(v) => response(StatusCode::OK, format!("{}", v)),
             Err(e) => match e {
-                MocksError::ObjectNotFound() => {
+                MocksError::ObjectNotFound => {
                     response(StatusCode::NOT_FOUND, format_err(&e.to_string()))
                 }
                 _ => response(
