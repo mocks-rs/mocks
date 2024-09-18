@@ -1,7 +1,7 @@
 use crate::storage::Storage;
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, Mutex};
 
-pub type SharedState = Arc<RwLock<AppState>>;
+pub type SharedState = Arc<Mutex<AppState>>;
 
 pub struct AppState {
     pub storage: Storage,
@@ -9,6 +9,6 @@ pub struct AppState {
 
 impl AppState {
     pub fn new(storage: Storage) -> SharedState {
-        Arc::new(RwLock::new(AppState { storage }))
+        Arc::new(Mutex::new(AppState { storage }))
     }
 }

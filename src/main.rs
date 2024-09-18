@@ -52,7 +52,14 @@ async fn main() {
             match Storage::new(&args.file, !args.no_overwrite) {
                 Ok(s) => {
                     // Run mock api server
-                    let _ = Server::startup(socket_addr, &url, s).await;
+                    match Server::startup(socket_addr, &url, s).await {
+                        Ok(()) => {
+                            println!();
+                        }
+                        Err(e) => {
+                            println_err(&e);
+                        }
+                    }
                 }
                 Err(e) => {
                     println_err(&e);
@@ -74,9 +81,7 @@ fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
 
     match ip_addr.parse::<IpAddr>() {
         Ok(ip_addr) => Ok(SocketAddr::from((ip_addr, port))),
-        Err(_) => Err(MocksError::ArgsError(
-            "Host is not an IP address".to_string(),
-        )),
+        Err(e) => Err(MocksError::InvalidArgs(e.to_string())),
     }
 }
 
