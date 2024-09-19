@@ -46,7 +46,7 @@ mod tests {
     use serde_json::json;
 
     #[test]
-    fn test_read() {
+    fn test_writer_write() {
         let writer = Writer::new("storage.test.json");
         let value = json!({"posts":[{"id":"test1","title":"first post","views":100}]});
         assert_eq!(writer.write(&value).is_ok(), true);

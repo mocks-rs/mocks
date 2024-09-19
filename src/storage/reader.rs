@@ -44,7 +44,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_read() {
+    fn test_reader_read() {
         let reader = Reader::new("storage.json");
 
         match reader.read() {

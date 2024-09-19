@@ -1,4 +1,4 @@
-use crate::error::MocksError;
+use crate::error::{MocksError, EXCEPTION_ERROR_MESSAGE};
 use crate::storage::{Input, StorageData};
 use serde_json::Value;
 
@@ -17,7 +17,7 @@ pub fn update_one(
                 map.extend(input_map.iter().map(|(k, v)| (k.clone(), v.clone())));
             } else {
                 // フォーマットエラー
-                return Err(MocksError::Exception("".to_string()));
+                return Err(MocksError::Exception(EXCEPTION_ERROR_MESSAGE.to_string()));
             }
 
             Ok(resource.clone())

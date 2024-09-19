@@ -1,3 +1,4 @@
+mod context;
 mod handler;
 mod hc;
 mod state;
@@ -7,8 +8,6 @@ use crate::server::handler::{delete, get_all, get_one, patch, patch_one, post, p
 use crate::server::hc::hc;
 use crate::server::state::{AppState, SharedState};
 use crate::storage::Storage;
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 use axum::Router;
 use serde_json::Value;
@@ -37,7 +36,6 @@ impl Server {
             .await
             .map_err(|e| MocksError::Exception(e.to_string()))?;
 
-        println!();
         println!("Endpoints:");
         print_endpoints(url, &storage.data);
 
@@ -69,16 +67,4 @@ fn create_router(state: SharedState) -> Router {
         .nest("/_hc", hc_router)
         .nest("/:resource", storage_router)
         .with_state(state)
-}
-
-pub fn response(status_code: StatusCode, body: String) -> Result<impl IntoResponse, StatusCode> {
-    Response::builder()
-        .status(status_code)
-        .header("Content-Type", "application/json")
-        .body(body)
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
-}
-
-pub fn format_err(message: &str) -> String {
-    format!("{{\"error\": \"{}\"}}", message)
 }

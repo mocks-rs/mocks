@@ -1,3 +1,7 @@
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
+use axum::Json;
+use serde_json::json;
 use std::fmt;
 
 pub const EXCEPTION_ERROR_MESSAGE: &str = "An unexpected error occurred.";
@@ -32,5 +36,22 @@ impl fmt::Display for MocksError {
             Self::MethodNotAllowed => write!(fmt, "Method not allowed."),
             Self::InvalidRequest => write!(fmt, "Invalid request."),
         }
+    }
+}
+impl IntoResponse for MocksError {
+    fn into_response(self) -> Response {
+        let (status, message) = match self {
+            MocksError::FailedReadFile(err)
+            | MocksError::FailedWriteFile(err)
+            | MocksError::InvalidArgs(err)
+            | MocksError::Exception(err) => (StatusCode::INTERNAL_SERVER_ERROR, err),
+            MocksError::ResourceNotFound | MocksError::ObjectNotFound => {
+                (StatusCode::NOT_FOUND, self.to_string())
+            }
+            MocksError::MethodNotAllowed => (StatusCode::METHOD_NOT_ALLOWED, self.to_string()),
+            MocksError::InvalidRequest => (StatusCode::BAD_REQUEST, self.to_string()),
+        };
+
+        (status, Json(json!({ "error": message }))).into_response()
     }
 }
