@@ -1,0 +1,51 @@
+desc: "profile endpoint tests"
+runners:
+  req:
+    endpoint: http://localhost:3000
+vars:
+  profileId: "01J7BAQE1GMD78FN3J0FJCNS8T"
+if: included
+steps:
+  putProfile:
+    desc: "Update profile"
+    req:
+      /profile:
+        put:
+          body:
+            application/json:
+              id: "{{ vars.profileId }}"
+              name: "John Smith"
+              age: 20
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.profileId
+      && current.res.body.name == "John Smith"
+      && current.res.body.age == 20
+  patchProfile:
+    desc: "Change profile data"
+    req:
+      /profile:
+        patch:
+          body:
+            application/json:
+              age: 30
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.profileId
+      && current.res.body.name == "John Smith"
+      && current.res.body.age == 30
+  getProfile:
+    desc: "Get profile"
+    req:
+      /profile:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.profile.id == vars.profileId
+      && current.res.body.profile.name == "John Smith"
+      && current.res.body.profile.age == 30

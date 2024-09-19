@@ -1,0 +1,93 @@
+desc: "comment endpoint tests"
+runners:
+  req:
+    endpoint: http://localhost:3000
+vars:
+  commentId: 3
+if: included
+steps:
+  postComment:
+    desc: "Create new comment"
+    req:
+      /comments:
+        post:
+          body:
+            application/json:
+              id: "{{ vars.commentId }}"
+              text: "new comment"
+              post_id: "{{ vars.postId }}"
+    test: |
+      // Status code must be 201.
+      current.res.status == 201
+      && current.res.body.id == vars.commentId
+      && current.res.body.text == "new comment"
+      && current.res.body.post_id == vars.postId
+  getComment:
+    desc: "Get created comment"
+    req:
+      /comments/{{ vars.commentId }}:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.commentId
+      && current.res.body.text == "new comment"
+      && current.res.body.post_id == vars.postId
+  putComment:
+    desc: "Update comment"
+    req:
+      /comments/{{ vars.commentId }}:
+        put:
+          body:
+            application/json:
+              id: "{{ vars.commentId }}"
+              text: "putted comment"
+              post_id: "{{ vars.postId }}"
+              likes: 10
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.commentId
+      && current.res.body.text == "putted comment"
+      && current.res.body.post_id == vars.postId
+      && current.res.body.likes == 10
+  patchComment:
+    desc: "Change comment data"
+    req:
+      /comments/{{ vars.commentId }}:
+        patch:
+          body:
+            application/json:
+              text: "patched comment"
+              likes: 20
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.commentId
+      && current.res.body.text == "patched comment"
+      && current.res.body.post_id == vars.postId
+      && current.res.body.likes == 20
+  getAllComments:
+    desc: "Get all comments"
+    req:
+      /comments:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && len(current.res.body.comments) > 0
+  deleteComment:
+    desc: "Delete comment"
+    req:
+      /comments/{{ vars.commentId }}:
+        delete:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.commentId

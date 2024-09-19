@@ -1,0 +1,24 @@
+desc: "mocks tests"
+runners:
+  req:
+    endpoint: http://localhost:3000
+steps:
+  hc:
+    desc: "Health Check"
+    req:
+      /_hc:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 204.
+      current.res.status == 204
+  post:
+    include:
+      path: test_post.yml
+  comment:
+      include:
+          path: test_comment.yml
+  profile:
+    include:
+      path: test_profile.yml

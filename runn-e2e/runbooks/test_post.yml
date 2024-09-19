@@ -1,0 +1,93 @@
+desc: "post endpoint tests"
+runners:
+  req:
+    endpoint: http://localhost:3000
+vars:
+  postId: "01J85A9VQ8ZDGXDC7A00YRWKBE"
+if: included
+steps:
+  postPost:
+    desc: "Create new post"
+    req:
+      /posts:
+        post:
+          body:
+            application/json:
+              id: "{{ vars.postId }}"
+              title: "new post"
+              views: 0
+    test: |
+      // Status code must be 201.
+      current.res.status == 201
+      && current.res.body.id == vars.postId
+      && current.res.body.title == "new post"
+      && current.res.body.views == 0
+  getPost:
+    desc: "Get created post"
+    req:
+      /posts/{{ vars.postId }}:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.postId
+      && current.res.body.title == "new post"
+      && current.res.body.views == 0
+  putPost:
+    desc: "Update post"
+    req:
+      /posts/{{ vars.postId }}:
+        put:
+          body:
+            application/json:
+              id: "{{ vars.postId }}"
+              title: "putted post"
+              views: 1000
+              likes: 100
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.postId
+      && current.res.body.title == "putted post"
+      && current.res.body.views == 1000
+      && current.res.body.likes == 100
+  patchPost:
+    desc: "Change post data"
+    req:
+      /posts/{{ vars.postId }}:
+        patch:
+          body:
+            application/json:
+              title: "patched post"
+              views: 2000
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.postId
+      && current.res.body.title == "patched post"
+      && current.res.body.views == 2000
+      && current.res.body.likes == 100
+  getAllPosts:
+    desc: "Get all posts"
+    req:
+      /posts:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && len(current.res.body.posts) > 0
+  deletePost:
+    desc: "Delete post"
+    req:
+      /posts/{{ vars.postId }}:
+        delete:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.postId
