@@ -38,10 +38,7 @@ pub async fn get_one(
         .storage
         .get_one(&resource, &id)
         .ok_or(MocksError::ObjectNotFound)?;
-    let response = json!({
-        resource: value
-    });
-    Ok((StatusCode::OK, Json(response)))
+    Ok((StatusCode::OK, Json(value)))
 }
 
 pub async fn post(
