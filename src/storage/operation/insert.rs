@@ -104,4 +104,36 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn test_insert_error_with_duplicated_string_id() {
+        let mut data = json!({"posts":[{"id":"test1","title":"first post","views":100}]});
+        let input = json!({"id":"test1","title":"duplicated id","views":0});
+
+        match insert(&mut data, "posts", &input) {
+            Ok(_v) => {
+                panic!("panic in test_insert_error_with_duplicated_string_id");
+            }
+            Err(e) => {
+                // TODO: エラー応答の確認
+                assert!(true);
+            }
+        }
+    }
+
+    #[test]
+    fn test_insert_error_with_duplicated_number_id() {
+        let mut data = json!({"posts":[{"id":1,"title":"first post","views":100}]});
+        let input = json!({"id":1,"title":"duplicated id","views":0});
+
+        match insert(&mut data, "posts", &input) {
+            Ok(_v) => {
+                panic!("panic in test_insert_error_with_duplicated_number_id");
+            }
+            Err(e) => {
+                // TODO: エラー応答の確認
+                assert!(true);
+            }
+        }
+    }
 }
