@@ -115,8 +115,7 @@ mod tests {
                 panic!("panic in test_insert_error_with_duplicated_string_id");
             }
             Err(e) => {
-                // TODO: エラー応答の確認
-                assert!(true);
+                assert_eq!(e, MocksError::DuplicateId);
             }
         }
     }
@@ -131,8 +130,7 @@ mod tests {
                 panic!("panic in test_insert_error_with_duplicated_number_id");
             }
             Err(e) => {
-                // TODO: エラー応答の確認
-                assert!(true);
+                assert_eq!(e, MocksError::DuplicateId);
             }
         }
     }
