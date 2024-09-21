@@ -1,0 +1,31 @@
+desc: "comment endpoint error tests"
+runners:
+  req:
+    endpoint: http://localhost:3000
+vars:
+  duplicateCommentId: 1
+if: included
+steps:
+  postCommentDuplicateIdError:
+    desc: "Failed due to duplicate ID"
+    req:
+      /comments:
+        post:
+          body:
+            application/json:
+              id: "{{ vars.duplicateCommentId }}"
+              text: "new comment"
+              post_id: "{{ vars.postId }}"
+    test: |
+      // Status code must be 409.
+      current.res.status == 409
+  getCommentNotFoundError:
+    desc: "Post is not found"
+    req:
+      /comments/999999:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 404.
+      current.res.status == 404

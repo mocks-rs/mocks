@@ -16,9 +16,15 @@ steps:
   post:
     include:
       path: test_post.yml
+  postError:
+    include:
+      path: test_post_error.yml
   comment:
       include:
           path: test_comment.yml
+  commentError:
+    include:
+      path: test_comment_error.yml
   profile:
     include:
       path: test_profile.yml
