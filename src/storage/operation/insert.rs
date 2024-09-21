@@ -60,7 +60,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_insert_with_string_id: {}", e.to_string());
+                panic!("panic in test_insert_with_string_id: {}", e);
             }
         }
     }
@@ -84,7 +84,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_insert_with_string_id: {}", e.to_string());
+                panic!("panic in test_insert_with_string_id: {}", e);
             }
         }
     }
@@ -99,7 +99,7 @@ mod tests {
                 panic!("panic in test_insert_error_method_not_allowed");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::MethodNotAllowed.to_string());
+                assert_eq!(e, MocksError::MethodNotAllowed);
             }
         }
     }
@@ -114,7 +114,7 @@ mod tests {
                 panic!("panic in test_insert_error_resource_not_found");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
+                assert_eq!(e, MocksError::ObjectNotFound);
             }
         }
     }

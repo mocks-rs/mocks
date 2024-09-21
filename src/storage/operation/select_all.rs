@@ -58,7 +58,7 @@ mod tests {
                 panic!("panic in test_select_all_error_list");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ResourceNotFound.to_string());
+                assert_eq!(e, MocksError::ResourceNotFound);
             }
         }
     }
@@ -72,7 +72,7 @@ mod tests {
                 panic!("panic in test_select_all_error_object");
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ResourceNotFound.to_string());
+                assert_eq!(e, MocksError::ResourceNotFound);
             }
         }
     }
