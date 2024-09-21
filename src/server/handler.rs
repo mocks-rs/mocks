@@ -1,128 +1,19 @@
-use crate::error::MocksError;
-use crate::server::context::{Payload, PayloadWithId};
-use crate::server::state::SharedState;
-use axum::extract::{Path, State};
-use axum::http::StatusCode;
-use axum::response::IntoResponse;
-use axum::Json;
-use serde_json::json;
-
-pub async fn get_all(
-    Path(resource): Path<String>,
-    state: State<SharedState>,
-) -> Result<impl IntoResponse, MocksError> {
-    let state = state
-        .lock()
-        .map_err(|e| MocksError::Exception(e.to_string()))?;
-
-    let value = state
-        .storage
-        .get_all(&resource)
-        .ok_or(MocksError::ResourceNotFound)?;
-    let response = json!({
-        resource: value
-    });
-
-    Ok((StatusCode::OK, Json(response)))
-}
-
-pub async fn get_one(
-    Path((resource, id)): Path<(String, String)>,
-    state: State<SharedState>,
-) -> Result<impl IntoResponse, MocksError> {
-    let state = state
-        .lock()
-        .map_err(|e| MocksError::Exception(e.to_string()))?;
-
-    let value = state
-        .storage
-        .get_one(&resource, &id)
-        .ok_or(MocksError::ObjectNotFound)?;
-    Ok((StatusCode::OK, Json(value)))
-}
-
-pub async fn post(
-    Path(resource): Path<String>,
-    state: State<SharedState>,
-    PayloadWithId(input): PayloadWithId,
-) -> Result<impl IntoResponse, MocksError> {
-    let mut state = state
-        .lock()
-        .map_err(|e| MocksError::Exception(e.to_string()))?;
-
-    let value = state.storage.insert(&resource, &input)?;
-    Ok((StatusCode::CREATED, Json(value)))
-}
-
-pub async fn put(
-    Path((resource, id)): Path<(String, String)>,
-    state: State<SharedState>,
-    PayloadWithId(input): PayloadWithId,
-) -> Result<impl IntoResponse, MocksError> {
-    let mut state = state
-        .lock()
-        .map_err(|e| MocksError::Exception(e.to_string()))?;
-
-    let value = state.storage.replace(&resource, &id, &input)?;
-    Ok((StatusCode::OK, Json(value)))
-}
-
-pub async fn put_one(
-    Path(resource): Path<String>,
-    state: State<SharedState>,
-    PayloadWithId(input): PayloadWithId,
-) -> Result<impl IntoResponse, MocksError> {
-    let mut state = state
-        .lock()
-        .map_err(|e| MocksError::Exception(e.to_string()))?;
-
-    let value = state.storage.replace_one(&resource, &input)?;
-    Ok((StatusCode::OK, Json(value)))
-}
-
-pub async fn patch(
-    Path((resource, id)): Path<(String, String)>,
-    state: State<SharedState>,
-    Payload(input): Payload,
-) -> Result<impl IntoResponse, MocksError> {
-    let mut state = state
-        .lock()
-        .map_err(|e| MocksError::Exception(e.to_string()))?;
-
-    let value = state.storage.update(&resource, &id, &input)?;
-    Ok((StatusCode::OK, Json(value)))
-}
-
-pub async fn patch_one(
-    Path(resource): Path<String>,
-    state: State<SharedState>,
-    Payload(input): Payload,
-) -> Result<impl IntoResponse, MocksError> {
-    let mut state = state
-        .lock()
-        .map_err(|e| MocksError::Exception(e.to_string()))?;
-
-    let value = state.storage.update_one(&resource, &input)?;
-    Ok((StatusCode::OK, Json(value)))
-}
-
-pub async fn delete(
-    Path((resource, id)): Path<(String, String)>,
-    state: State<SharedState>,
-) -> Result<impl IntoResponse, MocksError> {
-    let mut state = state
-        .lock()
-        .map_err(|e| MocksError::Exception(e.to_string()))?;
-
-    let value = state.storage.delete(&resource, &id)?;
-    Ok((StatusCode::OK, Json(value)))
-}
+pub mod delete;
+pub mod get;
+pub mod hc;
+pub mod patch;
+pub mod post;
+pub mod put;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::super::*;
+    use crate::server::context::{Payload, PayloadWithId};
     use crate::server::state::AppState;
+    use crate::server::state::SharedState;
     use crate::storage::Storage;
+    use axum::extract::{Path, State};
+    use serde_json::json;
 
     fn init_state() -> SharedState {
         let storage = Storage::new("storage.json", false)

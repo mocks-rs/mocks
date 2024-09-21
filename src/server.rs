@@ -1,11 +1,14 @@
 mod context;
 mod handler;
-mod hc;
 mod state;
 
 use crate::error::MocksError;
-use crate::server::handler::{delete, get_all, get_one, patch, patch_one, post, put, put_one};
-use crate::server::hc::hc;
+use crate::server::handler::delete::delete;
+use crate::server::handler::get::{get_all, get_one};
+use crate::server::handler::hc::hc;
+use crate::server::handler::patch::{patch, patch_one};
+use crate::server::handler::post::post;
+use crate::server::handler::put::{put, put_one};
 use crate::server::state::{AppState, SharedState};
 use crate::storage::Storage;
 use axum::routing::get;

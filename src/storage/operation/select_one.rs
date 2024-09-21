@@ -66,7 +66,7 @@ mod tests {
                 panic!("panic in test_select_one_error")
             }
             Err(e) => {
-                assert_eq!(e.to_string(), MocksError::ObjectNotFound.to_string());
+                assert_eq!(e, MocksError::ObjectNotFound);
             }
         }
     }

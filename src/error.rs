@@ -6,7 +6,7 @@ use std::fmt;
 
 pub const EXCEPTION_ERROR_MESSAGE: &str = "An unexpected error occurred.";
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum MocksError {
     FailedReadFile(String),
     FailedWriteFile(String),
@@ -16,6 +16,7 @@ pub enum MocksError {
     ObjectNotFound,
     MethodNotAllowed,
     InvalidRequest,
+    DuplicateId,
 }
 
 impl std::error::Error for MocksError {
@@ -35,6 +36,7 @@ impl fmt::Display for MocksError {
             Self::ObjectNotFound => write!(fmt, "Object not found."),
             Self::MethodNotAllowed => write!(fmt, "Method not allowed."),
             Self::InvalidRequest => write!(fmt, "Invalid request."),
+            Self::DuplicateId => write!(fmt, "Duplicate ID."),
         }
     }
 }
@@ -50,6 +52,7 @@ impl IntoResponse for MocksError {
             }
             MocksError::MethodNotAllowed => (StatusCode::METHOD_NOT_ALLOWED, self.to_string()),
             MocksError::InvalidRequest => (StatusCode::BAD_REQUEST, self.to_string()),
+            MocksError::DuplicateId => (StatusCode::CONFLICT, self.to_string()),
         };
 
         (status, Json(json!({ "error": message }))).into_response()
