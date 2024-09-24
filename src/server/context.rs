@@ -52,7 +52,7 @@ where
 
         // ID is required for updates
         if value.get("id").is_none() {
-            return Err(to_rejection("ID is required for updates."));
+            return Err(to_rejection("ID is required for creation or update."));
         }
 
         Ok(PayloadWithId(value))
