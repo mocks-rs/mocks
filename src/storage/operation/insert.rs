@@ -1,5 +1,5 @@
 use crate::error::MocksError;
-use crate::storage::operation::select_one::select_one;
+use crate::storage::operation::{check_duplicate_id, extract_id_in_input};
 use crate::storage::{Input, StorageData};
 use serde_json::Value;
 
@@ -9,18 +9,16 @@ pub fn insert(
     input: &Input,
 ) -> Result<Value, MocksError> {
     // Validation to check duplicate IDs
-    let id = input
-        .get("id")
-        .and_then(|v| match v {
-            Value::Number(id) => Some(id.to_string()),
-            Value::String(id) => Some(id.to_string()),
-            _ => None,
-        })
-        .ok_or(MocksError::InvalidRequest)?;
-    if select_one(data, resource_key, &id).is_ok() {
-        return Err(MocksError::DuplicateId);
-    }
+    let id = extract_id_in_input(input)?;
+    check_duplicate_id(data, resource_key, &id)?;
+    insert_input(data, resource_key, input)
+}
 
+fn insert_input(
+    data: &mut StorageData,
+    resource_key: &str,
+    input: &Input,
+) -> Result<Value, MocksError> {
     data.get_mut(resource_key)
         .and_then(Value::as_array_mut)
         .map(|values| {

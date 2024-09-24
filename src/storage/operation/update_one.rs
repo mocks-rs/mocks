@@ -10,8 +10,11 @@ pub fn update_one(
     let resource = data
         .get_mut(resource_key)
         .ok_or(MocksError::ObjectNotFound)?;
+    update_target_with_input(resource, input)
+}
 
-    match resource {
+fn update_target_with_input(value: &mut Value, input: &Input) -> Result<Value, MocksError> {
+    match value {
         Value::Object(map) => {
             if let Value::Object(input_map) = input {
                 map.extend(input_map.iter().map(|(k, v)| (k.clone(), v.clone())));
@@ -20,7 +23,7 @@ pub fn update_one(
                 return Err(MocksError::Exception(EXCEPTION_ERROR_MESSAGE.to_string()));
             }
 
-            Ok(resource.clone())
+            Ok(value.clone())
         }
         _ => Err(MocksError::ObjectNotFound),
     }
