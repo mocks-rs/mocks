@@ -51,12 +51,16 @@ impl Server {
 }
 
 fn print_endpoints(url: &str, value: &Value) {
-    println!("{}/_hc", url);
+    let mut endpoints = vec![format!("{}/_hc", url)];
 
     if let Value::Object(obj) = value {
         for (key, _) in obj {
-            println!("{}/{}", url, key);
+            endpoints.push(format!("{}/{}", url, key));
         }
+    }
+
+    for endpoint in endpoints {
+        println!("{}", endpoint);
     }
 }
 

@@ -3,6 +3,7 @@ runners:
   req:
     endpoint: http://localhost:3000
 vars:
+  commentId: 1
   duplicateCommentId: 1
 if: included
 steps:
@@ -19,6 +20,30 @@ steps:
     test: |
       // Status code must be 409.
       current.res.status == 409
+  postCommentRequiredIdError:
+    desc: "Failed because the ID does not exist"
+    req:
+      /comments:
+        post:
+          body:
+            application/json:
+              text: "nothing id comment"
+              post_id: "{{ vars.postId }}"
+    test: |
+      // Status code must be 400.
+      current.res.status == 400
+  putCommentRequiredIdError:
+    desc: "Failed because the ID does not exist"
+    req:
+      /comments/{{ vars.commentId }}:
+        put:
+          body:
+            application/json:
+              text: "nothing id comment"
+              post_id: "{{ vars.postId }}"
+    test: |
+      // Status code must be 400.
+      current.res.status == 400
   getCommentNotFoundError:
     desc: "Post is not found"
     req:

@@ -1,6 +1,6 @@
 [package]
 name = "mocks"
-version = "0.3.3"
+version = "0.3.4"
 edition = "2021"
 authors = ["codemountains <codemountains@gmail.com>"]
 description = "Get a mock REST APIs with zero coding within seconds."
