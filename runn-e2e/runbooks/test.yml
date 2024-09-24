@@ -13,6 +13,16 @@ steps:
     test: |
       // Status code must be 204.
       current.res.status == 204
+  resourceNotFound:
+    desc: "Resource is not found."
+    req:
+      /errors:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 404.
+      current.res.status == 404
   post:
     include:
       path: test_post.yml
@@ -20,11 +30,14 @@ steps:
     include:
       path: test_post_error.yml
   comment:
-      include:
-          path: test_comment.yml
+    include:
+        path: test_comment.yml
   commentError:
     include:
       path: test_comment_error.yml
   profile:
     include:
       path: test_profile.yml
+  profileError:
+    include:
+      path: test_profile_error.yml
