@@ -1,5 +1,4 @@
 use crate::error::MocksError;
-// use crate::storage::operation::select_one::select_one;
 use crate::storage::operation::select_one::select_one;
 use crate::storage::{Input, StorageData};
 use serde_json::Value;
