@@ -1,6 +1,6 @@
 # mocks docs
 
-## Build
+## Build for Homebrew
 
 ```shell
 cargo build --release

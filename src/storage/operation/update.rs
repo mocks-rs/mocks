@@ -12,8 +12,18 @@ pub fn update(
         .get_mut(resource_key)
         .and_then(Value::as_array_mut)
         .ok_or(MocksError::ResourceNotFound)?;
+    match update_resource_with_input(values, search_key, input) {
+        Some(value) => Ok(value),
+        None => Err(MocksError::ObjectNotFound),
+    }
+}
 
-    let updated = values.iter_mut().find_map(|value| {
+fn update_resource_with_input(
+    values: &mut [Value],
+    search_key: &str,
+    input: &Input,
+) -> Option<Value> {
+    values.iter_mut().find_map(|value| {
         let obj = value.as_object_mut()?;
         let id = obj.get("id")?;
 
@@ -31,12 +41,7 @@ pub fn update(
         } else {
             None
         }
-    });
-
-    match updated {
-        Some(value) => Ok(value),
-        None => Err(MocksError::ObjectNotFound),
-    }
+    })
 }
 
 #[cfg(test)]

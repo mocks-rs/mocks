@@ -1,4 +1,5 @@
 use crate::error::MocksError;
+use crate::storage::operation::extract_array_resource;
 use crate::storage::operation::select_one::select_one;
 use crate::storage::{Input, StorageData};
 use serde_json::Value;
@@ -9,30 +10,29 @@ pub fn replace(
     search_key: &str,
     input: &Input,
 ) -> Result<Value, MocksError> {
-    let values = data
-        .get(resource_key)
-        .and_then(Value::as_array)
-        .ok_or(MocksError::ResourceNotFound)?;
+    let values = extract_array_resource(data, resource_key)?;
 
     // Validation to confirm the existence
     select_one(data, resource_key, search_key)?;
+    let replaced_resource = replace_target_with_input(values, search_key, input);
+    data[resource_key] = Value::Array(replaced_resource);
+    Ok(input.clone())
+}
 
-    let replaced: Vec<Value> = values
+fn replace_target_with_input(values: Vec<Value>, key: &str, input: &Input) -> Vec<Value> {
+    values
         .iter()
         .map(|value| {
             let id = value.get("id");
-            if matches!(id, Some(Value::Number(n)) if n.to_string() == search_key)
-                || matches!(id, Some(Value::String(s)) if s == search_key)
+            if matches!(id, Some(Value::Number(n)) if n.to_string() == key)
+                || matches!(id, Some(Value::String(s)) if s == key)
             {
                 input.clone()
             } else {
                 value.clone()
             }
         })
-        .collect();
-
-    data[resource_key] = Value::Array(replaced);
-    Ok(input.clone())
+        .collect()
 }
 
 #[cfg(test)]

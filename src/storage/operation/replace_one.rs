@@ -1,19 +1,28 @@
 use crate::error::MocksError;
+use crate::storage::operation::extract_id_in_input;
 use crate::storage::{Input, StorageData};
-use serde_json::Value;
+use serde_json::{Map, Value};
 
 pub fn replace_one(
     data: &mut StorageData,
     resource_key: &str,
     input: &Input,
 ) -> Result<Value, MocksError> {
+    extract_id_in_input(input)?;
     let valid_input = input.as_object().ok_or(MocksError::InvalidRequest)?;
+    replace_target_with_map_input(data, resource_key, valid_input.clone())
+}
 
+fn replace_target_with_map_input(
+    data: &mut StorageData,
+    resource_key: &str,
+    map_input: Map<String, Value>,
+) -> Result<Value, MocksError> {
     data.get_mut(resource_key)
         .and_then(Value::as_object_mut)
         .map(|v| {
-            *v = valid_input.clone();
-            input.clone()
+            *v = map_input.clone();
+            Value::Object(map_input)
         })
         .ok_or(MocksError::ObjectNotFound)
 }

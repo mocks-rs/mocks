@@ -14,10 +14,7 @@ pub async fn get_all(
         .lock()
         .map_err(|e| MocksError::Exception(e.to_string()))?;
 
-    let value = state
-        .storage
-        .get_all(&resource)
-        .ok_or(MocksError::ResourceNotFound)?;
+    let value = state.storage.get_all(&resource)?;
     let response = json!({
         resource: value
     });
@@ -33,9 +30,6 @@ pub async fn get_one(
         .lock()
         .map_err(|e| MocksError::Exception(e.to_string()))?;
 
-    let value = state
-        .storage
-        .get_one(&resource, &id)
-        .ok_or(MocksError::ObjectNotFound)?;
+    let value = state.storage.get_one(&resource, &id)?;
     Ok((StatusCode::OK, Json(value)))
 }

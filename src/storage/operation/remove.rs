@@ -1,4 +1,5 @@
 use crate::error::MocksError;
+use crate::storage::operation::extract_array_resource;
 use crate::storage::operation::select_one::select_one;
 use crate::storage::StorageData;
 use serde_json::Value;
@@ -8,31 +9,30 @@ pub fn remove(
     resource_key: &str,
     search_key: &str,
 ) -> Result<Value, MocksError> {
-    let values = data
-        .get(resource_key)
-        .and_then(Value::as_array)
-        .ok_or(MocksError::ResourceNotFound)?;
+    let values = extract_array_resource(data, resource_key)?;
 
     // Get the target to be removed
-    let removed = select_one(data, resource_key, search_key)?;
+    let remove_one = select_one(data, resource_key, search_key)?;
+    let removed_resource = remove_target(values, search_key);
+    data[resource_key] = Value::Array(removed_resource);
+    Ok(remove_one)
+}
 
-    let filtered: Vec<Value> = values
+fn remove_target(values: Vec<Value>, key: &str) -> Vec<Value> {
+    values
         .iter()
         .filter(|&value| {
             value
                 .get("id")
                 .and_then(|id| match id {
-                    Value::Number(n) => Some(n.to_string() != search_key),
-                    Value::String(s) => Some(s != search_key),
+                    Value::Number(n) => Some(n.to_string() != key),
+                    Value::String(s) => Some(s != key),
                     _ => None,
                 })
                 .unwrap_or(true)
         })
         .cloned()
-        .collect();
-
-    data[resource_key] = Value::Array(filtered);
-    Ok(removed)
+        .collect()
 }
 
 #[cfg(test)]
