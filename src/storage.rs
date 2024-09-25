@@ -42,14 +42,14 @@ impl Storage {
 
     /// **GET**
     /// Retrieve all items for a given resource
-    pub fn get_all(&self, resource_key: &str) -> Option<Value> {
-        select_all(&self.data, resource_key).ok()
+    pub fn get_all(&self, resource_key: &str) -> Result<Value, MocksError> {
+        self.fetch(|data| select_all(data, resource_key))
     }
 
     /// **GET**
     /// Retrieve a specific item from a resource
-    pub fn get_one(&self, resource_key: &str, item_key: &str) -> Option<Value> {
-        select_one(&self.data, resource_key, item_key).ok()
+    pub fn get_one(&self, resource_key: &str, item_key: &str) -> Result<Value, MocksError> {
+        self.fetch(|data| select_one(data, resource_key, item_key))
     }
 
     /// **POST**
@@ -96,6 +96,18 @@ impl Storage {
     /// Delete an item from a resource
     pub fn delete(&mut self, resource_key: &str, item_key: &str) -> Result<Value, MocksError> {
         self.operate(|data| remove(data, resource_key, item_key))
+    }
+
+    /// Fetches data from the storage using the provided operation
+    ///
+    /// This method abstracts the common pattern of performing a fetch operation,
+    /// and returning the result.
+    fn fetch<F>(&self, operation: F) -> Result<Value, MocksError>
+    where
+        F: FnOnce(&StorageData) -> Result<Value, MocksError>,
+    {
+        let result = operation(&self.data)?;
+        Ok(result)
     }
 
     /// Perform an operation on the storage data and write changes if successful
