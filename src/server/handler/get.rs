@@ -33,3 +33,27 @@ pub async fn get_one(
     let value = state.storage.get_one(&resource, &id)?;
     Ok((StatusCode::OK, Json(value)))
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::server::handler::get::{get_all, get_one};
+    use crate::server::handler::tests::init_state;
+    use axum::extract::{Path, State};
+
+    #[tokio::test]
+    async fn test_get_all() {
+        let state = init_state();
+        let path: Path<String> = Path("posts".to_string());
+        assert!(get_all(path, State(state)).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_get_one() {
+        let state = init_state();
+        let path: Path<(String, String)> = Path((
+            "posts".to_string(),
+            "01J7BAKH37HPG116ZRRFKHBDGB".to_string(),
+        ));
+        assert!(get_one(path, State(state)).await.is_ok());
+    }
+}
