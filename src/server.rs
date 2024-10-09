@@ -41,6 +41,7 @@ impl Server {
 
         println!("Endpoints:");
         print_endpoints(url, &storage.data);
+        println!();
 
         let state = AppState::new(storage);
         let router = create_router(state);

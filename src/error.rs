@@ -40,6 +40,7 @@ impl fmt::Display for MocksError {
         }
     }
 }
+
 impl IntoResponse for MocksError {
     fn into_response(self) -> Response {
         let (status, message) = match self {
