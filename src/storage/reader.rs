@@ -31,7 +31,11 @@ impl Reader {
             .ok_or_else(|| MocksError::FailedReadFile(INVALID_JSON_FORMAT_ERROR.to_string()))?;
 
         // Allow only Object or Array
-        if obj.values().any(|v| v.is_object() || v.is_array()) {
+        if obj
+            .iter()
+            .filter(|(k, _)| !k.is_empty())
+            .any(|(_, v)| v.is_object() || v.is_array())
+        {
             Ok(value)
         } else {
             Err(MocksError::FailedReadFile(UNABLE_TO_GEN_API.to_string()))

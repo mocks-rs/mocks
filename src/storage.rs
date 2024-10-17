@@ -45,7 +45,7 @@ impl Storage {
         let mut resources = vec![];
         if let Value::Object(obj) = &self.data {
             for (key, val) in obj {
-                if val.is_object() || val.is_array() {
+                if !key.is_empty() && (val.is_object() || val.is_array()) {
                     resources.push(key.to_string());
                 }
             }
