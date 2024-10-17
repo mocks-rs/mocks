@@ -30,6 +30,7 @@ impl Reader {
             .as_object()
             .ok_or_else(|| MocksError::FailedReadFile(INVALID_JSON_FORMAT_ERROR.to_string()))?;
 
+        // Allow only Object or Array
         if obj.values().any(|v| v.is_object() || v.is_array()) {
             Ok(value)
         } else {
