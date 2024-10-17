@@ -40,7 +40,7 @@ impl Server {
             .map_err(|e| MocksError::Exception(e.to_string()))?;
 
         println!("Endpoints:");
-        print_endpoints(url, &storage.data);
+        print_endpoints(url, storage.resources());
         println!();
 
         let state = AppState::new(storage);
@@ -51,15 +51,11 @@ impl Server {
     }
 }
 
-fn print_endpoints(url: &str, value: &Value) {
+fn print_endpoints(url: &str, resources: Vec<String>) {
     let mut endpoints = vec![format!("{}/_hc", url)];
 
-    if let Value::Object(obj) = value {
-        for (key, val) in obj {
-            if val.is_object() || val.is_array() {
-                endpoints.push(format!("{}/{}", url, key));
-            }
-        }
+    for r in resources {
+        endpoints.push(format!("{}/{}", url, r));
     }
 
     for endpoint in endpoints {

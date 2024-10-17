@@ -40,6 +40,20 @@ impl Storage {
         })
     }
 
+    /// Resources for API endpoints
+    pub fn resources(&self) -> Vec<String> {
+        let mut resources = vec![];
+        if let Value::Object(obj) = &self.data {
+            for (key, val) in obj {
+                if val.is_object() || val.is_array() {
+                    resources.push(key.to_string());
+                }
+            }
+        }
+
+        resources
+    }
+
     /// **GET**
     /// Retrieve all items for a given resource
     pub fn get_all(&self, resource_key: &str) -> Result<Value, MocksError> {
