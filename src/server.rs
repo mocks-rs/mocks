@@ -55,8 +55,10 @@ fn print_endpoints(url: &str, value: &Value) {
     let mut endpoints = vec![format!("{}/_hc", url)];
 
     if let Value::Object(obj) = value {
-        for (key, _) in obj {
-            endpoints.push(format!("{}/{}", url, key));
+        for (key, val) in obj {
+            if val.is_object() || val.is_array() {
+                endpoints.push(format!("{}/{}", url, key));
+            }
         }
     }
 
