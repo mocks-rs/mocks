@@ -3,7 +3,8 @@ use serde_json::Value;
 use std::fs;
 use std::path::Path;
 
-const INVALID_JSON_FORMAT_ERROR: &str = "Storage file contains invalid JSON format.";
+const INVALID_JSON_FORMAT_ERROR: &str = "Storage file is invalid JSON format.";
+const UNABLE_TO_GEN_API: &str = "Unable to generate API endpoints.";
 
 /// Storage file reader
 pub struct Reader {
@@ -29,13 +30,16 @@ impl Reader {
             .as_object()
             .ok_or_else(|| MocksError::FailedReadFile(INVALID_JSON_FORMAT_ERROR.to_string()))?;
 
-        if obj.values().any(|v| !v.is_object() && !v.is_array()) {
-            return Err(MocksError::FailedReadFile(
-                INVALID_JSON_FORMAT_ERROR.to_string(),
-            ));
+        // Allow only Object or Array
+        if obj
+            .iter()
+            .filter(|(k, _)| !k.is_empty())
+            .any(|(_, v)| v.is_object() || v.is_array())
+        {
+            Ok(value)
+        } else {
+            Err(MocksError::FailedReadFile(UNABLE_TO_GEN_API.to_string()))
         }
-
-        Ok(value)
     }
 }
 
