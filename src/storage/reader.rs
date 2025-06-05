@@ -5,7 +5,7 @@ use std::fs;
 use std::path::Path;
 
 const INVALID_JSON_FORMAT_ERROR: &str = "Storage file is invalid JSON format.";
-const UNABLE_TO_GEN_API: &str = "Unable to generate API endpoints.";
+const UNABLE_TO_GEN_API_ERROR: &str = "Unable to generate API endpoints.";
 const DUPLICATE_RESOURCE_ERROR: &str =
     "Duplicate resource found in storage file (e.g. api/v1/users and api/v2/users).";
 
@@ -61,7 +61,7 @@ impl Reader {
         {
             Ok(value)
         } else {
-            Err(MocksError::FailedReadFile(UNABLE_TO_GEN_API.to_string()))
+            Err(MocksError::FailedReadFile(UNABLE_TO_GEN_API_ERROR.to_string()))
         }
     }
 }
