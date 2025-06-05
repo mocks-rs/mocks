@@ -1,10 +1,13 @@
 use crate::error::MocksError;
 use serde_json::Value;
+use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
 const INVALID_JSON_FORMAT_ERROR: &str = "Storage file is invalid JSON format.";
 const UNABLE_TO_GEN_API: &str = "Unable to generate API endpoints.";
+const DUPLICATE_RESOURCE_ERROR: &str =
+    "Duplicate resource found in storage file (e.g. api/v1/users and api/v2/users).";
 
 /// Storage file reader
 pub struct Reader {
@@ -29,6 +32,26 @@ impl Reader {
         let obj = value
             .as_object()
             .ok_or_else(|| MocksError::FailedReadFile(INVALID_JSON_FORMAT_ERROR.to_string()))?;
+
+        let mut seen = HashSet::new();
+        for (key, _) in obj {
+            let resource = if key.contains('/') {
+                let parts: Vec<&str> = key.split('/').collect();
+                if let Some(last_part) = parts.last() {
+                    last_part.to_string()
+                } else {
+                    continue;
+                }
+            } else {
+                key.to_string()
+            };
+
+            if !seen.insert(resource) {
+                return Err(MocksError::FailedReadFile(
+                    DUPLICATE_RESOURCE_ERROR.to_string(),
+                ));
+            }
+        }
 
         // Allow only Object or Array
         if obj

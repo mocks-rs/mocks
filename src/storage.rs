@@ -19,6 +19,7 @@ pub type StorageData = Value;
 pub type Input = Value;
 
 /// Storage module
+#[derive(Clone)]
 pub struct Storage {
     pub file: String,
     pub data: StorageData,
