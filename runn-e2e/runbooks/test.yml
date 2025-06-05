@@ -41,3 +41,12 @@ steps:
   profileError:
     include:
       path: test_profile_error.yml
+  nestedUser:
+    include:
+      path: test_nested_user.yml
+  nestedPicture:
+    include:
+      path: test_nested_picture.yml
+  nestedSnapshot:
+    include:
+      path: test_nested_snapshot.yml
