@@ -59,7 +59,6 @@ mod tests {
         }
     }
 
-
     #[test]
     fn test_select_all_object() {
         let mut data = json!({"profile":{"id":1,"name":"John Smith","age":25}});

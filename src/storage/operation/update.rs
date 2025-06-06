@@ -135,7 +135,6 @@ mod tests {
         }
     }
 
-
     #[test]
     fn test_update_error_resource_not_found() {
         let mut data = json!({"posts":[{"id":"test1","title":"first post","views":100}]});

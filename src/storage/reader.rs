@@ -61,7 +61,9 @@ impl Reader {
         {
             Ok(value)
         } else {
-            Err(MocksError::FailedReadFile(UNABLE_TO_GEN_API_ERROR.to_string()))
+            Err(MocksError::FailedReadFile(
+                UNABLE_TO_GEN_API_ERROR.to_string(),
+            ))
         }
     }
 }

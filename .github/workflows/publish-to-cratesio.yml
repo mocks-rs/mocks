@@ -1,7 +1,7 @@
 on:
   workflow_dispatch:
 
-name: Publish
+name: Publish to crates.io
 
 jobs:
   publish:
