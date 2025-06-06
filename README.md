@@ -41,6 +41,9 @@ Create a `storage.json`.
 }
 ```
 
+> [!WARNING]
+> You cannot define duplicate resource (e.g., `api/v1/users` and `api/v2/users`) in the storage file. Each resource name must be unique.
+
 Pass it to `mocks` CLI.
 
 ```shell

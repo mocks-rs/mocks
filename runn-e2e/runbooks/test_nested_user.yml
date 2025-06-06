@@ -1,0 +1,87 @@
+desc: "user nested endpoint tests"
+runners:
+  req:
+    endpoint: http://localhost:3000
+vars:
+  userId: "01JX06VME1ARXQXEK2Y44632EG"
+if: included
+steps:
+  postUser:
+    desc: "Create new user"
+    req:
+      /api/v1/users:
+        post:
+          body:
+            application/json:
+              id: "{{ vars.userId }}"
+              name: "new user"
+    test: |
+      // Status code must be 201.
+      current.res.status == 201
+      && current.res.body.id == vars.userId
+      && current.res.body.name == "new user"
+  getUser:
+    desc: "Get created user"
+    req:
+      /api/v1/users/{{ vars.userId }}:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.userId
+      && current.res.body.name == "new user"
+  putUser:
+    desc: "Update user"
+    req:
+      /api/v1/users/{{ vars.userId }}:
+        put:
+          body:
+            application/json:
+              id: "{{ vars.userId }}"
+              name: "putted user"
+              age: 25
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.userId
+      && current.res.body.name == "putted user"
+      && current.res.body.age == 25
+  patchUser:
+    desc: "Change user data"
+    req:
+      /api/v1/users/{{ vars.userId }}:
+        patch:
+          body:
+            application/json:
+              name: "patched user"
+              age: 30
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.userId
+      && current.res.body.name == "patched user"
+      && current.res.body.age == 30
+  getAllUsers:
+    desc: "Get all users"
+    req:
+      /api/v1/users:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && len(current.res.body.users) > 0
+  deleteUser:
+    desc: "Delete user"
+    req:
+      /api/v1/users/{{ vars.userId }}:
+        delete:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.userId

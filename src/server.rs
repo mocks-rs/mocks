@@ -40,23 +40,23 @@ impl Server {
             .map_err(|e| MocksError::Exception(e.to_string()))?;
 
         println!("Endpoints:");
-        print_endpoints(url, &storage.data);
+        print_endpoints(url, storage.resources());
+        println!();
 
+        let data = storage.data.clone();
         let state = AppState::new(storage);
-        let router = create_router(state);
+        let router = create_router(state, &data);
         axum::serve(listener, router)
             .await
             .map_err(|e| MocksError::Exception(e.to_string()))
     }
 }
 
-fn print_endpoints(url: &str, value: &Value) {
+fn print_endpoints(url: &str, resources: Vec<String>) {
     let mut endpoints = vec![format!("{}/_hc", url)];
 
-    if let Value::Object(obj) = value {
-        for (key, _) in obj {
-            endpoints.push(format!("{}/{}", url, key));
-        }
+    for r in resources {
+        endpoints.push(format!("{}/{}", url, r));
     }
 
     for endpoint in endpoints {
@@ -64,14 +64,45 @@ fn print_endpoints(url: &str, value: &Value) {
     }
 }
 
-fn create_router(state: SharedState) -> Router {
+fn convert_to_resource_paths(value: &Value) -> Vec<String> {
+    let mut paths = vec![];
+    let mut resources = vec![];
+
+    if let Value::Object(obj) = value {
+        for (key, _) in obj {
+            if let Some(last_slash) = key.rfind('/') {
+                let (prefix, _) = key.split_at(last_slash + 1);
+                paths.push(format!("/{}:resource", prefix));
+                resources.push(key.replace(prefix, ""));
+            } else {
+                paths.push("/:resource".to_string());
+                resources.push(key.to_string());
+            }
+        }
+    }
+
+    paths.dedup();
+    paths.sort_by(|a, b| {
+        let a_count = a.matches('/').count();
+        let b_count = b.matches('/').count();
+        b_count.cmp(&a_count)
+    });
+
+    paths
+}
+
+fn create_router(state: SharedState, value: &Value) -> Router {
     let hc_router = Router::new().route("/", get(hc));
     let storage_router = Router::new()
         .route("/", get(get_all).post(post).put(put_one).patch(patch_one))
         .route("/:id", get(get_one).put(put).patch(patch).delete(delete));
 
-    Router::new()
-        .nest("/_hc", hc_router)
-        .nest("/:resource", storage_router)
-        .with_state(state)
+    let mut router = Router::new().nest("/_hc", hc_router);
+
+    let resource_paths = convert_to_resource_paths(value);
+    for path in resource_paths {
+        router = router.nest(path.as_str(), storage_router.clone());
+    }
+
+    router.with_state(state)
 }

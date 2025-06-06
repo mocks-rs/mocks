@@ -43,3 +43,19 @@ pub fn extract_array_resource(
         .ok_or(MocksError::ResourceNotFound)
         .cloned()
 }
+
+pub fn build_search_resource_key(data: &StorageData, resource_key: &str) -> String {
+    let mut search_resource_key = resource_key.to_string();
+    if let Some(obj) = data.as_object() {
+        for (key, _) in obj {
+            if let Some(last_slash) = key.rfind('/') {
+                let (_, last_part) = key.split_at(last_slash + 1);
+                if last_part == resource_key {
+                    search_resource_key = key.to_string();
+                }
+            }
+        }
+    }
+
+    search_resource_key
+}

@@ -1,5 +1,7 @@
 use crate::error::MocksError;
-use crate::storage::operation::{check_duplicate_id, extract_id_in_input};
+use crate::storage::operation::{
+    build_search_resource_key, check_duplicate_id, extract_id_in_input,
+};
 use crate::storage::{Input, StorageData};
 use serde_json::Value;
 
@@ -10,8 +12,9 @@ pub fn insert(
 ) -> Result<Value, MocksError> {
     // Validation to check duplicate IDs
     let id = extract_id_in_input(input)?;
-    check_duplicate_id(data, resource_key, &id)?;
-    insert_input(data, resource_key, input)
+    let search_resource_key = build_search_resource_key(data, resource_key);
+    check_duplicate_id(data, &search_resource_key, &id)?;
+    insert_input(data, &search_resource_key, input)
 }
 
 fn insert_input(
@@ -64,6 +67,30 @@ mod tests {
     }
 
     #[test]
+    fn test_insert_nested_resource_with_string_id() {
+        let mut data = json!({"api/v1/posts":[{"id":"test1","title":"first post","views":100}]});
+        let input = json!({"id":"test2","title":"second post","views":0});
+
+        match insert(&mut data, "api/v1/posts", &input) {
+            Ok(v) => {
+                assert_eq!(v, json!({"id":"test2","title":"second post","views":0}));
+
+                match &data["api/v1/posts"].as_array() {
+                    None => {
+                        panic!("panic in test_insert_with_string_id");
+                    }
+                    Some(values) => {
+                        assert_eq!(values.len(), 2);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("panic in test_insert_with_string_id: {}", e);
+            }
+        }
+    }
+
+    #[test]
     fn test_insert_with_number_id() {
         let mut data = json!({"posts":[{"id":1,"title":"first post","views":100}]});
         let input = json!({"id":2,"title":"second post","views":0});
@@ -73,6 +100,30 @@ mod tests {
                 assert_eq!(v, json!({"id":2,"title":"second post","views":0}));
 
                 match &data["posts"].as_array() {
+                    None => {
+                        panic!("panic in test_insert_with_number_id");
+                    }
+                    Some(values) => {
+                        assert_eq!(values.len(), 2);
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("panic in test_insert_with_string_id: {}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_insert_nested_resource_with_number_id() {
+        let mut data = json!({"api/v1/posts":[{"id":1,"title":"first post","views":100}]});
+        let input = json!({"id":2,"title":"second post","views":0});
+
+        match insert(&mut data, "api/v1/posts", &input) {
+            Ok(v) => {
+                assert_eq!(v, json!({"id":2,"title":"second post","views":0}));
+
+                match &data["api/v1/posts"].as_array() {
                     None => {
                         panic!("panic in test_insert_with_number_id");
                     }

@@ -1,5 +1,5 @@
 use crate::error::MocksError;
-use crate::storage::operation::extract_id_in_input;
+use crate::storage::operation::{build_search_resource_key, extract_id_in_input};
 use crate::storage::{Input, StorageData};
 use serde_json::{Map, Value};
 
@@ -10,7 +10,8 @@ pub fn replace_one(
 ) -> Result<Value, MocksError> {
     extract_id_in_input(input)?;
     let valid_input = input.as_object().ok_or(MocksError::InvalidRequest)?;
-    replace_target_with_map_input(data, resource_key, valid_input.clone())
+    let search_resource_key = build_search_resource_key(data, resource_key);
+    replace_target_with_map_input(data, &search_resource_key, valid_input.clone())
 }
 
 fn replace_target_with_map_input(
@@ -42,6 +43,30 @@ mod tests {
                 assert_eq!(v, json!({"id":"user1","name":"Jane Smith","age":30}));
 
                 let updated_value = &data["profile"];
+                assert_eq!(
+                    *updated_value,
+                    json!({"id":"user1","name":"Jane Smith","age":30})
+                );
+            }
+            Err(e) => {
+                panic!(
+                    "panic in test_replace_one_with_string_id: {}",
+                    e.to_string()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn test_replace_one_nested_resource_with_string_id() {
+        let mut data = json!({"api/v1/profile":{"id":"user1","name":"John Smith","age":25}});
+        let input = json!({"id":"user1","name":"Jane Smith","age":30});
+
+        match replace_one(&mut data, "api/v1/profile", &input) {
+            Ok(v) => {
+                assert_eq!(v, json!({"id":"user1","name":"Jane Smith","age":30}));
+
+                let updated_value = &data["api/v1/profile"];
                 assert_eq!(
                     *updated_value,
                     json!({"id":"user1","name":"Jane Smith","age":30})

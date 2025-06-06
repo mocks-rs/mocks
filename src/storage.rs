@@ -19,6 +19,7 @@ pub type StorageData = Value;
 pub type Input = Value;
 
 /// Storage module
+#[derive(Clone)]
 pub struct Storage {
     pub file: String,
     pub data: StorageData,
@@ -38,6 +39,20 @@ impl Storage {
             data,
             overwrite,
         })
+    }
+
+    /// Resources for API endpoints
+    pub fn resources(&self) -> Vec<String> {
+        let mut resources = vec![];
+        if let Value::Object(obj) = &self.data {
+            for (key, val) in obj {
+                if !key.is_empty() && (val.is_object() || val.is_array()) {
+                    resources.push(key.to_string());
+                }
+            }
+        }
+
+        resources
     }
 
     /// **GET**

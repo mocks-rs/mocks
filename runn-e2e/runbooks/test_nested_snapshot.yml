@@ -1,0 +1,47 @@
+desc: "snapshot nested endpoint tests"
+runners:
+  req:
+    endpoint: http://localhost:3000
+vars:
+  snapshotId: 2
+if: included
+steps:
+  putSnapshot:
+    desc: "Update snapshot"
+    req:
+      /api/v1/snapshot:
+        put:
+          body:
+            application/json:
+              id: "{{ vars.snapshotId }}"
+              time: "1749133222"
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.snapshotId
+      && current.res.body.time == "1749133222"
+  patchSnapshot:
+    desc: "Change snapshot data"
+    req:
+      /api/v1/snapshot:
+        patch:
+          body:
+            application/json:
+              time: "1749133233"
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.snapshotId
+      && current.res.body.time == "1749133233"
+  getSnapshot:
+    desc: "Get snapshot"
+    req:
+      /api/v1/snapshot:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.snapshot.id == vars.snapshotId
+      && current.res.body.snapshot.time == "1749133233"

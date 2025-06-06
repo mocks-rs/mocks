@@ -1,0 +1,87 @@
+desc: "picture nested endpoint tests"
+runners:
+  req:
+    endpoint: http://localhost:3000
+vars:
+  pictureId: 3
+if: included
+steps:
+  postPicture:
+    desc: "Create new picture"
+    req:
+      /api/v1/pictures:
+        post:
+          body:
+            application/json:
+              id: "{{ vars.pictureId }}"
+              size: "34567"
+    test: |
+      // Status code must be 201.
+      current.res.status == 201
+      && current.res.body.id == vars.pictureId
+      && current.res.body.size == "34567"
+  getPicture:
+    desc: "Get created picture"
+    req:
+      /api/v1/pictures/{{ vars.pictureId }}:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.pictureId
+      && current.res.body.size == "34567"
+  putPicture:
+    desc: "Update picture"
+    req:
+      /api/v1/pictures/{{ vars.pictureId }}:
+        put:
+          body:
+            application/json:
+              id: "{{ vars.pictureId }}"
+              size: "10000"
+              unit: "bytes"
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.pictureId
+      && current.res.body.size == "10000"
+      && current.res.body.unit == "bytes"
+  patchPicture:
+    desc: "Change picture data"
+    req:
+      /api/v1/pictures/{{ vars.pictureId }}:
+        patch:
+          body:
+            application/json:
+              size: "9.7"
+              unit: "KB"
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.pictureId
+      && current.res.body.size == "9.7"
+      && current.res.body.unit == "KB"
+  getAllPictures:
+    desc: "Get all pictures"
+    req:
+      /api/v1/pictures:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && len(current.res.body.pictures) > 0
+  deletePicture:
+    desc: "Delete picture"
+    req:
+      /api/v1/pictures/{{ vars.pictureId }}:
+        delete:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.pictureId
