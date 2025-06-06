@@ -37,7 +37,11 @@ Create a `storage.json`.
     { "id": 2, "text": "another comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" }
   ],
   "profile": { "id": "01J7BAQE1GMD78FN3J0FJCNS8T", "name": "mocks" },
-  "friends": []
+  "friends": [],
+  "api/v1/users": [
+    { "id": "01JX06KAAES0EXP0T39B8W4CNY", "name": "John Smith" },
+    { "id": "01JX06SYEVJZTAPVSTXK22YAR3", "name": "Jane Smith" }
+  ]
 }
 ```
 
