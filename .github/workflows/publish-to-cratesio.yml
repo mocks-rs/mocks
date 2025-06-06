@@ -8,22 +8,7 @@ name: Publish to crates.io
 
 jobs:
   test-and-lint:
-    name: Test and Lint
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-    
-    - name: Run tests
-      run: cargo test
-    
-    - name: Check formatting
-      run: cargo fmt -- --check
+    uses: ./.github/workflows/test-and-lint.yml
 
   publish:
     name: Publish
