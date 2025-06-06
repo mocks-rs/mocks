@@ -2,9 +2,11 @@ name: Test and Lint
 
 on:
   push:
-    branches: [ '*' ]
+    branches-ignore:
+      - main
   pull_request:
-    branches: [ '*' ]
+    branches:
+      - '*'
   workflow_dispatch:
   workflow_call:
 
