@@ -1,23 +1,62 @@
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 name: Publish to crates.io
 
 jobs:
-  publish:
-    name: Publish
+  test-and-lint:
+    name: Test and Lint
     runs-on: ubuntu-latest
     steps:
-      -   name: Checkout sources
-          uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+    
+    - name: Run tests
+      run: cargo test
+    
+    - name: Check formatting
+      run: cargo fmt -- --check
 
-      -   name: Install stable toolchain
-          uses: actions-rs/toolchain@v1
-          with:
-            profile: minimal
-            toolchain: stable
-            override: true
+  publish:
+    name: Publish
+    needs: test-and-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      -   run: cargo publish --token ${CRATES_TOKEN}
-          env:
-            CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Check version change
+        id: version_check
+        run: |
+          PREV_VERSION=$(git show HEAD^:Cargo.toml | grep "^version = " | cut -d'"' -f2)
+          CURRENT_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
+          if [ "$PREV_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $PREV_VERSION to $CURRENT_VERSION"
+          else
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version not changed"
+          fi
+
+      - name: Publish to crates.io
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: cargo publish --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
