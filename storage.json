@@ -1,41 +1,4 @@
 {
-  "api/v1/pictures": [
-    {
-      "id": 1,
-      "size": "12345"
-    },
-    {
-      "id": 2,
-      "size": "23456"
-    }
-  ],
-  "api/v1/snapshot": {
-    "id": 2,
-    "time": "1749133233"
-  },
-  "api/v1/users": [
-    {
-      "id": "01JX06KAAES0EXP0T39B8W4CNY",
-      "name": "John Smith"
-    },
-    {
-      "id": "01JX06SYEVJZTAPVSTXK22YAR3",
-      "name": "Jane Smith"
-    }
-  ],
-  "comments": [
-    {
-      "id": 1,
-      "post_id": "01J7BAKH37HPG116ZRRFKHBDGB",
-      "text": "a comment"
-    },
-    {
-      "id": 2,
-      "post_id": "01J7BAKH37HPG116ZRRFKHBDGB",
-      "text": "another comment"
-    }
-  ],
-  "friends": [],
   "posts": [
     {
       "id": "01J7BAKH37HPG116ZRRFKHBDGB",
@@ -48,9 +11,45 @@
       "views": 10
     }
   ],
+  "comments": [
+    {
+      "id": 1,
+      "text": "a comment",
+      "post_id": "01J7BAKH37HPG116ZRRFKHBDGB"
+    },
+    {
+      "id": 2,
+      "text": "another comment",
+      "post_id": "01J7BAKH37HPG116ZRRFKHBDGB"
+    }
+  ],
+  "api/v1/users": [
+    {
+      "id": "01JX06KAAES0EXP0T39B8W4CNY",
+      "name": "John Smith"
+    },
+    {
+      "id": "01JX06SYEVJZTAPVSTXK22YAR3",
+      "name": "Jane Smith"
+    }
+  ],
+  "api/v1/pictures": [
+    {
+      "id": 1,
+      "size": "12345"
+    },
+    {
+      "id": 2,
+      "size": "23456"
+    }
+  ],
   "profile": {
-    "age": 30,
     "id": "01J7BAQE1GMD78FN3J0FJCNS8T",
-    "name": "John Smith"
-  }
+    "name": "mocks"
+  },
+  "api/v1/snapshot": {
+    "id": 1,
+    "time": "1749133111"
+  },
+  "friends": []
 }
