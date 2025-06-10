@@ -72,10 +72,10 @@ fn convert_to_resource_paths(value: &Value) -> Vec<String> {
         for (key, _) in obj {
             if let Some(last_slash) = key.rfind('/') {
                 let (prefix, _) = key.split_at(last_slash + 1);
-                paths.push(format!("/{}:resource", prefix));
+                paths.push(format!("/{}{{resource}}", prefix));
                 resources.push(key.replace(prefix, ""));
             } else {
-                paths.push("/:resource".to_string());
+                paths.push("/{resource}".to_string());
                 resources.push(key.to_string());
             }
         }
@@ -95,7 +95,7 @@ fn create_router(state: SharedState, value: &Value) -> Router {
     let hc_router = Router::new().route("/", get(hc));
     let storage_router = Router::new()
         .route("/", get(get_all).post(post).put(put_one).patch(patch_one))
-        .route("/:id", get(get_one).put(put).patch(patch).delete(delete));
+        .route("/{id}", get(get_one).put(put).patch(patch).delete(delete));
 
     let mut router = Router::new().nest("/_hc", hc_router);
 

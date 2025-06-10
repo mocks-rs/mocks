@@ -29,7 +29,7 @@ fn insert_input(
             input.clone()
         })
         .ok_or_else(|| {
-            if data.get(resource_key).map_or(false, Value::is_object) {
+            if data.get(resource_key).is_some_and(Value::is_object) {
                 MocksError::MethodNotAllowed
             } else {
                 MocksError::ObjectNotFound
