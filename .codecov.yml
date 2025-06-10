@@ -4,10 +4,12 @@ coverage:
       default:
         target: 80%
         threshold: 1%
+        if_ci_failed: error
     patch:
       default:
         target: 80%
         threshold: 1%
+        if_ci_failed: error
 
 comment:
   layout: "reach, diff, flags, files"
