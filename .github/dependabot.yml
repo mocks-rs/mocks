@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # Rustの依存関係の更新設定
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "rust"
+    commit-message:
+      prefix: "cargo"
+      include: "scope"
+    versioning-strategy: auto
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+        match-update-types: true
+
+  # GitHub Actionsの更新設定
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "github-actions"
+      include: "scope"
