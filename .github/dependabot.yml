@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Rustの依存関係の更新設定
+  # Configuration for Rust dependencies
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
@@ -19,7 +19,7 @@ updates:
         update-types: ["version-update:semver-patch"]
         match-update-types: true
 
-  # GitHub Actionsの更新設定
+  # Configuration for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
