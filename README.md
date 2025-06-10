@@ -1,7 +1,8 @@
 # mocks
 
 [![Crates.io](https://img.shields.io/crates/v/mocks.svg)](https://crates.io/crates/mocks)
-[![msrv 1.65.0](https://img.shields.io/badge/msrv-1.74.1-dea584.svg?logo=rust)](https://github.com/rust-lang/rust/releases/tag/1.74.1)
+[![msrv 1.78.0](https://img.shields.io/badge/msrv-1.78.0-dea584.svg?logo=rust)](https://github.com/rust-lang/rust/releases/tag/1.78.0)
+[![codecov](https://codecov.io/gh/mocks-rs/mocks/branch/main/graph/badge.svg?token=1WZ0YCZK9J)](https://codecov.io/gh/mocks-rs/mocks)
 [![License](https://img.shields.io/github/license/mocks-rs/mocks)](LICENSE)
 
 Get a mock REST APIs with zero coding within seconds.
