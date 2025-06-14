@@ -18,7 +18,13 @@ comment:
 
 ignore:
   - "tests/*"
-  - "**/*.rs:#[cfg(test)]"
-  - "**/*.rs:mod tests"
   - "docs/*"
   - "runn-e2e/*"
+
+parsers:
+    rust:
+      ignore:
+        # Lines containing #[cfg(test)]
+        - ".*#\\[cfg\\(test\\)\\].*"
+        # Test function lines
+        - ".*#\\[test\\].*"
