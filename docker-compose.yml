@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mocks:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:cached
+      - cargo-cache:/home/mocks-dev/.cargo/registry
+      - target-cache:/workspace/target
+      - .zshrc:/root/.zshrc
+      - oh-my-zsh:/root/.oh-my-zsh
+      - zsh-history:/root/.history
+    environment:
+      - RUST_BACKTRACE=1
+      - RUST_LOG=debug
+    ports:
+      - "3000:3000"
+    tty: true
+    stdin_open: true
+
+volumes:
+  cargo-cache:
+    name: mocks-cargo-cache
+  target-cache:
+    name: mocks-target-cache
+  oh-my-zsh:
+    name: mocks-oh-my-zsh
+  zsh-history:
+    name: mocks-zsh-history

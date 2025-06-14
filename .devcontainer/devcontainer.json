@@ -1,0 +1,50 @@
+{
+    "name": "mocks Development",
+    "dockerComposeFile": [
+        "../docker-compose.yml"
+    ],
+    "service": "mocks",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "serayuzgur.crates",
+                "tamasfe.even-better-toml",
+                "vadimcn.vscode-lldb",
+                "fill-labs.dependi",
+                "Swellaby.vscode-rust-test-adapter",
+                "JScearcy.rust-doc-viewer",
+                "formulahendry.code-runner",
+                "ms-vscode.test-adapter-converter",
+                "hbenl.vscode-test-explorer",
+                "ms-azuretools.vscode-docker",
+                "streetsidesoftware.code-spell-checker"
+            ],
+            "settings": {
+                "rust-analyzer.check.command": "clippy",
+                "editor.formatOnSave": true,
+                "rust-analyzer.cargo.features": "all",
+                "rust-analyzer.cargo.buildScripts.enable": true,
+                "rust-analyzer.cargo.buildScripts.runBuildScripts": "on-demand",
+                "rust-analyzer.procMacro.enable": true,
+                "editor.defaultFormatter": "rust-lang.rust-analyzer",
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "cSpell.enabled": true,
+                "cSpell.language": "en,ja",
+                "cSpell.dictionaries": [
+                    "mocks-words"
+                ],
+                "cSpell.dictionaryDefinitions": [
+                    {
+                        "name": "mocks-words",
+                        "path": "./.devcontainer/cspell-dict/mocks-words.txt",
+                        "scope": "folder",
+                        "addWords": true
+                    }
+                ],
+                "cSpell.ignorePaths": []
+            }
+        }
+    }
+}
