@@ -59,7 +59,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_remove_with_string_id: {}", e.to_string());
+                panic!("panic in test_remove_with_string_id: {}", e);
             }
         }
     }
@@ -82,7 +82,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_remove_with_string_id: {}", e.to_string());
+                panic!("panic in test_remove_with_string_id: {}", e);
             }
         }
     }
@@ -105,7 +105,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_remove_with_number_id: {}", e.to_string());
+                panic!("panic in test_remove_with_number_id: {}", e);
             }
         }
     }
@@ -128,7 +128,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_remove_with_number_id: {}", e.to_string());
+                panic!("panic in test_remove_with_number_id: {}", e);
             }
         }
     }

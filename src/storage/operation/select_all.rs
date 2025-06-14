@@ -61,9 +61,9 @@ mod tests {
 
     #[test]
     fn test_select_all_object() {
-        let mut data = json!({"profile":{"id":1,"name":"John Smith","age":25}});
+        let data = json!({"profile":{"id":1,"name":"John Smith","age":25}});
 
-        match select_all(&mut data, "profile") {
+        match select_all(&data, "profile") {
             Ok(v) => {
                 assert_eq!(v, json!({"id":1,"name":"John Smith","age":25}));
             }
@@ -75,9 +75,9 @@ mod tests {
 
     #[test]
     fn test_select_all_object_nested_resource() {
-        let mut data = json!({"api/v1/profile":{"id":1,"name":"John Smith","age":25}});
+        let data = json!({"api/v1/profile":{"id":1,"name":"John Smith","age":25}});
 
-        match select_all(&mut data, "api/v1/profile") {
+        match select_all(&data, "api/v1/profile") {
             Ok(v) => {
                 assert_eq!(v, json!({"id":1,"name":"John Smith","age":25}));
             }
@@ -103,9 +103,9 @@ mod tests {
 
     #[test]
     fn test_select_all_error_object() {
-        let mut data = json!({"profile":{"id":1,"name":"John Smith","age":25}});
+        let data = json!({"profile":{"id":1,"name":"John Smith","age":25}});
 
-        match select_all(&mut data, "error") {
+        match select_all(&data, "error") {
             Ok(_v) => {
                 panic!("panic in test_select_all_error_object");
             }

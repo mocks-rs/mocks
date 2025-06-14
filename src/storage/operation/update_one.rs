@@ -52,7 +52,7 @@ mod tests {
                 );
             }
             Err(e) => {
-                panic!("panic in test_update_one: {}", e.to_string());
+                panic!("panic in test_update_one: {}", e);
             }
         }
     }
@@ -73,7 +73,7 @@ mod tests {
                 );
             }
             Err(e) => {
-                panic!("panic in test_update_one: {}", e.to_string());
+                panic!("panic in test_update_one: {}", e);
             }
         }
     }
