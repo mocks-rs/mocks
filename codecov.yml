@@ -20,3 +20,15 @@ ignore:
   - "tests/*"
   - "docs/*"
   - "runn-e2e/*"
+
+parsers:
+  rust:
+    ignore:
+      # cfg(test)で囲まれたコードブロック
+      - ".*#\\[cfg\\(test\\)\\].*"
+      # テスト関数
+      - ".*#\\[test\\].*"
+      # ベンチマーク関数
+      - ".*#\\[bench\\].*"
+      # should_panicテスト
+      - ".*#\\[should_panic.*\\].*"

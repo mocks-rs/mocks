@@ -17,3 +17,9 @@ cargo msrv find
 ```
 
 For more details: [cargo-msrv](https://github.com/foresterre/cargo-msrv)
+
+## Check code coverage
+
+```shell
+cargo llvm-cov
+```

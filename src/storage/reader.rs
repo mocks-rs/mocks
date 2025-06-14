@@ -79,13 +79,13 @@ mod tests {
         match reader.read() {
             Ok(v) => {
                 if v.is_object() {
-                    assert!(true);
+                    // Verify that the value is an object
                 } else {
                     panic!("panic in test_read");
                 }
             }
             Err(e) => {
-                panic!("panic in test_read: {}", e.to_string());
+                panic!("panic in test_read: {}", e);
             }
         }
     }
