@@ -36,6 +36,7 @@ fn remove_target(values: Vec<Value>, key: &str) -> Vec<Value> {
         .collect()
 }
 
+// codecov:ignore-start
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -161,3 +162,4 @@ mod tests {
         }
     }
 }
+// codecov:ignore-end
