@@ -18,6 +18,7 @@ comment:
 
 ignore:
   - "tests/*"
+  - "**/*.rs:#[cfg(test)]"
   - "**/*.rs:mod tests"
   - "docs/*"
   - "runn-e2e/*"
