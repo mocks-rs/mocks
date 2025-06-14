@@ -18,5 +18,6 @@ comment:
 
 ignore:
   - "tests/*"
+  - "**/*.rs:mod tests"
   - "docs/*"
   - "runn-e2e/*"
