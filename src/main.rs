@@ -65,3 +65,28 @@ fn print_startup_info(url: &str, file: &str, overwrite: bool) {
     println!("\nOverwrite:\n{}", if overwrite { "YES" } else { "NO" });
     println!();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_init_with_localhost() {
+        let result = init("localhost", 3000).unwrap();
+        assert_eq!(result.ip().to_string(), "127.0.0.1");
+        assert_eq!(result.port(), 3000);
+    }
+
+    #[test]
+    fn test_init_with_ip_address() {
+        let result = init("192.168.1.1", 8080).unwrap();
+        assert_eq!(result.ip().to_string(), "192.168.1.1");
+        assert_eq!(result.port(), 8080);
+    }
+
+    #[test]
+    fn test_init_with_invalid_host() {
+        let result = init("invalid.host", 3000);
+        assert!(result.is_err());
+    }
+}
