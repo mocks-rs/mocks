@@ -106,3 +106,61 @@ fn create_router(state: SharedState, value: &Value) -> Router {
 
     router.with_state(state)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    use tempfile::NamedTempFile;
+
+    #[test]
+    fn test_print_endpoints() {
+        let url = "http://localhost:8080";
+        let resources = vec!["users".to_string(), "posts".to_string()];
+        // Just check that it does not panic; do not check output content
+        print_endpoints(url, resources);
+    }
+
+    #[test]
+    fn test_print_endpoints_with_empty_resources() {
+        let url = "http://localhost:8080";
+        let resources: Vec<String> = vec![];
+        // Just check that it does not panic; do not check output content
+        print_endpoints(url, resources);
+    }
+
+    #[test]
+    fn test_convert_to_resource_paths() {
+        let value = json!({
+            "users": {},
+            "posts": {},
+        });
+
+        let paths = convert_to_resource_paths(&value);
+        assert!(paths.contains(&"/{resource}".to_string()));
+    }
+
+    #[test]
+    fn test_convert_to_resource_paths_with_nested_paths() {
+        let value = json!({
+            "api/v1/users": {},
+            "api/v1/posts": {},
+        });
+
+        let paths = convert_to_resource_paths(&value);
+        assert!(paths.contains(&"/api/v1/{resource}".to_string()));
+    }
+
+    #[test]
+    fn test_create_router() {
+        let value = json!({
+            "users": [],
+        });
+        let tmpfile = NamedTempFile::new().unwrap();
+        std::fs::write(tmpfile.path(), "{\"users\": []}").unwrap();
+        let storage = Storage::new(tmpfile.path().to_str().unwrap(), true).unwrap();
+        let state = AppState::new(storage);
+        // Just check that router can be created
+        let _ = create_router(state, &value);
+    }
+}

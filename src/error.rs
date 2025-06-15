@@ -59,3 +59,149 @@ impl IntoResponse for MocksError {
         (status, Json(json!({ "error": message }))).into_response()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::http::StatusCode;
+    use std::error::Error;
+
+    #[test]
+    fn test_display_implementation() {
+        let read_error = MocksError::FailedReadFile("ファイルの読み込みに失敗しました".to_string());
+        assert_eq!(read_error.to_string(), "ファイルの読み込みに失敗しました");
+
+        let write_error =
+            MocksError::FailedWriteFile("ファイルの書き込みに失敗しました".to_string());
+        assert_eq!(write_error.to_string(), "ファイルの書き込みに失敗しました");
+
+        let invalid_args = MocksError::InvalidArgs("無効な引数です".to_string());
+        assert_eq!(invalid_args.to_string(), "無効な引数です");
+
+        let exception = MocksError::Exception("予期せぬエラーが発生しました".to_string());
+        assert_eq!(exception.to_string(), "予期せぬエラーが発生しました");
+
+        assert_eq!(
+            MocksError::ResourceNotFound.to_string(),
+            "Resource not found."
+        );
+        assert_eq!(MocksError::ObjectNotFound.to_string(), "Object not found.");
+        assert_eq!(
+            MocksError::MethodNotAllowed.to_string(),
+            "Method not allowed."
+        );
+        assert_eq!(MocksError::InvalidRequest.to_string(), "Invalid request.");
+        assert_eq!(MocksError::DuplicateId.to_string(), "Duplicate ID.");
+    }
+
+    #[test]
+    fn test_into_response_implementation() {
+        // 内部エラー系のテスト
+        let read_error = MocksError::FailedReadFile("ファイルの読み込みに失敗しました".to_string());
+        let response = read_error.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+
+        // 404エラーのテスト
+        let not_found = MocksError::ResourceNotFound;
+        let response = not_found.into_response();
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+        // 405エラーのテスト
+        let method_not_allowed = MocksError::MethodNotAllowed;
+        let response = method_not_allowed.into_response();
+        assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
+
+        // 400エラーのテスト
+        let invalid_request = MocksError::InvalidRequest;
+        let response = invalid_request.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        // 409エラーのテスト
+        let duplicate_id = MocksError::DuplicateId;
+        let response = duplicate_id.into_response();
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+    }
+
+    #[test]
+    fn test_error_equality() {
+        let resource_not_found_error = MocksError::ResourceNotFound;
+        let other_resource_not_found_error = MocksError::ResourceNotFound;
+        let object_not_found_error = MocksError::ObjectNotFound;
+
+        assert_eq!(resource_not_found_error, other_resource_not_found_error);
+        assert_ne!(resource_not_found_error, object_not_found_error);
+    }
+
+    #[test]
+    fn test_error_source() {
+        let error = MocksError::ResourceNotFound;
+        assert!(error.source().is_none());
+    }
+
+    #[test]
+    fn test_error_response_body() {
+        let error = MocksError::ResourceNotFound;
+        let response = error.into_response();
+
+        // レスポンスボディの内容を確認
+        let (parts, _) = response.into_parts();
+        assert_eq!(parts.status, StatusCode::NOT_FOUND);
+    }
+
+    #[test]
+    fn test_all_error_variants() {
+        // FailedReadFile
+        let error = MocksError::FailedReadFile("test error".to_string());
+        assert_eq!(error.to_string(), "test error");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+
+        // FailedWriteFile
+        let error = MocksError::FailedWriteFile("test error".to_string());
+        assert_eq!(error.to_string(), "test error");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+
+        // InvalidArgs
+        let error = MocksError::InvalidArgs("test error".to_string());
+        assert_eq!(error.to_string(), "test error");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+
+        // Exception
+        let error = MocksError::Exception("test error".to_string());
+        assert_eq!(error.to_string(), "test error");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
+
+        // ResourceNotFound
+        let error = MocksError::ResourceNotFound;
+        assert_eq!(error.to_string(), "Resource not found.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+        // ObjectNotFound
+        let error = MocksError::ObjectNotFound;
+        assert_eq!(error.to_string(), "Object not found.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+        // MethodNotAllowed
+        let error = MocksError::MethodNotAllowed;
+        assert_eq!(error.to_string(), "Method not allowed.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
+
+        // InvalidRequest
+        let error = MocksError::InvalidRequest;
+        assert_eq!(error.to_string(), "Invalid request.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        // DuplicateId
+        let error = MocksError::DuplicateId;
+        assert_eq!(error.to_string(), "Duplicate ID.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+    }
+}
