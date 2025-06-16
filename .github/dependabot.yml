@@ -5,7 +5,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "wednesday"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
@@ -24,7 +24,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "wednesday"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
