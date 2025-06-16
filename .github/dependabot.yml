@@ -14,10 +14,10 @@ updates:
       prefix: "cargo"
       include: "scope"
     versioning-strategy: auto
+    rebase-strategy: "auto"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
-        match-update-types: true
 
   # Configuration for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -32,3 +32,4 @@ updates:
     commit-message:
       prefix: "github-actions"
       include: "scope"
+    rebase-strategy: "auto"
