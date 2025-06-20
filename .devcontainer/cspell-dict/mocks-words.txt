@@ -2,6 +2,7 @@ clippy
 codegen
 codemountains
 dependi
+dtolnay
 formulahendry
 hbenl
 JScearcy

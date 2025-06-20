@@ -19,7 +19,8 @@
                 "ms-vscode.test-adapter-converter",
                 "hbenl.vscode-test-explorer",
                 "ms-azuretools.vscode-docker",
-                "streetsidesoftware.code-spell-checker"
+                "streetsidesoftware.code-spell-checker",
+                "github.vscode-github-actions"
             ],
             "settings": {
                 "rust-analyzer.check.command": "clippy",
