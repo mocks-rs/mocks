@@ -39,10 +39,21 @@ Create a `storage.json`.
   ],
   "profile": { "id": "01J7BAQE1GMD78FN3J0FJCNS8T", "name": "mocks" },
   "friends": [],
-  "api/v1/users": [
-    { "id": "01JX06KAAES0EXP0T39B8W4CNY", "name": "John Smith" },
-    { "id": "01JX06SYEVJZTAPVSTXK22YAR3", "name": "Jane Smith" }
-  ]
+}
+```
+
+```json
+{
+  "api/v1/posts": [
+    { "id": "01J7BAKH37HPG116ZRRFKHBDGB", "title": "first post", "views": 100 },
+    { "id": "01J7BAKH37GE8B688PT4RC7TP4", "title": "second post", "views": 10 }
+  ],
+  "api/v1/comments": [
+    { "id": 1, "text": "a comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" },
+    { "id": 2, "text": "another comment", "post_id": "01J7BAKH37HPG116ZRRFKHBDGB" }
+  ],
+  "api/v1/profile": { "id": "01J7BAQE1GMD78FN3J0FJCNS8T", "name": "mocks" },
+  "api/v1/friends": [],
 }
 ```
 
@@ -56,7 +67,13 @@ mocks storage.json
 ```
 
 ```shell
-mocks -H 127.0.0.1 -p 8080 storage.json
+mocks -H 127.0.0.1 -p 3000 storage.json
+```
+
+If you want to access from the host OS (e.g., when running in a container), specify `0.0.0.0` as the host:
+
+```shell
+mocks -H 0.0.0.0 storage.json
 ```
 
 Get a REST API with `curl`.
@@ -99,7 +116,7 @@ Run `mocks --help` for a list of options.
 
 ### Developer mode
 
-To help with debugging, you can enable a special feature that saves mock data to a separate file. 
+To help with debugging, you can enable a special feature that saves mock data to a separate file.
 
 To do this, simply set the environment variable called `MOCKS_DEBUG_OVERWRITTEN_FILE`.
 

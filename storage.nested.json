@@ -1,5 +1,5 @@
 {
-  "posts": [
+  "api/v1/posts": [
     {
       "id": "01J7BAKH37HPG116ZRRFKHBDGB",
       "title": "first post",
@@ -11,7 +11,7 @@
       "views": 10
     }
   ],
-  "comments": [
+  "api/v1/comments": [
     {
       "id": 1,
       "text": "a comment",
@@ -23,9 +23,9 @@
       "post_id": "01J7BAKH37HPG116ZRRFKHBDGB"
     }
   ],
-  "profile": {
+  "api/v1/profile": {
     "id": "01J7BAQE1GMD78FN3J0FJCNS8T",
     "name": "mocks"
   },
-  "friends": []
+  "api/v1/friends": []
 }

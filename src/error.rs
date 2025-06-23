@@ -17,6 +17,11 @@ pub enum MocksError {
     MethodNotAllowed,
     InvalidRequest,
     DuplicateId,
+    QueryParamsNotAllowed,
+    InvalidSearchValue,
+    InvalidMatchType,
+    InvalidQueryParam,
+    MatchTypeRequired,
 }
 
 impl std::error::Error for MocksError {
@@ -37,6 +42,16 @@ impl fmt::Display for MocksError {
             Self::MethodNotAllowed => write!(fmt, "Method not allowed."),
             Self::InvalidRequest => write!(fmt, "Invalid request."),
             Self::DuplicateId => write!(fmt, "Duplicate ID."),
+            Self::QueryParamsNotAllowed => write!(fmt, "Query parameters not allowed."),
+            Self::InvalidSearchValue => {
+                write!(fmt, "Cannot search on complex values (objects or arrays).")
+            }
+            Self::InvalidMatchType => write!(
+                fmt,
+                "Invalid match type. Use: exact, startswith, endswith, contains."
+            ),
+            Self::InvalidQueryParam => write!(fmt, "Invalid query parameter format."),
+            Self::MatchTypeRequired => write!(fmt, "Match type is required. Use: field.exact, field.startswith, field.endswith, or field.contains."),
         }
     }
 }
@@ -54,6 +69,11 @@ impl IntoResponse for MocksError {
             MocksError::MethodNotAllowed => (StatusCode::METHOD_NOT_ALLOWED, self.to_string()),
             MocksError::InvalidRequest => (StatusCode::BAD_REQUEST, self.to_string()),
             MocksError::DuplicateId => (StatusCode::CONFLICT, self.to_string()),
+            MocksError::QueryParamsNotAllowed => (StatusCode::BAD_REQUEST, self.to_string()),
+            MocksError::InvalidSearchValue => (StatusCode::BAD_REQUEST, self.to_string()),
+            MocksError::InvalidMatchType => (StatusCode::BAD_REQUEST, self.to_string()),
+            MocksError::InvalidQueryParam => (StatusCode::BAD_REQUEST, self.to_string()),
+            MocksError::MatchTypeRequired => (StatusCode::BAD_REQUEST, self.to_string()),
         };
 
         (status, Json(json!({ "error": message }))).into_response()
@@ -203,5 +223,41 @@ mod tests {
         assert_eq!(error.to_string(), "Duplicate ID.");
         let response = error.into_response();
         assert_eq!(response.status(), StatusCode::CONFLICT);
+
+        // QueryParamsNotAllowed
+        let error = MocksError::QueryParamsNotAllowed;
+        assert_eq!(error.to_string(), "Query parameters not allowed.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        // InvalidSearchValue
+        let error = MocksError::InvalidSearchValue;
+        assert_eq!(
+            error.to_string(),
+            "Cannot search on complex values (objects or arrays)."
+        );
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        // InvalidMatchType
+        let error = MocksError::InvalidMatchType;
+        assert_eq!(
+            error.to_string(),
+            "Invalid match type. Use: exact, startswith, endswith, contains."
+        );
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        // InvalidQueryParam
+        let error = MocksError::InvalidQueryParam;
+        assert_eq!(error.to_string(), "Invalid query parameter format.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        // MatchTypeRequired
+        let error = MocksError::MatchTypeRequired;
+        assert_eq!(error.to_string(), "Match type is required. Use: field.exact, field.startswith, field.endswith, or field.contains.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
     }
 }
