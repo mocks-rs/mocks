@@ -1,0 +1,56 @@
+on:
+  workflow_dispatch:
+
+name: Manual Publish to crates.io
+
+jobs:
+  test-and-lint:
+    uses: ./.github/workflows/test-and-lint.yml
+
+  publish:
+    needs: test-and-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Get current version
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Create GitHub Release
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+
+          # Configure git user
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+          # Create tag
+          git tag -a "v$VERSION" -m "v$VERSION"
+          git push origin "v$VERSION"
+
+          # Generate release notes from commit messages
+          RELEASE_NOTES=$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo HEAD^)..HEAD | grep -v "Merge pull request" | grep -v "Merge branch")
+
+          # Create release using GitHub CLI
+          gh release create "v$VERSION" \
+            --title "v$VERSION" \
+            --notes "$RELEASE_NOTES" \
+            --draft=false \
+            --prerelease=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to crates.io
+        run: cargo publish --token ${CRATES_TOKEN}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
