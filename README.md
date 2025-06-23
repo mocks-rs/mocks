@@ -89,6 +89,8 @@ Based on the example [storage.json](storage.json), you'll get the following rout
 
 ```
 GET     /posts
+GET     /posts?title.contains=first    # Query parameter search (contains match)
+GET     /posts?views.exact=100         # Query parameter search (exact match)
 GET     /posts/:id
 POST    /posts
 PUT     /posts/:id
@@ -109,6 +111,43 @@ GET     /_hc
 
 # Health check endpoint returns a 204 response.
 ```
+
+#### Query Parameter Search
+
+For array-based resources (like `posts`, `comments`, `friends`), you can use query parameters to filter results. The query parameter format requires specifying both the field name and match type:
+
+**Format:** `field.matchtype=value`
+
+**Available match types:**
+- `exact` - Exact match (case-insensitive)
+- `contains` - Contains substring (case-insensitive)
+- `startswith` - Starts with substring (case-insensitive)
+- `endswith` - Ends with substring (case-insensitive)
+
+**Examples:**
+
+```shell
+# Search posts with titles containing "first"
+curl "http://localhost:3000/posts?title.contains=first"
+
+# Search posts with exact view count
+curl "http://localhost:3000/posts?views.exact=100"
+
+# Search posts starting with "Hello"
+curl "http://localhost:3000/posts?title.startswith=hello"
+
+# Search posts ending with "World"
+curl "http://localhost:3000/posts?title.endswith=world"
+
+# Multiple query parameters (AND logic)
+curl "http://localhost:3000/posts?title.contains=post&views.exact=100"
+```
+
+**Restrictions:**
+- Query parameters are only supported for array-based resources (not single objects like `profile`)
+- Query parameters are not allowed on individual item endpoints (like `/posts/:id`)
+- Match type is required - using just `field=value` will return an error
+- Complex values (objects or arrays) cannot be searched
 
 ### Options
 
