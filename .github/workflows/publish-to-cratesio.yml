@@ -11,7 +11,6 @@ jobs:
     uses: ./.github/workflows/test-and-lint.yml
 
   publish:
-    name: Publish
     needs: test-and-lint
     runs-on: ubuntu-latest
     steps:
@@ -37,29 +36,9 @@ jobs:
             echo "Version not changed"
           fi
 
-      - name: Create GitHub Release
+      - name: Trigger manual publish workflow
         if: steps.version_check.outputs.version_changed == 'true'
         run: |
-          VERSION="${{ steps.version_check.outputs.version }}"
-
-          # Create tag
-          git tag -a "v$VERSION" -m "v$VERSION"
-          git push origin "v$VERSION"
-
-          # Generate release notes from commit messages
-          RELEASE_NOTES=$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo HEAD^)..HEAD | grep -v "Merge pull request" | grep -v "Merge branch")
-
-          # Create release using GitHub CLI
-          gh release create "v$VERSION" \
-            --title "v$VERSION" \
-            --notes "$RELEASE_NOTES" \
-            --draft=false \
-            --prerelease=false
+          gh workflow run manual-publish-to-cratesio.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish to crates.io
-        if: steps.version_check.outputs.version_changed == 'true'
-        run: cargo publish --token ${CRATES_TOKEN}
-        env:
-          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
