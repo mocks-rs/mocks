@@ -1,0 +1,84 @@
+desc: "post endpoint filter tests"
+runners:
+  req:
+    endpoint: http://${HOST:-127.0.0.1}:3000
+vars:
+  postId: "01J85A9VQ8ZDGXDC7A00YRWKXY"
+  postTitle: "abcdefg"
+if: included
+steps:
+  postPost:
+    desc: "Create test post"
+    req:
+      /posts:
+        post:
+          body:
+            application/json:
+              id: "{{ vars.postId }}"
+              title: "{{ vars.postTitle }}"
+              views: 0
+    test: |
+      // Status code must be 201.
+      current.res.status == 201
+      && current.res.body.id == vars.postId
+      && current.res.body.title == vars.postTitle
+      && current.res.body.views == 0
+  getPostsWithExactFilter:
+    desc: "Get posts with exact filter"
+    req:
+      /posts?title.exact=abcdefg:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && len(current.res.body.posts) == 1
+      && current.res.body.posts[0].title == vars.postTitle
+  getPostsWithStartsWithFilter:
+    desc: "Get posts with starts with filter"
+    req:
+      /posts?title.startswith=abc:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && len(current.res.body.posts) == 1
+      && current.res.body.posts[0].title == vars.postTitle
+  getPostsWithEndsWithFilter:
+    desc: "Get posts with ends with filter"
+    req:
+      /posts?title.endswith=efg:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && len(current.res.body.posts) == 1
+      && current.res.body.posts[0].title == vars.postTitle
+  getPostsWithContainsFilter:
+    desc: "Get posts with contains filter"
+    req:
+      /posts?title.contains=efg:
+        get:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && len(current.res.body.posts) == 1
+      && current.res.body.posts[0].title == vars.postTitle
+  deletePost:
+    desc: "Delete test post"
+    req:
+      /posts/{{ vars.postId }}:
+        delete:
+          body:
+            application/json: null
+    test: |
+      // Status code must be 200.
+      current.res.status == 200
+      && current.res.body.id == vars.postId

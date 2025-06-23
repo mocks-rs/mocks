@@ -1,7 +1,7 @@
 desc: "comment endpoint tests"
 runners:
   req:
-    endpoint: http://localhost:3000
+    endpoint: http://${HOST:-127.0.0.1}:3000
 vars:
   commentId: 3
 if: included

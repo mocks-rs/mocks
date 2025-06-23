@@ -1,7 +1,7 @@
 desc: "mocks tests"
 runners:
   req:
-    endpoint: http://localhost:3000
+    endpoint: http://${HOST:-127.0.0.1}:3000
 steps:
   hc:
     desc: "Health Check"
@@ -29,6 +29,9 @@ steps:
   postError:
     include:
       path: test_post_error.yml
+  postFilter:
+    include:
+      path: test_post_filter.yml
   comment:
     include:
         path: test_comment.yml

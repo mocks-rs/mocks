@@ -1,7 +1,7 @@
 desc: "post endpoint tests"
 runners:
   req:
-    endpoint: http://localhost:3000
+    endpoint: http://${HOST:-127.0.0.1}:3000
 vars:
   postId: "01J85A9VQ8ZDGXDC7A00YRWKBE"
 if: included
