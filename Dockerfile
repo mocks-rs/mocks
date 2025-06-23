@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install -y \
     net-tools \
     && rm -rf /var/lib/apt/lists/*
 
-
 # Optimize Rust settings
 RUN rustup component add rustfmt clippy llvm-tools-preview
 RUN cargo install cargo-llvm-cov

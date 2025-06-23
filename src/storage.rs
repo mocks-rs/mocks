@@ -5,11 +5,13 @@ use crate::storage::operation::replace::replace;
 use crate::storage::operation::replace_one::replace_one;
 use crate::storage::operation::select_all::select_all;
 use crate::storage::operation::select_one::select_one;
+use crate::storage::operation::select_with_filter::select_with_filter;
 use crate::storage::operation::update::update;
 use crate::storage::operation::update_one::update_one;
 use crate::storage::reader::Reader;
 use crate::storage::writer::Writer;
 use serde_json::Value;
+use std::collections::HashMap;
 
 mod operation;
 mod reader;
@@ -59,6 +61,16 @@ impl Storage {
     /// Retrieve all items for a given resource
     pub fn get_all(&self, resource_key: &str) -> Result<Value, MocksError> {
         self.fetch(|data| select_all(data, resource_key))
+    }
+
+    /// **GET**
+    /// Retrieve filtered items for a given resource
+    pub fn get_all_with_filter(
+        &self,
+        resource_key: &str,
+        filters: &HashMap<String, String>,
+    ) -> Result<Value, MocksError> {
+        self.fetch(|data| select_with_filter(data, resource_key, filters))
     }
 
     /// **GET**

@@ -1,8 +1,11 @@
+anthropics
 clippy
 codegen
 codemountains
 dependi
+devcontainers
 dtolnay
+endswith
 formulahendry
 hbenl
 JScearcy
@@ -15,6 +18,7 @@ runn
 rustup
 serayuzgur
 serde
+startswith
 Swellaby
 tamasfe
 vadimcn

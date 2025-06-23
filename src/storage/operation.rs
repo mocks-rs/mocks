@@ -8,6 +8,7 @@ pub mod replace;
 pub mod replace_one;
 pub mod select_all;
 pub mod select_one;
+pub mod select_with_filter;
 pub mod update;
 pub mod update_one;
 
