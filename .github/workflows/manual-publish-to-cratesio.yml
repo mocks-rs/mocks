@@ -3,6 +3,10 @@ on:
 
 name: Manual Publish to crates.io
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   test-and-lint:
     uses: ./.github/workflows/test-and-lint.yml
@@ -10,6 +14,9 @@ jobs:
   publish:
     needs: test-and-lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
