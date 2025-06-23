@@ -3,6 +3,10 @@ on:
 
 name: Manual Publish to crates.io
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   test-and-lint:
     uses: ./.github/workflows/test-and-lint.yml
