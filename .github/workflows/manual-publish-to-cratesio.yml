@@ -6,6 +6,7 @@ name: Manual Publish to crates.io
 permissions:
   contents: write
   pull-requests: read
+  actions: write
 
 jobs:
   test-and-lint:
