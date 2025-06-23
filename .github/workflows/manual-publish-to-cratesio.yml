@@ -39,15 +39,22 @@ jobs:
           git config --global user.name "GitHub Action"
 
           # Create tag
-          git tag -a "v$VERSION" -m "v$VERSION"
-          git push origin "v$VERSION"
+          git tag -a "$VERSION" -m "$VERSION"
+          git push origin "$VERSION"
 
-          # Generate release notes from commit messages
-          RELEASE_NOTES=$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo HEAD^)..HEAD | grep -v "Merge pull request" | grep -v "Merge branch")
+          # Generate release notes from PR titles only
+          RELEASE_NOTES=""
+          while IFS= read -r line; do
+            if [[ $line =~ ^-\ Merge\ pull\ request\ #([0-9]+) ]]; then
+              PR_NUMBER="${BASH_REMATCH[1]}"
+              PR_TITLE=$(gh pr view "$PR_NUMBER" --json title --jq '.title' 2>/dev/null || echo "PR #$PR_NUMBER")
+              RELEASE_NOTES+="- $PR_TITLE #$PR_NUMBER"$'\n'
+            fi
+          done <<< "$(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo HEAD^)..HEAD)"
 
           # Create release using GitHub CLI
-          gh release create "v$VERSION" \
-            --title "v$VERSION" \
+          gh release create "$VERSION" \
+            --title "$VERSION" \
             --notes "$RELEASE_NOTES" \
             --draft=false \
             --prerelease=false
