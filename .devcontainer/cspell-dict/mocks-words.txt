@@ -2,6 +2,7 @@ anthropics
 clippy
 codegen
 codemountains
+cratesio
 dependi
 devcontainers
 dtolnay
