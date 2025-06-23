@@ -47,5 +47,16 @@
                 "cSpell.ignorePaths": []
             }
         }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {},
+        "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+    },
+    "forwardPorts": [3000],
+    "portsAttributes": {
+        "3000": {
+            "label": "mocks API",
+            "onAutoForward": "notify"
+        }
     }
 }
