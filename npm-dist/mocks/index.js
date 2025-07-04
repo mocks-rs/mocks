@@ -1,9 +1,11 @@
 // This is the main entry point for the @mocks-rs/mocks package
 // The actual binary is executed through the bin/mocks.js wrapper
 
+const packageJson = require('./package.json');
+
 module.exports = {
-  name: '@mocks-rs/mocks',
-  version: '0.4.0',
-  description: 'Get a mock REST APIs with zero coding within seconds.',
+  name: packageJson.name,
+  version: packageJson.version,
+  description: packageJson.description,
   binaryPath: require('./lib/install.js')
 };
