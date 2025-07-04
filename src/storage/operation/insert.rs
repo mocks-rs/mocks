@@ -61,7 +61,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_insert_with_string_id: {}", e);
+                panic!("panic in test_insert_with_string_id: {e}");
             }
         }
     }
@@ -85,7 +85,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_insert_with_string_id: {}", e);
+                panic!("panic in test_insert_with_string_id: {e}");
             }
         }
     }
@@ -109,7 +109,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_insert_with_string_id: {}", e);
+                panic!("panic in test_insert_with_string_id: {e}");
             }
         }
     }
@@ -133,7 +133,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_insert_with_string_id: {}", e);
+                panic!("panic in test_insert_with_string_id: {e}");
             }
         }
     }

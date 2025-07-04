@@ -41,7 +41,7 @@ mod tests {
                 assert_eq!(v, json!({"id":"test1","title":"first post","views":100}));
             }
             Err(e) => {
-                panic!("panic in test_select_one_with_string_id: {}", e);
+                panic!("panic in test_select_one_with_string_id: {e}");
             }
         }
     }
@@ -55,7 +55,7 @@ mod tests {
                 assert_eq!(v, json!({"id":"test1","title":"first post","views":100}));
             }
             Err(e) => {
-                panic!("panic in test_select_one_with_string_id: {}", e);
+                panic!("panic in test_select_one_with_string_id: {e}");
             }
         }
     }
@@ -70,7 +70,7 @@ mod tests {
                 assert_eq!(v["id"], Value::Number(1.into()));
             }
             Err(e) => {
-                panic!("panic in test_select_one_with_number_id: {}", e);
+                panic!("panic in test_select_one_with_number_id: {e}");
             }
         }
     }
@@ -85,7 +85,7 @@ mod tests {
                 assert_eq!(v["id"], Value::Number(1.into()));
             }
             Err(e) => {
-                panic!("panic in test_select_one_with_number_id: {}", e);
+                panic!("panic in test_select_one_with_number_id: {e}");
             }
         }
     }

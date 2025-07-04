@@ -57,7 +57,7 @@ mod tests {
                 );
             }
             Err(e) => {
-                panic!("panic in test_replace_with_string_id: {}", e);
+                panic!("panic in test_replace_with_string_id: {e}");
             }
         }
     }
@@ -78,7 +78,7 @@ mod tests {
                 );
             }
             Err(e) => {
-                panic!("panic in test_replace_with_string_id: {}", e);
+                panic!("panic in test_replace_with_string_id: {e}");
             }
         }
     }
@@ -99,7 +99,7 @@ mod tests {
                 );
             }
             Err(e) => {
-                panic!("panic in test_replace_with_string_id: {}", e);
+                panic!("panic in test_replace_with_string_id: {e}");
             }
         }
     }
@@ -120,7 +120,7 @@ mod tests {
                 );
             }
             Err(e) => {
-                panic!("panic in test_replace_with_string_id: {}", e);
+                panic!("panic in test_replace_with_string_id: {e}");
             }
         }
     }

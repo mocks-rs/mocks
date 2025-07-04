@@ -60,8 +60,8 @@ fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
 }
 
 fn print_startup_info(url: &str, file: &str, overwrite: bool) {
-    println!("\nIndex:\n{}", url);
-    println!("\nStorage files:\n{}", file);
+    println!("\nIndex:\n{url}");
+    println!("\nStorage files:\n{file}");
     println!("\nOverwrite:\n{}", if overwrite { "YES" } else { "NO" });
     println!();
 }
