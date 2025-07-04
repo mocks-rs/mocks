@@ -95,7 +95,6 @@ jobs:
         if [ ! -f "deny.toml" ]; then
           cat > deny.toml << 'EOF'
         [licenses]
-        unlicensed = "deny"
         allow = [
             "MIT",
             "Apache-2.0",
@@ -119,9 +118,7 @@ jobs:
         highlight = "all"
 
         [advisories]
-        vulnerability = "deny"
         yanked = "warn"
-        notice = "warn"
         ignore = []
         EOF
         fi
