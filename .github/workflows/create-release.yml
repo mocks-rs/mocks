@@ -7,9 +7,14 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
+  test-and-lint:
+    uses: ./.github/workflows/test-and-lint.yml
+
   create-release:
+    needs: test-and-lint
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
