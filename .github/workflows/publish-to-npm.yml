@@ -1,0 +1,151 @@
+name: Publish to NPM
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (do not actually publish)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            platform: linux-x64
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            platform: darwin-x64
+          - target: x86_64-pc-windows-gnu
+            os: ubuntu-latest
+            platform: win32-x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: ./.github/actions/setup-rust
+        with:
+          targets: ${{ matrix.target }}
+          cache-key: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools
+        if: matrix.target == 'x86_64-pc-windows-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64-x86-64
+
+      - name: Build binary
+        run: |
+          if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
+            export CC_x86_64_pc_windows_gnu=x86_64-w64-mingw32-gcc
+            export CXX_x86_64_pc_windows_gnu=x86_64-w64-mingw32-g++
+          fi
+          cargo build --release --target ${{ matrix.target }}
+
+      - name: Verify binary
+        run: |
+          if [ "${{ matrix.platform }}" = "win32-x64" ]; then
+            BINARY_PATH="target/${{ matrix.target }}/release/mocks.exe"
+          else
+            BINARY_PATH="target/${{ matrix.target }}/release/mocks"
+          fi
+          
+          if [ ! -f "$BINARY_PATH" ]; then
+            echo "Binary not found at $BINARY_PATH"
+            exit 1
+          fi
+          
+          ls -la "$BINARY_PATH"
+
+      - name: Prepare platform package
+        run: |
+          mkdir -p dist/${{ matrix.platform }}
+          
+          # Check if npm-dist directory exists
+          if [ ! -d "npm-dist/mocks-${{ matrix.platform }}" ]; then
+            echo "npm-dist/mocks-${{ matrix.platform }} directory not found"
+            exit 1
+          fi
+          
+          cp -r npm-dist/mocks-${{ matrix.platform }}/* dist/${{ matrix.platform }}/
+          
+          # Copy the binary to the platform package
+          if [ "${{ matrix.platform }}" = "win32-x64" ]; then
+            cp target/${{ matrix.target }}/release/mocks.exe dist/${{ matrix.platform }}/
+          else
+            cp target/${{ matrix.target }}/release/mocks dist/${{ matrix.platform }}/
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+          cache-dependency-path: 'dist/${{ matrix.platform }}/package.json'
+
+      - name: Dry run publish platform package
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          cd dist/${{ matrix.platform }}
+          npm publish --access public --dry-run
+
+      - name: Publish platform package
+        if: github.event.inputs.dry_run == 'false'
+        run: |
+          cd dist/${{ matrix.platform }}
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-main:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+          cache-dependency-path: 'npm-dist/mocks/package.json'
+
+      - name: Verify main package
+        run: |
+          if [ ! -d "npm-dist/mocks" ]; then
+            echo "npm-dist/mocks directory not found"
+            exit 1
+          fi
+          
+          ls -la npm-dist/mocks/
+
+      - name: Dry run publish main package
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          cd npm-dist/mocks
+          npm publish --access public --dry-run
+
+      - name: Publish main package
+        if: github.event.inputs.dry_run == 'false'
+        run: |
+          cd npm-dist/mocks
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
