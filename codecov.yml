@@ -20,6 +20,7 @@ ignore:
   - "tests/*"
   - "docs/*"
   - "runn-e2e/*"
+  - "scripts/*"
 
 parsers:
   rust:
