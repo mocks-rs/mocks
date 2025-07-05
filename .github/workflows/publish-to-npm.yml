@@ -44,6 +44,9 @@ jobs:
           - target: x86_64-pc-windows-gnu
             os: ubuntu-latest
             platform: win32-x64
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+            platform: win32-arm64
 
     steps:
       - name: Checkout code
@@ -89,7 +92,7 @@ jobs:
 
       - name: Verify binary
         run: |
-          if [ "${{ matrix.platform }}" = "win32-x64" ]; then
+          if [ "${{ matrix.platform }}" = "win32-x64" ] || [ "${{ matrix.platform }}" = "win32-arm64" ]; then
             BINARY_PATH="target/${{ matrix.target }}/release/mocks.exe"
           else
             BINARY_PATH="target/${{ matrix.target }}/release/mocks"
@@ -115,7 +118,7 @@ jobs:
           cp -r npm-dist/mocks-${{ matrix.platform }}/* dist/${{ matrix.platform }}/
           
           # Copy the binary to the platform package
-          if [ "${{ matrix.platform }}" = "win32-x64" ]; then
+          if [ "${{ matrix.platform }}" = "win32-x64" ] || [ "${{ matrix.platform }}" = "win32-arm64" ]; then
             cp target/${{ matrix.target }}/release/mocks.exe dist/${{ matrix.platform }}/
           else
             cp target/${{ matrix.target }}/release/mocks dist/${{ matrix.platform }}/

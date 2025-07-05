@@ -39,6 +39,9 @@ function getPlatformInfo() {
       if (arch === 'x64') {
         platformName = 'win32-x64';
         packageName = '@mocks-rs/mocks-win32-x64';
+      } else if (arch === 'arm64') {
+        platformName = 'win32-arm64';
+        packageName = '@mocks-rs/mocks-win32-arm64';
       } else {
         throw new Error(`Unsupported architecture: ${arch} on ${platform}`);
       }
