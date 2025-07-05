@@ -51,3 +51,7 @@ Temporary Items
 *.test.json
 
 *.tar.gz
+
+# Claude Code
+CLAUDE.local.md
+.claude/settings.local.json

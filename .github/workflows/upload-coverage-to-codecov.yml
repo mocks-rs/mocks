@@ -2,18 +2,25 @@ name: Code Coverage
 
 on:
   pull_request:
-    branches:
-      - '*'
+    branches: [ '*' ]
+  push:
+    branches: [ main ]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
+    - name: Setup Rust
+      uses: ./.github/actions/setup-rust
       with:
         components: llvm-tools-preview
     
@@ -33,3 +40,11 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: true
+        verbose: true
+    
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: lcov.info
+        retention-days: 30

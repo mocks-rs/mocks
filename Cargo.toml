@@ -9,6 +9,7 @@ repository = "https://github.com/mocks-rs/mocks"
 documentation = "https://github.com/mocks-rs/mocks"
 readme = "README.md"
 license = "MIT"
+rust-version = "1.78.0"
 
 [dependencies]
 axum = "0.8.3"

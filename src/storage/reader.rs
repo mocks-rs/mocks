@@ -85,7 +85,7 @@ mod tests {
                 }
             }
             Err(e) => {
-                panic!("panic in test_read: {}", e);
+                panic!("panic in test_read: {e}");
             }
         }
     }

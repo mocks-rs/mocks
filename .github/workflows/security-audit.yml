@@ -1,0 +1,126 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ '*' ]
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Rust
+      uses: ./.github/actions/setup-rust
+      with:
+        components: ''
+
+    - name: Install cargo-audit
+      uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-audit
+
+    - name: Run cargo audit
+      run: cargo audit --format json > audit-results.json
+      continue-on-error: true
+
+    - name: Upload audit results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-audit-results
+        path: audit-results.json
+        retention-days: 30
+
+    - name: Check for vulnerabilities
+      run: |
+        if [ -f "audit-results.json" ]; then
+          # Check if there are any vulnerabilities
+          VULN_COUNT=$(jq '.vulnerabilities.count' audit-results.json)
+          if [ "$VULN_COUNT" -gt 0 ]; then
+            echo "::warning::Found $VULN_COUNT vulnerabilities"
+            jq '.vulnerabilities.list[] | "::warning::Vulnerability in \(.package.name) \(.package.version): \(.advisory.title)"' -r audit-results.json
+            exit 1
+          else
+            echo "No vulnerabilities found"
+          fi
+        fi
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Dependency Review
+      uses: actions/dependency-review-action@v4
+      with:
+        fail-on-severity: moderate
+
+  supply-chain-security:
+    name: Supply Chain Security
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: ./.github/actions/setup-rust
+      with:
+        components: ''
+
+    - name: Install cargo-deny
+      uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-deny
+
+    - name: Check licenses and security
+      run: |
+        # Create a basic deny.toml if it doesn't exist
+        if [ ! -f "deny.toml" ]; then
+          cat > deny.toml << 'EOF'
+        [licenses]
+        allow = [
+            "MIT",
+            "Apache-2.0",
+            "Apache-2.0 WITH LLVM-exception",
+            "BSD-2-Clause",
+            "BSD-3-Clause",
+            "ISC",
+            "Unicode-DFS-2016",
+            "Unicode-3.0",
+            "MPL-2.0",
+            "CC0-1.0",
+            "Zlib",
+            "Unlicense",
+            "WTFPL",
+        ]
+        confidence-threshold = 0.8
+
+        [bans]
+        multiple-versions = "warn"
+        wildcards = "deny"
+        highlight = "all"
+
+        [advisories]
+        yanked = "warn"
+        ignore = []
+        EOF
+        fi
+        
+        cargo deny check

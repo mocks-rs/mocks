@@ -56,11 +56,11 @@ fn print_endpoints(url: &str, resources: Vec<String>) {
     let mut endpoints = vec![format!("{}/_hc", url)];
 
     for r in resources {
-        endpoints.push(format!("{}/{}", url, r));
+        endpoints.push(format!("{url}/{r}"));
     }
 
     for endpoint in endpoints {
-        println!("{}", endpoint);
+        println!("{endpoint}");
     }
 }
 
@@ -72,7 +72,7 @@ fn convert_to_resource_paths(value: &Value) -> Vec<String> {
         for (key, _) in obj {
             if let Some(last_slash) = key.rfind('/') {
                 let (prefix, _) = key.split_at(last_slash + 1);
-                paths.push(format!("/{}{{resource}}", prefix));
+                paths.push(format!("/{prefix}{{resource}}"));
                 resources.push(key.replace(prefix, ""));
             } else {
                 paths.push("/{resource}".to_string());

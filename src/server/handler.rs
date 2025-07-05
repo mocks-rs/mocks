@@ -13,7 +13,7 @@ mod tests {
 
     pub(crate) fn init_state() -> SharedState {
         let storage = Storage::new("storage.json", false)
-            .unwrap_or_else(|e| panic!("Failed to init storage: {}", e));
+            .unwrap_or_else(|e| panic!("Failed to init storage: {e}"));
         AppState::new(storage)
     }
 }
