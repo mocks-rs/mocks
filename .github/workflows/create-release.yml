@@ -77,6 +77,8 @@ jobs:
     - name: Create Git tag
       if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
       run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
         TAG="${{ steps.get_version.outputs.version }}"
         git tag -a "$TAG" -m "Release $TAG"
         git push origin "$TAG"
