@@ -5,6 +5,10 @@ on:
     types: [published]
   workflow_dispatch:
     inputs:
+      version:
+        description: 'Version to publish (e.g., v1.0.0)'
+        required: true
+        type: string
       dry_run:
         description: 'Dry run (do not actually publish)'
         required: false
@@ -15,7 +19,11 @@ permissions:
   contents: read
 
 jobs:
+  test-and-lint:
+    uses: ./.github/workflows/test-and-lint.yml
+
   build-and-publish:
+    needs: test-and-lint
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -34,6 +42,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Get version from release or input
+        id: get_version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${{ github.event.release.tag_name }}"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Setup Rust
         uses: ./.github/actions/setup-rust
@@ -104,7 +123,7 @@ jobs:
           npm publish --access public --dry-run
 
       - name: Publish platform package
-        if: github.event.inputs.dry_run == 'false'
+        if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
         run: |
           cd dist/${{ matrix.platform }}
           npm publish --access public
@@ -143,7 +162,7 @@ jobs:
           npm publish --access public --dry-run
 
       - name: Publish main package
-        if: github.event.inputs.dry_run == 'false'
+        if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
         run: |
           cd npm-dist/mocks
           npm publish --access public

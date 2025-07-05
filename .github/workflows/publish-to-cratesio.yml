@@ -9,10 +9,14 @@ on:
         description: 'Version to publish (e.g., v1.0.0)'
         required: true
         type: string
+      dry_run:
+        description: 'Dry run (do not actually publish)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
-  contents: write
-  pull-requests: read
+  contents: read
 
 jobs:
   test-and-lint:
@@ -40,7 +44,7 @@ jobs:
           else
             VERSION="${{ github.event.release.tag_name }}"
           fi
-          echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "tag=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Verify version matches Cargo.toml
@@ -52,7 +56,14 @@ jobs:
           fi
 
 
+      - name: Dry run publish to crates.io
+        if: github.event.inputs.dry_run == 'true'
+        run: cargo publish --dry-run --token ${{ secrets.CRATES_TOKEN }}
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+
       - name: Publish to crates.io
+        if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
         run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
