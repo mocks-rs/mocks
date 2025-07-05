@@ -1,13 +1,13 @@
 {
-  "name": "@mocks-rs/mocks-win32-x64",
-  "version": "0.4.2",
-  "description": "mocks Windows x64 binary",
+  "name": "@mocks-rs/mocks-darwin-arm64",
+  "version": "0.4.1",
+  "description": "mocks Darwin ARM64 binary",
   "main": "index.js",
   "os": [
-    "win32"
+    "darwin"
   ],
   "cpu": [
-    "x64"
+    "arm64"
   ],
   "keywords": [
     "mock",
@@ -27,7 +27,7 @@
     "url": "https://github.com/mocks-rs/mocks/issues"
   },
   "files": [
-    "mocks.exe",
+    "mocks",
     "index.js"
   ],
   "engines": {

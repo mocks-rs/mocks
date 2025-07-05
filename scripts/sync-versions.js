@@ -6,7 +6,9 @@ const path = require('path');
 const CARGO_TOML_PATH = path.join(__dirname, '..', 'Cargo.toml');
 const PACKAGE_JSON_PATHS = [
   path.join(__dirname, '..', 'npm-dist', 'mocks', 'package.json'),
+  path.join(__dirname, '..', 'npm-dist', 'mocks-linux-arm64', 'package.json'),
   path.join(__dirname, '..', 'npm-dist', 'mocks-linux-x64', 'package.json'),
+  path.join(__dirname, '..', 'npm-dist', 'mocks-linux-arm64', 'package.json'),
   path.join(__dirname, '..', 'npm-dist', 'mocks-darwin-x64', 'package.json'),
   path.join(__dirname, '..', 'npm-dist', 'mocks-win32-x64', 'package.json')
 ];

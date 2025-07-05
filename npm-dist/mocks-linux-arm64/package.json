@@ -1,13 +1,13 @@
 {
-  "name": "@mocks-rs/mocks-win32-x64",
+  "name": "@mocks-rs/mocks-linux-arm64",
   "version": "0.4.2",
-  "description": "mocks Windows x64 binary",
+  "description": "mocks Linux ARM64 binary",
   "main": "index.js",
   "os": [
-    "win32"
+    "linux"
   ],
   "cpu": [
-    "x64"
+    "arm64"
   ],
   "keywords": [
     "mock",
@@ -27,7 +27,7 @@
     "url": "https://github.com/mocks-rs/mocks/issues"
   },
   "files": [
-    "mocks.exe",
+    "mocks",
     "index.js"
   ],
   "engines": {

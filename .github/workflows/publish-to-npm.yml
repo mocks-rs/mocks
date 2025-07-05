@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g., v1.0.0)'
+        description: 'Version to publish (e.g., 1.0.0)'
         required: true
         type: string
       dry_run:
@@ -32,9 +32,15 @@ jobs:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
             platform: linux-x64
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            platform: linux-arm64
           - target: x86_64-apple-darwin
             os: macos-latest
             platform: darwin-x64
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            platform: darwin-arm64
           - target: x86_64-pc-windows-gnu
             os: ubuntu-latest
             platform: win32-x64
@@ -61,16 +67,23 @@ jobs:
           cache-key: ${{ matrix.target }}
 
       - name: Install cross-compilation tools
-        if: matrix.target == 'x86_64-pc-windows-gnu'
+        if: matrix.target == 'x86_64-pc-windows-gnu' || matrix.target == 'aarch64-unknown-linux-gnu'
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-x86-64
+          if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
+            sudo apt-get install -y gcc-mingw-w64-x86-64
+          elif [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu
+          fi
 
       - name: Build binary
         run: |
           if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
             export CC_x86_64_pc_windows_gnu=x86_64-w64-mingw32-gcc
             export CXX_x86_64_pc_windows_gnu=x86_64-w64-mingw32-g++
+          elif [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
+            export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
+            export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
           fi
           cargo build --release --target ${{ matrix.target }}
 
