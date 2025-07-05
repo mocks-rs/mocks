@@ -1,10 +1,14 @@
 {
   "name": "@mocks-rs/mocks-linux-x64",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "mocks Linux x64 binary",
   "main": "index.js",
-  "os": ["linux"],
-  "cpu": ["x64"],
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
   "keywords": [
     "mock",
     "rest",

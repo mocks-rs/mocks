@@ -44,7 +44,8 @@ function updatePackageJson(packagePath, version) {
     }
     
     fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + '\n');
-    console.log(`Updated ${path.basename(packagePath)}: ${oldVersion} → ${version}`);
+    const relativePath = path.join(path.basename(path.dirname(packagePath)), path.basename(packagePath));
+    console.log(`Updated ${relativePath}: ${oldVersion} → ${version}`);
     
     return oldVersion !== version;
   } catch (error) {
@@ -90,11 +91,12 @@ function verifyVersionConsistency() {
         const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
         const packageVersion = packageJson.version;
         
+        const relativePath = path.join(path.basename(path.dirname(packagePath)), path.basename(packagePath));
         if (packageVersion !== cargoVersion) {
-          console.error(`[ERROR] Version mismatch in ${path.basename(packagePath)}: ${packageVersion} (expected: ${cargoVersion})`);
+          console.error(`[ERROR] Version mismatch in ${relativePath}: ${packageVersion} (expected: ${cargoVersion})`);
           allConsistent = false;
         } else {
-          console.log(`[OK] ${path.basename(packagePath)}: ${packageVersion}`);
+          console.log(`[OK] ${relativePath}: ${packageVersion}`);
         }
         
         // Check optionalDependencies
