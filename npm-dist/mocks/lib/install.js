@@ -17,14 +17,20 @@ function getPlatformInfo() {
       if (arch === 'x64') {
         platformName = 'linux-x64';
         packageName = '@mocks-rs/mocks-linux-x64';
+      } else if (arch === 'arm64') {
+        platformName = 'linux-arm64';
+        packageName = '@mocks-rs/mocks-linux-arm64';
       } else {
         throw new Error(`Unsupported architecture: ${arch} on ${platform}`);
       }
       break;
     case 'darwin':
-      if (arch === 'x64' || arch === 'arm64') {
+      if (arch === 'x64') {
         platformName = 'darwin-x64';
         packageName = '@mocks-rs/mocks-darwin-x64';
+      } else if (arch === 'arm64') {
+        platformName = 'darwin-arm64';
+        packageName = '@mocks-rs/mocks-darwin-arm64';
       } else {
         throw new Error(`Unsupported architecture: ${arch} on ${platform}`);
       }
@@ -33,6 +39,9 @@ function getPlatformInfo() {
       if (arch === 'x64') {
         platformName = 'win32-x64';
         packageName = '@mocks-rs/mocks-win32-x64';
+      } else if (arch === 'arm64') {
+        platformName = 'win32-arm64';
+        packageName = '@mocks-rs/mocks-win32-arm64';
       } else {
         throw new Error(`Unsupported architecture: ${arch} on ${platform}`);
       }

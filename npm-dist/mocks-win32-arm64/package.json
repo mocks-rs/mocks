@@ -1,13 +1,13 @@
 {
-  "name": "@mocks-rs/mocks-win32-x64",
+  "name": "@mocks-rs/mocks-win32-arm64",
   "version": "0.4.2",
-  "description": "mocks Windows x64 binary",
+  "description": "mocks Windows ARM64 binary",
   "main": "index.js",
   "os": [
     "win32"
   ],
   "cpu": [
-    "x64"
+    "arm64"
   ],
   "keywords": [
     "mock",
