@@ -55,7 +55,7 @@ jobs:
       - name: Get version from release or input
         id: get_version
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ github.event.inputs.version }}"
           else
             VERSION="${{ github.event.release.tag_name }}"
