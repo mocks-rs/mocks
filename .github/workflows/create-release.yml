@@ -36,10 +36,6 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Synchronize versions
-      run: |
-        node scripts/sync-versions.js sync
-
     - name: Check if version changed
       id: check_version
       run: |
@@ -57,24 +53,13 @@ jobs:
         else
           echo "version_changed=false" >> $GITHUB_OUTPUT
           echo "Version unchanged: $CURRENT_VERSION"
+          echo "No version change detected. Skipping release creation."
         fi
 
-    - name: Commit synchronized versions
+    - name: Check version consistency
       if: steps.check_version.outputs.version_changed == 'true'
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        
-        # Check if there are changes to commit
-        if git diff --quiet; then
-          echo "No changes to commit"
-        else
-          git add npm-dist/*/package.json
-          git commit -m "Sync package.json versions to v${{ steps.get_version.outputs.version }}"
-          git push
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        node scripts/sync-versions.js check
 
     - name: Check if tag exists
       id: check_tag
