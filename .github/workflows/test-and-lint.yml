@@ -1,8 +1,6 @@
 name: Test and Lint
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ '*' ]
   workflow_dispatch:
