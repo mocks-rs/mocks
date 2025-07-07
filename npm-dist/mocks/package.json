@@ -1,6 +1,6 @@
 {
   "name": "@mocks-rs/mocks",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Get a mock REST APIs with zero coding within seconds.",
   "main": "index.js",
   "bin": {
@@ -30,12 +30,12 @@
   },
   "preferGlobal": true,
   "optionalDependencies": {
-    "@mocks-rs/mocks-linux-x64": "0.4.3",
-    "@mocks-rs/mocks-linux-arm64": "0.4.3",
-    "@mocks-rs/mocks-darwin-x64": "0.4.3",
-    "@mocks-rs/mocks-darwin-arm64": "0.4.3",
-    "@mocks-rs/mocks-win32-x64": "0.4.3",
-    "@mocks-rs/mocks-win32-arm64": "0.4.3"
+    "@mocks-rs/mocks-linux-x64": "0.4.4",
+    "@mocks-rs/mocks-linux-arm64": "0.4.4",
+    "@mocks-rs/mocks-darwin-x64": "0.4.4",
+    "@mocks-rs/mocks-darwin-arm64": "0.4.4",
+    "@mocks-rs/mocks-win32-x64": "0.4.4",
+    "@mocks-rs/mocks-win32-arm64": "0.4.4"
   },
   "files": [
     "lib",
