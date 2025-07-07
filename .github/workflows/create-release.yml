@@ -74,17 +74,6 @@ jobs:
           echo "Tag $TAG does not exist"
         fi
 
-    - name: Create Git tag
-      if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
-      run: |
-        git config --global user.email "action@github.com"
-        git config --global user.name "GitHub Action"
-        TAG="${{ steps.get_version.outputs.version }}"
-        git tag -a "$TAG" -m "Release $TAG"
-        git push origin "$TAG"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Create GitHub Release
       if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
       uses: softprops/action-gh-release@v2
@@ -94,5 +83,6 @@ jobs:
         generate_release_notes: true
         draft: false
         prerelease: false
+        make_latest: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
