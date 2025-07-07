@@ -2,7 +2,7 @@ name: Publish to NPM
 
 on:
   release:
-    types: [published]
+    types: [published, created]
   workflow_dispatch:
     inputs:
       version:
@@ -54,6 +54,7 @@ jobs:
 
       - name: Get version from release or input
         id: get_version
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ github.event.inputs.version }}"
@@ -71,6 +72,7 @@ jobs:
 
       - name: Install cross-compilation tools
         if: matrix.target == 'x86_64-pc-windows-gnu' || matrix.target == 'aarch64-unknown-linux-gnu'
+        shell: bash
         run: |
           sudo apt-get update
           if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
@@ -80,6 +82,7 @@ jobs:
           fi
 
       - name: Build binary
+        shell: bash
         run: |
           if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
             export CC_x86_64_pc_windows_gnu=x86_64-w64-mingw32-gcc
@@ -93,6 +96,7 @@ jobs:
           cargo build --release --target ${{ matrix.target }}
 
       - name: Verify binary
+        shell: bash
         run: |
           if [ "${{ matrix.platform }}" = "win32-x64" ] || [ "${{ matrix.platform }}" = "win32-arm64" ]; then
             BINARY_PATH="target/${{ matrix.target }}/release/mocks.exe"
@@ -108,6 +112,7 @@ jobs:
           ls -la "$BINARY_PATH"
 
       - name: Prepare platform package
+        shell: bash
         run: |
           mkdir -p dist/${{ matrix.platform }}
           
@@ -136,12 +141,14 @@ jobs:
 
       - name: Dry run publish platform package
         if: github.event.inputs.dry_run == 'true'
+        shell: bash
         run: |
           cd dist/${{ matrix.platform }}
           npm publish --access public --dry-run
 
       - name: Publish platform package
         if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
+        shell: bash
         run: |
           cd dist/${{ matrix.platform }}
           npm publish --access public
@@ -165,6 +172,7 @@ jobs:
           cache-dependency-path: 'npm-dist/mocks/package.json'
 
       - name: Verify main package
+        shell: bash
         run: |
           if [ ! -d "npm-dist/mocks" ]; then
             echo "npm-dist/mocks directory not found"
@@ -175,12 +183,14 @@ jobs:
 
       - name: Dry run publish main package
         if: github.event.inputs.dry_run == 'true'
+        shell: bash
         run: |
           cd npm-dist/mocks
           npm publish --access public --dry-run
 
       - name: Publish main package
         if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
+        shell: bash
         run: |
           cd npm-dist/mocks
           npm publish --access public
