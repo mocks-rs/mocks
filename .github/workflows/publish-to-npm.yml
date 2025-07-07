@@ -2,7 +2,7 @@ name: Publish to NPM
 
 on:
   release:
-    types: [published, created]
+    types: [published]
   workflow_dispatch:
     inputs:
       version:
@@ -29,11 +29,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-20.04
             platform: linux-x64
-          - target: aarch64-unknown-linux-gnu
-            os: ubuntu-latest
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-20.04
             platform: linux-arm64
           - target: x86_64-apple-darwin
             os: macos-latest
@@ -71,14 +71,14 @@ jobs:
           cache-key: ${{ matrix.target }}
 
       - name: Install cross-compilation tools
-        if: matrix.target == 'x86_64-pc-windows-gnu' || matrix.target == 'aarch64-unknown-linux-gnu'
+        if: matrix.target == 'x86_64-pc-windows-gnu' || matrix.target == 'aarch64-unknown-linux-musl'
         shell: bash
         run: |
           sudo apt-get update
           if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
             sudo apt-get install -y gcc-mingw-w64-x86-64
-          elif [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu
+          elif [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu musl-tools
           fi
 
       - name: Build binary
@@ -87,11 +87,11 @@ jobs:
           if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
             export CC_x86_64_pc_windows_gnu=x86_64-w64-mingw32-gcc
             export CXX_x86_64_pc_windows_gnu=x86_64-w64-mingw32-g++
-          elif [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
-            export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
-            export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
-            export AR_aarch64_unknown_linux_gnu=aarch64-linux-gnu-ar
-            export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
+          elif [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
+            export CC_aarch64_unknown_linux_musl=aarch64-linux-gnu-gcc
+            export CXX_aarch64_unknown_linux_musl=aarch64-linux-gnu-g++
+            export AR_aarch64_unknown_linux_musl=aarch64-linux-gnu-ar
+            export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc
           fi
           cargo build --release --target ${{ matrix.target }}
 
