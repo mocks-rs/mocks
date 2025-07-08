@@ -3,6 +3,17 @@ name: Publish to crates.io
 on:
   release:
     types: [published]
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.0)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (do not actually publish)'
+        required: false
+        default: false
+        type: boolean
   workflow_dispatch:
     inputs:
       version:
@@ -19,11 +30,7 @@ permissions:
   contents: read
 
 jobs:
-  test-and-lint:
-    uses: ./.github/workflows/test-and-lint.yml
-
   publish:
-    needs: test-and-lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
