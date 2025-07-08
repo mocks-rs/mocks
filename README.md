@@ -153,6 +153,8 @@ curl "http://localhost:3000/posts?title.contains=post&views.exact=100"
 
 Run `mocks --help` for a list of options.
 
+## Development
+
 ### Developer mode
 
 To help with debugging, you can enable a special feature that saves mock data to a separate file.
@@ -164,6 +166,30 @@ MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json cargo run -- storage.json
 ```
 
 We recommend specifying the filename as `*.debug.json`. For more details, please check [.gitignore](.gitignore) file.
+
+### Check MSRV
+
+```shell
+cargo install cargo-msrv --locked
+cargo msrv find
+```
+
+For more details: [cargo-msrv](https://github.com/foresterre/cargo-msrv)
+
+### Check code coverage
+
+```shell
+cargo llvm-cov
+```
+
+### Build for Homebrew
+
+```shell
+cargo build --release
+cd target/release
+tar -czf mocks-X.X.X-x86_64-apple-darwin.tar.gz mocks
+shasum -a 256 mocks-X.X.X-x86_64-apple-darwin.tar.gz
+```
 
 ## LICENSE
 
