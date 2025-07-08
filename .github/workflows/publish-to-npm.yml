@@ -1,8 +1,6 @@
 name: Publish to NPM
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       version:
@@ -19,11 +17,7 @@ permissions:
   contents: read
 
 jobs:
-  test-and-lint:
-    uses: ./.github/workflows/test-and-lint.yml
-
   build-and-publish:
-    needs: test-and-lint
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

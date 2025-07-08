@@ -1,8 +1,9 @@
-name: Create Release
+name: Release
 
 on:
   push:
     branches: [ main ]
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -16,6 +17,10 @@ jobs:
   create-release:
     needs: test-and-lint
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      version_changed: ${{ steps.check_version.outputs.version_changed }}
+      tag_exists: ${{ steps.check_tag.outputs.tag_exists }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -95,3 +100,12 @@ jobs:
         gh release edit "$TAG" --draft=false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-to-cratesio:
+    needs: create-release
+    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
+    uses: ./.github/workflows/publish-to-cratesio.yml
+    with:
+      version: ${{ needs.create-release.outputs.version }}
+      dry_run: false
+    secrets: inherit
