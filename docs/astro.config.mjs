@@ -16,6 +16,7 @@ export default defineConfig({
 			description: 'Get a mock REST APIs with zero coding within seconds.',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/mocks-rs/mocks' },
+				{ icon: 'seti:rust', label: 'crates.io', href: 'https://crates.io/crates/mocks' },
 			],
 			sidebar: [
 				{
