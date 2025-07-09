@@ -56,10 +56,14 @@
         "ghcr.io/devcontainers/features/github-cli:1": {},
         "ghcr.io/devcontainers/features/go:1": {}
     },
-    "forwardPorts": [3000],
+    "forwardPorts": [3000, 4321],
     "portsAttributes": {
         "3000": {
             "label": "mocks API",
+            "onAutoForward": "notify"
+        },
+        "4321": {
+            "label": "Astro docs",
             "onAutoForward": "notify"
         }
     }

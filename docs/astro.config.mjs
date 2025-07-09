@@ -4,6 +4,10 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+	server: {
+		host: '0.0.0.0',
+		port: 4321
+	},
 	integrations: [
 		starlight({
 			title: 'mocks',
@@ -31,6 +35,7 @@ export default defineConfig({
 					label: 'Help',
 					items: [
 						{ label: 'Troubleshooting', slug: 'troubleshooting' },
+						{ label: 'Uninstallation', slug: 'uninstallation' },
 					],
 				},
 			],
