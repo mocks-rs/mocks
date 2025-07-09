@@ -10,7 +10,19 @@ use std::net::{IpAddr, SocketAddr};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
-struct Args {
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum Commands {
+    /// Start the mock server
+    Run(RunArgs),
+}
+
+#[derive(clap::Args, Debug)]
+struct RunArgs {
     /// Path of json file for data storage
     file: String,
 
@@ -29,19 +41,24 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<(), MocksError> {
-    let args = Args::parse();
-    let socket_addr = init(&args.host, args.port)?;
+    let cli = Cli::parse();
 
-    println!("`mocks` started");
-    println!("Press CTRL-C to stop");
+    match cli.command {
+        Commands::Run(args) => {
+            let socket_addr = init(&args.host, args.port)?;
 
-    let url = format!("http://{}:{}", &args.host, args.port);
-    let overwrite = !args.no_overwrite;
+            println!("`mocks` started");
+            println!("Press CTRL-C to stop");
 
-    print_startup_info(&url, &args.file, overwrite);
+            let url = format!("http://{}:{}", &args.host, args.port);
+            let overwrite = !args.no_overwrite;
 
-    let storage = Storage::new(&args.file, overwrite)?;
-    Server::startup(socket_addr, &url, storage).await?;
+            print_startup_info(&url, &args.file, overwrite);
+
+            let storage = Storage::new(&args.file, overwrite)?;
+            Server::startup(socket_addr, &url, storage).await?;
+        }
+    }
 
     Ok(())
 }
