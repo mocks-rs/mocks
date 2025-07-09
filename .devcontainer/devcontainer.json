@@ -20,7 +20,8 @@
                 "hbenl.vscode-test-explorer",
                 "ms-azuretools.vscode-docker",
                 "streetsidesoftware.code-spell-checker",
-                "github.vscode-github-actions"
+                "github.vscode-github-actions",
+                "astro-build.astro-vscode"
             ],
             "settings": {
                 "rust-analyzer.check.command": "clippy",
