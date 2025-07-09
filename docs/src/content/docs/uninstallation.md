@@ -81,36 +81,6 @@ rm storage.json
 rm *.debug.json
 ```
 
-## Troubleshooting Uninstallation
-
-### Command Not Found During Uninstallation
-
-If you get a "command not found" error when trying to uninstall:
-
-- **For Homebrew**: Make sure Homebrew is properly installed and the tap is still available
-- **For Cargo**: Ensure Cargo is properly installed and in your PATH
-- **For Binary**: The binary may have already been removed or moved
-
-### Permission Denied
-
-If you encounter permission errors:
-
-```bash
-# For system-wide installations, use sudo
-sudo rm /usr/local/bin/mocks
-
-# For Homebrew installations, ensure proper permissions
-sudo chown -R $(whoami) /usr/local/bin
-```
-
-### Partial Uninstallation
-
-If mocks was installed in multiple ways, you may need to uninstall using multiple methods:
-
-1. Try `brew uninstall mocks`
-2. Try `cargo uninstall mocks`
-3. Manually remove any remaining binaries
-
 ## Getting Help
 
 If you encounter issues during uninstallation:

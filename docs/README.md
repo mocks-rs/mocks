@@ -60,7 +60,8 @@ docs/
 │   │       ├── quick-start.md
 │   │       ├── api-reference.md
 │   │       ├── examples.md
-│   │       └── troubleshooting.md
+│   │       ├── troubleshooting.md
+│   │       └── uninstallation.md
 │   └── styles/
 │       └── custom.css      # Custom styling
 ├── public/                 # Static assets
