@@ -4,6 +4,8 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+	site: 'https://mocks-rs.github.io',
+	base: '/mocks',
 	server: {
 		host: '0.0.0.0',
 		port: 4321
