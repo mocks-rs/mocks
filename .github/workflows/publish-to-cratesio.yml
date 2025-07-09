@@ -48,6 +48,8 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             VERSION="${{ github.event.inputs.version }}"
+          elif [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+            VERSION="${{ inputs.version }}"
           else
             VERSION="${{ github.event.release.tag_name }}"
           fi
