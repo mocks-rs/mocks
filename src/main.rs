@@ -6,7 +6,10 @@ use crate::error::MocksError;
 use crate::server::Server;
 use crate::storage::Storage;
 use clap::Parser;
+use std::fs;
+use std::io::{self, Write};
 use std::net::{IpAddr, SocketAddr};
+use std::path::Path;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -19,6 +22,8 @@ struct Cli {
 enum Commands {
     /// Start the mock server
     Run(RunArgs),
+    /// Initialize a new storage file
+    Init(InitArgs),
 }
 
 #[derive(clap::Args, Debug)]
@@ -37,6 +42,17 @@ struct RunArgs {
     /// No overwrite save to json file
     #[arg(long, default_value_t = false)]
     no_overwrite: bool,
+}
+
+#[derive(clap::Args, Debug)]
+struct InitArgs {
+    /// Path of json file to create (default: storage.json)
+    #[arg(default_value = "storage.json")]
+    file: String,
+
+    /// Create empty structure instead of sample data
+    #[arg(short = 'E', long)]
+    empty: bool,
 }
 
 #[tokio::main]
@@ -58,6 +74,9 @@ async fn main() -> Result<(), MocksError> {
             let storage = Storage::new(&args.file, overwrite)?;
             Server::startup(socket_addr, &url, storage).await?;
         }
+        Commands::Init(args) => {
+            init_storage_file(&args.file, args.empty)?;
+        }
     }
 
     Ok(())
@@ -74,6 +93,57 @@ fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
         .parse::<IpAddr>()
         .map(|ip| SocketAddr::from((ip, port)))
         .map_err(|e| MocksError::InvalidArgs(e.to_string()))
+}
+
+fn init_storage_file(file_path: &str, empty: bool) -> Result<(), MocksError> {
+    let path = Path::new(file_path);
+    
+    if path.exists() {
+        print!("File {} already exists. Overwrite? (y/N): ", file_path);
+        io::stdout().flush().unwrap();
+        
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        
+        if !input.trim().to_lowercase().starts_with('y') {
+            println!("Aborted.");
+            return Ok(());
+        }
+    }
+    
+    if let Some(parent) = path.parent() {
+        if !parent.exists() {
+            fs::create_dir_all(parent)
+                .map_err(|e| MocksError::InvalidArgs(format!("Failed to create directory: {}", e)))?;
+        }
+    }
+    
+    let content = if empty {
+        r#"{
+  "posts": [],
+  "profile": {}
+}"#
+    } else {
+        r#"{
+  "posts": [
+    {
+      "id": 1,
+      "title": "Hello World",
+      "content": "This is a sample post"
+    }
+  ],
+  "profile": {
+    "id": 1,
+    "name": "Sample User"
+  }
+}"#
+    };
+    
+    fs::write(path, content)
+        .map_err(|e| MocksError::InvalidArgs(format!("Failed to write file: {}", e)))?;
+    
+    println!("Created: {}", file_path);
+    Ok(())
 }
 
 fn print_startup_info(url: &str, file: &str, overwrite: bool) {
