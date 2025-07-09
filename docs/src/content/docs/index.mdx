@@ -1,0 +1,60 @@
+---
+title: mocks
+description: Get a mock REST APIs with zero coding within seconds.
+template: splash
+hero:
+  tagline: Get mock REST APIs with zero coding within seconds
+  image:
+    file: ../../assets/mocks.webp
+  actions:
+    - text: Installation
+      link: /installation/
+      icon: right-arrow
+      variant: primary
+    - text: View on Github
+      link: https://github.com/mocks-rs/mocks
+      icon: github
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What is mocks?
+
+**mocks** is a Rust CLI tool that generates mock REST APIs instantly from JSON files. With zero coding required, it dynamically creates RESTful endpoints that support full CRUD operations.
+
+## Key Features
+
+<CardGrid stagger>
+	<Card title="Zero Coding" icon="rocket">
+		Just create a JSON file and get a REST API instantly
+	</Card>
+	<Card title="Full CRUD Support" icon="list-format">
+		Auto-generates GET, POST, PUT, PATCH, DELETE operations
+	</Card>
+	<Card title="Dynamic Routing" icon="setting">
+		Automatically generates endpoints based on JSON file structure
+	</Card>
+	<Card title="Fast & Lightweight" icon="approve-check">
+		Built with Rust for high performance and lightweight binaries
+	</Card>
+</CardGrid>
+
+## Usage Example
+
+```json
+{
+  "posts": [
+    { "id": "1", "title": "First Post", "views": 100 },
+    { "id": "2", "title": "Second Post", "views": 10 }
+  ],
+  "profile": { "id": "1", "name": "mocks" }
+}
+```
+
+This JSON file automatically generates the following endpoints:
+
+- `GET /posts` - List all posts
+- `GET /posts/1` - Get specific post
+- `POST /posts` - Create new post
+- `PUT /posts/1` - Update post
+- `DELETE /posts/1` - Delete post

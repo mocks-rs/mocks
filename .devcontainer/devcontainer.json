@@ -20,7 +20,8 @@
                 "hbenl.vscode-test-explorer",
                 "ms-azuretools.vscode-docker",
                 "streetsidesoftware.code-spell-checker",
-                "github.vscode-github-actions"
+                "github.vscode-github-actions",
+                "astro-build.astro-vscode"
             ],
             "settings": {
                 "rust-analyzer.check.command": "clippy",
@@ -55,10 +56,14 @@
         "ghcr.io/devcontainers/features/github-cli:1": {},
         "ghcr.io/devcontainers/features/go:1": {}
     },
-    "forwardPorts": [3000],
+    "forwardPorts": [3000, 4321],
     "portsAttributes": {
         "3000": {
             "label": "mocks API",
+            "onAutoForward": "notify"
+        },
+        "4321": {
+            "label": "Astro docs",
             "onAutoForward": "notify"
         }
     }
