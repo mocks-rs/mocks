@@ -51,6 +51,7 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Check version consistency
-      run: |
-        node scripts/sync-versions.js check
+    # Publication to npm is being suspended.
+    # - name: Check version consistency
+    #   run: |
+    #     node scripts/sync-versions.js check

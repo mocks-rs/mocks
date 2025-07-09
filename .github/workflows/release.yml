@@ -61,10 +61,11 @@ jobs:
           echo "No version change detected. Skipping release creation."
         fi
 
-    - name: Check version consistency
-      if: steps.check_version.outputs.version_changed == 'true'
-      run: |
-        node scripts/sync-versions.js check
+    # Publication to npm is being suspended.
+    # - name: Check version consistency
+    #   if: steps.check_version.outputs.version_changed == 'true'
+    #   run: |
+    #     node scripts/sync-versions.js check
 
     - name: Check if tag exists
       id: check_tag
