@@ -156,6 +156,7 @@ fn print_startup_info(url: &str, file: &str, overwrite: bool) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tempfile::TempDir;
 
     #[test]
     fn test_init_with_localhost() {
@@ -175,5 +176,64 @@ mod tests {
     fn test_init_with_invalid_host() {
         let result = init("invalid.host", 3000);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_init_storage_file_creates_default_content() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("test.json");
+        let file_path_str = file_path.to_str().unwrap();
+        
+        let result = init_storage_file(file_path_str, false);
+        assert!(result.is_ok());
+        
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert!(content.contains("\"posts\""));
+        assert!(content.contains("\"Hello World\""));
+        assert!(content.contains("\"profile\""));
+        assert!(content.contains("\"Sample User\""));
+    }
+
+    #[test]
+    fn test_init_storage_file_creates_empty_content() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("test.json");
+        let file_path_str = file_path.to_str().unwrap();
+        
+        let result = init_storage_file(file_path_str, true);
+        assert!(result.is_ok());
+        
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert!(content.contains("\"posts\": []"));
+        assert!(content.contains("\"profile\": {}"));
+        assert!(!content.contains("Hello World"));
+        assert!(!content.contains("Sample User"));
+    }
+
+    #[test]
+    fn test_init_storage_file_creates_directories() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("sub").join("dir").join("test.json");
+        let file_path_str = file_path.to_str().unwrap();
+        
+        let result = init_storage_file(file_path_str, false);
+        assert!(result.is_ok());
+        
+        assert!(file_path.exists());
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert!(content.contains("\"posts\""));
+    }
+
+    #[test]
+    fn test_init_storage_file_with_existing_file() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("existing.json");
+        let file_path_str = file_path.to_str().unwrap();
+        
+        fs::write(&file_path, "existing content").unwrap();
+        assert!(file_path.exists());
+        
+        let result = init_storage_file(file_path_str, false);
+        assert!(result.is_ok());
     }
 }
