@@ -1,12 +1,12 @@
 [package]
 name = "mocks"
-version = "0.4.5"
+version = "0.4.6"
 edition = "2021"
 authors = ["codemountains <codemountains@gmail.com>"]
 description = "Get a mock REST APIs with zero coding within seconds."
 homepage = "https://github.com/mocks-rs/mocks"
 repository = "https://github.com/mocks-rs/mocks"
-documentation = "https://github.com/mocks-rs/mocks"
+documentation = "https://mocks-rs.github.io/mocks"
 readme = "README.md"
 license = "MIT"
 rust-version = "1.78.0"
