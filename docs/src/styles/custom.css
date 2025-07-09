@@ -1,0 +1,34 @@
+/* Custom styles for mocks documentation */
+:root {
+  --sl-color-accent: #007acc;
+  --sl-color-accent-high: #005a9c;
+}
+
+/* Japanese font improvements */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+}
+
+/* Code blocks styling */
+pre {
+  border-radius: 8px;
+}
+
+/* Table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+table th,
+table td {
+  border: 1px solid var(--sl-color-gray-5);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+table th {
+  background-color: var(--sl-color-gray-6);
+  font-weight: 600;
+}
