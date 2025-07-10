@@ -6,9 +6,10 @@ coverage:
         threshold: 3%
         if_ci_failed: error
     patch:
-      target: 80%
-      threshold: 3%
-      if_ci_failed: error
+      default:
+        target: 80%
+        threshold: 3%
+        if_ci_failed: error
 
 comment:
   layout: "reach, diff, flags, files"
@@ -20,15 +21,3 @@ ignore:
   - "docs/*"
   - "runn-e2e/*"
   - "scripts/*"
-
-parsers:
-  rust:
-    ignore:
-      # cfg(test)で囲まれたコードブロック
-      - ".*#\\[cfg\\(test\\)\\].*"
-      # テスト関数
-      - ".*#\\[test\\].*"
-      # ベンチマーク関数
-      - ".*#\\[bench\\].*"
-      # should_panicテスト
-      - ".*#\\[should_panic.*\\].*"
