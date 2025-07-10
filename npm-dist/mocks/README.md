@@ -13,7 +13,7 @@ npm install -g @mocks-rs/mocks
 
 ### Using npx
 ```bash
-npx @mocks-rs/mocks storage.json
+npx @mocks-rs/mocks run storage.json
 ```
 
 ## Usage
@@ -37,7 +37,7 @@ Create a `storage.json` file:
 Run the mock server:
 
 ```bash
-mocks storage.json
+mocks run storage.json
 ```
 
 Or with custom host and port:

@@ -145,7 +145,7 @@ chmod 644 storage.json
 **Solutions**:
 - Use debug mode to create backups
 ```bash
-MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks storage.json
+MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks run storage.json
 ```
 
 - Regularly backup JSON files
