@@ -18,7 +18,7 @@ Error: Failed to bind to address: Address already in use (os error 98)
 **Solutions**:
 - Use a different port
 ```bash
-mocks -p 8080 storage.json
+mocks run -p 8080 storage.json
 ```
 
 - Kill the existing process
@@ -184,19 +184,19 @@ cp storage.json storage.backup.json
 mocks outputs logs to stdout:
 
 ```bash
-mocks storage.json
+mocks run storage.json
 ```
 
 #### Use Debug Mode
 
 ```bash
-MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks storage.json
+MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks run storage.json
 ```
 
 #### Enable Verbose Logging
 
 ```bash
-RUST_LOG=debug mocks storage.json
+RUST_LOG=debug mocks run storage.json
 ```
 
 #### Health Check
@@ -246,7 +246,7 @@ When reporting issues, please include:
 Save modified data to a separate file:
 
 ```bash
-MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks storage.json
+MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks run storage.json
 ```
 
 #### RUST_LOG
@@ -254,7 +254,7 @@ MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks storage.json
 Enable debug logging:
 
 ```bash
-RUST_LOG=debug mocks storage.json
+RUST_LOG=debug mocks run storage.json
 ```
 
 ### 12. Common CLI Mistakes
@@ -263,20 +263,20 @@ RUST_LOG=debug mocks storage.json
 
 ```bash
 # Wrong: Will only bind to localhost
-mocks storage.json
+mocks run storage.json
 
 # Right: For Docker or external access
-mocks -H 0.0.0.0 storage.json
+mocks run -H 0.0.0.0 storage.json
 ```
 
 #### File Path Issues
 
 ```bash
 # Wrong: Relative path might not work
-mocks ../data/storage.json
+mocks run ../data/storage.json
 
 # Right: Use absolute path or correct relative path
-mocks /full/path/to/storage.json
+mocks run /full/path/to/storage.json
 ```
 
 ### 13. JSON Structure Guidelines
