@@ -11,8 +11,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Build and Run
 ```bash
 cargo build --release
-cargo run -- storage.json
+cargo run -- run storage.json
 cargo run -- --help  # View CLI options
+cargo run -- init --help  # View init command options
+cargo run -- run --help  # View run command options
 ```
 
 ### Testing
@@ -91,9 +93,11 @@ Located in `src/storage/operation/`:
 
 ### CLI Usage Examples
 ```bash
-mocks storage.json                           # Basic usage
-mocks -H 127.0.0.1 -p 8080 storage.json    # Custom host/port
-mocks --no-overwrite storage.json           # Prevent file modifications
+mocks init storage.json                      # Initialize storage file
+mocks init --empty storage.json             # Initialize empty storage file
+mocks run storage.json                      # Basic usage
+mocks run -H 127.0.0.1 -p 8080 storage.json  # Custom host/port
+mocks run --no-overwrite storage.json       # Prevent file modifications
 ```
 
 ## Key Dependencies

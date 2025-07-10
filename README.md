@@ -23,9 +23,23 @@ cargo install mocks
 
 ## Usage
 
+### Initialize a storage file
+
+Create a JSON file using the `init` command:
+
+```shell
+mocks init storage.json
+```
+
+This creates a `storage.json` file with sample data. Use the `--empty` option to create an empty structure:
+
+```shell
+mocks init --empty storage.json
+```
+
 ### Run a REST API server
 
-Create a `storage.json`.
+Start the mock server using your JSON file:
 
 ```json
 {
@@ -60,20 +74,20 @@ Create a `storage.json`.
 > [!WARNING]
 > You cannot define duplicate resource (e.g., `api/v1/users` and `api/v2/users`) in the storage file. Each resource name must be unique.
 
-Pass it to `mocks` CLI.
+Pass it to `mocks` CLI using the `run` command:
 
 ```shell
-mocks storage.json
+mocks run storage.json
 ```
 
 ```shell
-mocks -H 127.0.0.1 -p 3000 storage.json
+mocks run -H 127.0.0.1 -p 3000 storage.json
 ```
 
 If you want to access from the host OS (e.g., when running in a container), specify `0.0.0.0` as the host:
 
 ```shell
-mocks -H 0.0.0.0 storage.json
+mocks run -H 0.0.0.0 storage.json
 ```
 
 Get a REST API with `curl`.
@@ -149,9 +163,14 @@ curl "http://localhost:3000/posts?title.contains=post&views.exact=100"
 - Match type is required - using just `field=value` will return an error
 - Complex values (objects or arrays) cannot be searched
 
-### Options
+### Commands
 
-Run `mocks --help` for a list of options.
+The `mocks` CLI supports the following commands:
+
+- `mocks run [OPTIONS] <FILE>` - Start the mock server
+- `mocks init [OPTIONS] [FILE]` - Initialize a new storage file
+
+Run `mocks --help` or `mocks <command> --help` for detailed options.
 
 ## Development
 
@@ -162,7 +181,7 @@ To help with debugging, you can enable a special feature that saves mock data to
 To do this, simply set the environment variable called `MOCKS_DEBUG_OVERWRITTEN_FILE`.
 
 ```shell
-MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json cargo run -- storage.json
+MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json cargo run -- run storage.json
 ```
 
 We recommend specifying the filename as `*.debug.json`. For more details, please check [.gitignore](.gitignore) file.
