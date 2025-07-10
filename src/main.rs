@@ -54,24 +54,42 @@ struct InitArgs {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), MocksError> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
-    match cli.command {
+    let result = match cli.command {
         Commands::Run(args) => {
-            let socket_addr = init(&args.host, args.port)?;
+            let socket_addr = match init(&args.host, args.port) {
+                Ok(addr) => addr,
+                Err(e) => {
+                    print_error(&e);
+                    std::process::exit(1);
+                }
+            };
 
             let url = format!("http://{}:{}", &args.host, args.port);
             let overwrite = !args.no_overwrite;
 
+            let storage = match Storage::new(&args.file, overwrite) {
+                Ok(s) => s,
+                Err(e) => {
+                    print_error(&e);
+                    std::process::exit(1);
+                }
+            };
+
             print_startup_info(&url, &args.file, overwrite);
 
-            let storage = Storage::new(&args.file, overwrite)?;
-            Server::startup(socket_addr, storage).await?;
+            Server::startup(socket_addr, storage).await
         }
         Commands::Init(args) => {
-            Storage::init_file(&args.file, args.empty)?;
+            Storage::init_file(&args.file, args.empty)
         }
+    };
+
+    if let Err(e) = result {
+        print_error(&e);
+        std::process::exit(1);
     }
 
     Ok(())
@@ -128,6 +146,29 @@ fn get_styles() -> clap::builder::Styles {
         .error(clap::builder::styling::AnsiColor::Red.on_default().bold())
         .valid(clap::builder::styling::AnsiColor::Green.on_default().bold())
         .invalid(clap::builder::styling::AnsiColor::Red.on_default().bold())
+}
+
+fn print_error(error: &MocksError) {
+    // Check for NO_COLOR environment variable
+    if std::env::var("NO_COLOR").is_ok() {
+        colored::control::set_override(false);
+    }
+    
+    eprintln!("{}: {}", "Error".red().bold(), error.to_string().red());
+    
+    // Print additional context for some error types
+    match error {
+        MocksError::FailedReadFile(_) => {
+            eprintln!("{}: {}", "Hint".bright_yellow(), "Check if the file exists and is readable");
+        }
+        MocksError::FailedWriteFile(_) => {
+            eprintln!("{}: {}", "Hint".bright_yellow(), "Check file permissions and disk space");
+        }
+        MocksError::InvalidArgs(_) => {
+            eprintln!("{}: {}", "Hint".bright_yellow(), "Run with --help to see usage information");
+        }
+        _ => {}
+    }
 }
 
 #[cfg(test)]
