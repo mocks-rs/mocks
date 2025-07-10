@@ -55,6 +55,11 @@ struct InitArgs {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Check for NO_COLOR environment variable once at startup
+    if std::env::var("NO_COLOR").is_ok() {
+        colored::control::set_override(false);
+    }
+
     let cli = Cli::parse();
 
     let result = match cli.command {
@@ -82,7 +87,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             Server::startup(socket_addr, storage).await
         }
-        Commands::Init(args) => Storage::init_file(&args.file, args.empty),
+        Commands::Init(args) => {
+            let result = Storage::init_file(&args.file, args.empty);
+            if result.is_ok() {
+                print_init_success(&args.file);
+            }
+            result
+        }
     };
 
     if let Err(e) = result {
@@ -107,10 +118,6 @@ fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
 }
 
 fn print_startup_info(url: &str, file: &str, overwrite: bool) {
-    // Check for NO_COLOR environment variable
-    if std::env::var("NO_COLOR").is_ok() {
-        colored::control::set_override(false);
-    }
 
     println!();
     println!("{}", "======================================".cyan());
@@ -131,10 +138,6 @@ fn print_startup_info(url: &str, file: &str, overwrite: bool) {
 }
 
 fn get_styles() -> clap::builder::Styles {
-    // Check for NO_COLOR environment variable
-    if std::env::var("NO_COLOR").is_ok() {
-        return clap::builder::Styles::plain();
-    }
 
     clap::builder::Styles::styled()
         .header(clap::builder::styling::AnsiColor::Blue.on_default().bold())
@@ -146,11 +149,16 @@ fn get_styles() -> clap::builder::Styles {
         .invalid(clap::builder::styling::AnsiColor::Red.on_default().bold())
 }
 
+fn print_init_success(file_path: &str) {
+
+    println!("{}", "======================================".cyan());
+    println!("{}", "mocks initialized!".green().bold());
+    println!("{}", "======================================".cyan());
+    println!();
+    println!("{} {}", "Created:".bright_white(), file_path.bright_cyan());
+}
+
 fn print_error(error: &MocksError) {
-    // Check for NO_COLOR environment variable
-    if std::env::var("NO_COLOR").is_ok() {
-        colored::control::set_override(false);
-    }
 
     eprintln!("{}: {}", "Error".red().bold(), error.to_string().red());
 

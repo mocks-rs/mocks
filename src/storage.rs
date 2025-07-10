@@ -99,7 +99,6 @@ impl Storage {
         let writer = Writer::new(file_path);
         writer.write(&data)?;
 
-        println!("Created: {file_path}");
         Ok(())
     }
 
