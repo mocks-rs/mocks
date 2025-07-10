@@ -12,6 +12,9 @@ use crate::storage::reader::Reader;
 use crate::storage::writer::Writer;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::fs;
+use std::io::{self, Write};
+use std::path::Path;
 
 mod operation;
 mod reader;
@@ -41,6 +44,63 @@ impl Storage {
             data,
             overwrite,
         })
+    }
+
+    /// Initialize a new storage file
+    ///
+    /// # Arguments
+    /// - `file_path` - The path where the storage file will be created
+    /// - `empty` - Whether to create an empty structure or include sample data
+    pub fn init_file(file_path: &str, empty: bool) -> Result<(), MocksError> {
+        let path = Path::new(file_path);
+
+        if path.exists() {
+            print!("File {} already exists. Overwrite? (y/N): ", file_path);
+            io::stdout().flush().unwrap();
+
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+
+            if !input.trim().to_lowercase().starts_with('y') {
+                println!("Aborted.");
+                return Ok(());
+            }
+        }
+
+        if let Some(parent) = path.parent() {
+            if !parent.exists() {
+                fs::create_dir_all(parent).map_err(|e| {
+                    MocksError::InvalidArgs(format!("Failed to create directory: {}", e))
+                })?;
+            }
+        }
+
+        let data = if empty {
+            serde_json::json!({
+                "posts": [],
+                "profile": {}
+            })
+        } else {
+            serde_json::json!({
+                "posts": [
+                    {
+                        "id": 1,
+                        "title": "Hello World",
+                        "content": "This is a sample post"
+                    }
+                ],
+                "profile": {
+                    "id": 1,
+                    "name": "Sample User"
+                }
+            })
+        };
+
+        let writer = Writer::new(file_path);
+        writer.write(&data)?;
+
+        println!("Created: {}", file_path);
+        Ok(())
     }
 
     /// Resources for API endpoints
@@ -157,5 +217,71 @@ impl Storage {
             writer.write(&self.data)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::TempDir;
+
+    #[test]
+    fn test_init_file_creates_default_content() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("test.json");
+        let file_path_str = file_path.to_str().unwrap();
+
+        let result = Storage::init_file(file_path_str, false);
+        assert!(result.is_ok());
+
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert!(content.contains("\"posts\""));
+        assert!(content.contains("\"Hello World\""));
+        assert!(content.contains("\"profile\""));
+        assert!(content.contains("\"Sample User\""));
+    }
+
+    #[test]
+    fn test_init_file_creates_empty_content() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("test.json");
+        let file_path_str = file_path.to_str().unwrap();
+
+        let result = Storage::init_file(file_path_str, true);
+        assert!(result.is_ok());
+
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert!(content.contains("\"posts\": []"));
+        assert!(content.contains("\"profile\": {}"));
+        assert!(!content.contains("Hello World"));
+        assert!(!content.contains("Sample User"));
+    }
+
+    #[test]
+    fn test_init_file_creates_directories() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("sub").join("dir").join("test.json");
+        let file_path_str = file_path.to_str().unwrap();
+
+        let result = Storage::init_file(file_path_str, false);
+        assert!(result.is_ok());
+
+        assert!(file_path.exists());
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert!(content.contains("\"posts\""));
+    }
+
+    #[test]
+    fn test_init_file_with_existing_file() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("existing.json");
+        let file_path_str = file_path.to_str().unwrap();
+
+        fs::write(&file_path, "existing content").unwrap();
+        assert!(file_path.exists());
+
+        let result = Storage::init_file(file_path_str, false);
+        assert!(result.is_ok());
     }
 }
