@@ -61,7 +61,7 @@ fn print_endpoints(resources: Vec<String>) {
     );
 
     for resource in resources {
-        println!("   {}", format!("/{}", resource).bright_cyan());
+        println!("   {}", format!("/{resource}").bright_cyan());
     }
     println!();
 }

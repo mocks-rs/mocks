@@ -21,6 +21,9 @@ tokio = { version = "1.45.1", features = ["full"] }
 [dev-dependencies]
 tempfile = "3.20.0"
 
+[lints.clippy]
+uninlined_format_args = "warn"
+
 [profile.release]
 lto = true
 opt-level = "s"

@@ -55,7 +55,7 @@ impl Storage {
         let path = Path::new(file_path);
 
         if path.exists() {
-            print!("File {} already exists. Overwrite? (y/N): ", file_path);
+            print!("File {file_path} already exists. Overwrite? (y/N): ");
             io::stdout().flush().unwrap();
 
             let mut input = String::new();
@@ -70,7 +70,7 @@ impl Storage {
         if let Some(parent) = path.parent() {
             if !parent.exists() {
                 fs::create_dir_all(parent).map_err(|e| {
-                    MocksError::InvalidArgs(format!("Failed to create directory: {}", e))
+                    MocksError::InvalidArgs(format!("Failed to create directory: {e}"))
                 })?;
             }
         }
@@ -99,7 +99,7 @@ impl Storage {
         let writer = Writer::new(file_path);
         writer.write(&data)?;
 
-        println!("Created: {}", file_path);
+        println!("Created: {file_path}");
         Ok(())
     }
 
