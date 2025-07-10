@@ -70,14 +70,17 @@ impl Storage {
 
         if path.exists() && !force_overwrite {
             print!("File {file_path} already exists. Overwrite? (y/N): ");
-            io::stdout().flush().unwrap();
+            io::stdout()
+                .flush()
+                .map_err(|e| MocksError::Exception(format!("Failed to flush stdout: {e}")))?;
 
             let mut input = String::new();
-            io::stdin().read_line(&mut input).unwrap();
+            io::stdin()
+                .read_line(&mut input)
+                .map_err(|e| MocksError::InvalidArgs(format!("Failed to read input: {e}")))?;
 
             if !input.trim().to_lowercase().starts_with('y') {
-                println!("Aborted.");
-                return Ok(());
+                return Err(MocksError::Aborted);
             }
         }
 
@@ -319,6 +322,7 @@ mod tests {
         // but we can't easily test the interactive behavior in unit tests
         // The function should work correctly when force_overwrite is false
         // and user input is provided through stdin
+        // When user aborts, it should return MocksError::Aborted
     }
 
     #[test]

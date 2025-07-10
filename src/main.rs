@@ -89,8 +89,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Init(args) => {
             let result = Storage::init_file(&args.file, args.empty);
-            if result.is_ok() {
-                print_init_success(&args.file);
+            match &result {
+                Ok(()) => print_init_success(&args.file),
+                Err(MocksError::Aborted) => {
+                    print_init_aborted();
+                    return Ok(());
+                }
+                Err(_) => {
+                    // Other errors will be handled by the main error handling below
+                }
             }
             result
         }
@@ -142,6 +149,14 @@ fn print_init_success(file_path: &str) {
     println!("{}", "======================================".cyan());
     println!();
     println!("{} {}", "Created:".bright_white(), file_path.bright_cyan());
+}
+
+fn print_init_aborted() {
+    println!("{}", "======================================".cyan());
+    println!("{}", "mocks init aborted!".red().bold());
+    println!("{}", "======================================".cyan());
+    println!();
+    println!("{}", "Aborted.".yellow());
 }
 
 fn print_error(error: &MocksError) {
@@ -218,6 +233,11 @@ mod tests {
     fn test_print_init_success() {
         let file_path = "storage.json";
         print_init_success(file_path);
+    }
+
+    #[test]
+    fn test_print_init_aborted() {
+        print_init_aborted();
     }
 
     #[test]

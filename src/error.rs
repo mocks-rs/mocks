@@ -22,6 +22,7 @@ pub enum MocksError {
     InvalidMatchType,
     InvalidQueryParam,
     MatchTypeRequired,
+    Aborted,
 }
 
 impl std::error::Error for MocksError {
@@ -52,6 +53,7 @@ impl fmt::Display for MocksError {
             ),
             Self::InvalidQueryParam => write!(fmt, "Invalid query parameter format."),
             Self::MatchTypeRequired => write!(fmt, "Match type is required. Use: field.exact, field.startswith, field.endswith, or field.contains."),
+            Self::Aborted => write!(fmt, "Operation aborted by user."),
         }
     }
 }
@@ -74,6 +76,7 @@ impl IntoResponse for MocksError {
             MocksError::InvalidMatchType => (StatusCode::BAD_REQUEST, self.to_string()),
             MocksError::InvalidQueryParam => (StatusCode::BAD_REQUEST, self.to_string()),
             MocksError::MatchTypeRequired => (StatusCode::BAD_REQUEST, self.to_string()),
+            MocksError::Aborted => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
         };
 
         (status, Json(json!({ "error": message }))).into_response()
@@ -259,5 +262,11 @@ mod tests {
         assert_eq!(error.to_string(), "Match type is required. Use: field.exact, field.startswith, field.endswith, or field.contains.");
         let response = error.into_response();
         assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+
+        // Aborted
+        let error = MocksError::Aborted;
+        assert_eq!(error.to_string(), "Operation aborted by user.");
+        let response = error.into_response();
+        assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
     }
 }
