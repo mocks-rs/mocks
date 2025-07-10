@@ -5,7 +5,10 @@ coverage:
         target: 85%
         threshold: 3%
         if_ci_failed: error
-    patch: off
+    patch:
+      target: 80%
+      threshold: 3%
+      if_ci_failed: error
 
 comment:
   layout: "reach, diff, flags, files"
