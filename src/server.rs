@@ -13,6 +13,7 @@ use crate::server::state::{AppState, SharedState};
 use crate::storage::Storage;
 use axum::routing::get;
 use axum::Router;
+use colored::*;
 use serde_json::Value;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
@@ -30,18 +31,12 @@ impl Server {
     ///
     /// # Returns
     /// * `Result<(), MocksError>` - Ok if the server starts successfully, Err otherwise
-    pub async fn startup(
-        socket_addr: SocketAddr,
-        url: &str,
-        storage: Storage,
-    ) -> Result<(), MocksError> {
+    pub async fn startup(socket_addr: SocketAddr, storage: Storage) -> Result<(), MocksError> {
         let listener = TcpListener::bind(socket_addr)
             .await
             .map_err(|e| MocksError::Exception(e.to_string()))?;
 
-        println!("Endpoints:");
-        print_endpoints(url, storage.resources());
-        println!();
+        print_endpoints(storage.resources());
 
         let data = storage.data.clone();
         let state = AppState::new(storage);
@@ -52,16 +47,23 @@ impl Server {
     }
 }
 
-fn print_endpoints(url: &str, resources: Vec<String>) {
-    let mut endpoints = vec![format!("{}/_hc", url)];
-
-    for r in resources {
-        endpoints.push(format!("{url}/{r}"));
+fn print_endpoints(resources: Vec<String>) {
+    // Check for NO_COLOR environment variable
+    if std::env::var("NO_COLOR").is_ok() {
+        colored::control::set_override(false);
     }
 
-    for endpoint in endpoints {
-        println!("{endpoint}");
+    println!("{}", "Available Endpoints:".blue().bold());
+    println!(
+        "   {:<7} {}",
+        "/_hc".bright_cyan(),
+        "(Health Check)".bright_black()
+    );
+
+    for resource in resources {
+        println!("   {}", format!("/{}", resource).bright_cyan());
     }
+    println!();
 }
 
 fn convert_to_resource_paths(value: &Value) -> Vec<String> {
@@ -115,18 +117,16 @@ mod tests {
 
     #[test]
     fn test_print_endpoints() {
-        let url = "http://localhost:8080";
         let resources = vec!["users".to_string(), "posts".to_string()];
         // Just check that it does not panic; do not check output content
-        print_endpoints(url, resources);
+        print_endpoints(resources);
     }
 
     #[test]
     fn test_print_endpoints_with_empty_resources() {
-        let url = "http://localhost:8080";
         let resources: Vec<String> = vec![];
         // Just check that it does not panic; do not check output content
-        print_endpoints(url, resources);
+        print_endpoints(resources);
     }
 
     #[test]
