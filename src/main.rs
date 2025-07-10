@@ -136,17 +136,6 @@ fn print_startup_info(url: &str, file: &str, overwrite: bool) {
     println!();
 }
 
-fn get_styles() -> clap::builder::Styles {
-    clap::builder::Styles::styled()
-        .header(clap::builder::styling::AnsiColor::Blue.on_default().bold())
-        .usage(clap::builder::styling::AnsiColor::Green.on_default().bold())
-        .literal(clap::builder::styling::AnsiColor::BrightCyan.on_default())
-        .placeholder(clap::builder::styling::AnsiColor::BrightWhite.on_default())
-        .error(clap::builder::styling::AnsiColor::Red.on_default().bold())
-        .valid(clap::builder::styling::AnsiColor::Green.on_default().bold())
-        .invalid(clap::builder::styling::AnsiColor::Red.on_default().bold())
-}
-
 fn print_init_success(file_path: &str) {
     println!("{}", "======================================".cyan());
     println!("{}", "mocks initialized!".green().bold());
@@ -182,6 +171,17 @@ fn print_error(error: &MocksError) {
     }
 }
 
+fn get_styles() -> clap::builder::Styles {
+    clap::builder::Styles::styled()
+        .header(clap::builder::styling::AnsiColor::Blue.on_default().bold())
+        .usage(clap::builder::styling::AnsiColor::Green.on_default().bold())
+        .literal(clap::builder::styling::AnsiColor::BrightCyan.on_default())
+        .placeholder(clap::builder::styling::AnsiColor::BrightWhite.on_default())
+        .error(clap::builder::styling::AnsiColor::Red.on_default().bold())
+        .valid(clap::builder::styling::AnsiColor::Green.on_default().bold())
+        .invalid(clap::builder::styling::AnsiColor::Red.on_default().bold())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -204,5 +204,30 @@ mod tests {
     fn test_init_with_invalid_host() {
         let result = parse_socket_addr("invalid.host", 3000);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_print_startup_info() {
+        let url = "http://localhost:3000";
+        let file = "storage.json";
+        let overwrite = true;
+        print_startup_info(url, file, overwrite);
+    }
+
+    #[test]
+    fn test_print_init_success() {
+        let file_path = "storage.json";
+        print_init_success(file_path);
+    }
+
+    #[test]
+    fn test_print_error() {
+        let error = MocksError::InvalidArgs("Invalid argument".to_string());
+        print_error(&error);
+    }
+
+    #[test]
+    fn test_get_styles() {
+        let _ = get_styles();
     }
 }
