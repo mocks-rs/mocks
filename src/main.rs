@@ -224,6 +224,15 @@ mod tests {
     fn test_print_error() {
         let error = MocksError::InvalidArgs("Invalid argument".to_string());
         print_error(&error);
+
+        let error = MocksError::FailedReadFile("Failed to read file".to_string());
+        print_error(&error);
+
+        let error = MocksError::FailedWriteFile("Failed to write file".to_string());
+        print_error(&error);
+
+        let error = MocksError::Exception("Exception".to_string());
+        print_error(&error);
     }
 
     #[test]
