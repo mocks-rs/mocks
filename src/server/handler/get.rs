@@ -62,6 +62,16 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_get_all_with_filter() {
+        let state = init_state();
+        let path: Path<String> = Path("posts".to_string());
+        let mut params = HashMap::new();
+        params.insert("title.contains".to_string(), "post".to_string());
+        let query: Query<HashMap<String, String>> = Query(params);
+        assert!(get_all(path, query, State(state)).await.is_ok());
+    }
+
+    #[tokio::test]
     async fn test_get_one() {
         let state = init_state();
         let path: Path<(String, String)> = Path((
