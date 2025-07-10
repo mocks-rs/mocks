@@ -82,9 +82,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             Server::startup(socket_addr, storage).await
         }
-        Commands::Init(args) => {
-            Storage::init_file(&args.file, args.empty)
-        }
+        Commands::Init(args) => Storage::init_file(&args.file, args.empty),
     };
 
     if let Err(e) = result {
@@ -153,19 +151,28 @@ fn print_error(error: &MocksError) {
     if std::env::var("NO_COLOR").is_ok() {
         colored::control::set_override(false);
     }
-    
+
     eprintln!("{}: {}", "Error".red().bold(), error.to_string().red());
-    
+
     // Print additional context for some error types
     match error {
         MocksError::FailedReadFile(_) => {
-            eprintln!("{}: {}", "Hint".bright_yellow(), "Check if the file exists and is readable");
+            eprintln!(
+                "{}: Check if the file exists and is readable",
+                "Hint".bright_yellow()
+            );
         }
         MocksError::FailedWriteFile(_) => {
-            eprintln!("{}: {}", "Hint".bright_yellow(), "Check file permissions and disk space");
+            eprintln!(
+                "{}: Check file permissions and disk space",
+                "Hint".bright_yellow()
+            );
         }
         MocksError::InvalidArgs(_) => {
-            eprintln!("{}: {}", "Hint".bright_yellow(), "Run with --help to see usage information");
+            eprintln!(
+                "{}: Run with --help to see usage information",
+                "Hint".bright_yellow()
+            );
         }
         _ => {}
     }
