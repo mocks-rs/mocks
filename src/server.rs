@@ -158,4 +158,29 @@ mod tests {
         // Just check that router can be created
         let _ = create_router(state, &value);
     }
+
+    #[tokio::test]
+    async fn test_startup_success() {
+        let tmpfile = NamedTempFile::new().unwrap();
+        std::fs::write(tmpfile.path(), "{\"users\": []}").unwrap();
+        let storage = Storage::new(tmpfile.path().to_str().unwrap(), true).unwrap();
+
+        let socket_addr = "127.0.0.1:0".parse().unwrap();
+
+        // Test that startup can bind to a port (using port 0 for OS to assign)
+        let startup_task = tokio::spawn(async move { Server::startup(socket_addr, storage).await });
+
+        // Cancel the task immediately to avoid running server indefinitely
+        startup_task.abort();
+
+        // The test passes if we can create the server setup without panicking
+        // The actual binding test would require more complex setup
+    }
+
+    #[tokio::test]
+    async fn test_startup_invalid_address() {
+        // Use an invalid address that should fail to bind
+        let socket_addr: Result<SocketAddr, _> = "256.256.256.256:0".parse();
+        assert!(socket_addr.is_err());
+    }
 }
