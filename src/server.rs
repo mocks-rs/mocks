@@ -48,11 +48,6 @@ impl Server {
 }
 
 fn print_endpoints(resources: Vec<String>) {
-    // Check for NO_COLOR environment variable
-    if std::env::var("NO_COLOR").is_ok() {
-        colored::control::set_override(false);
-    }
-
     println!("{}", "Available Endpoints:".blue().bold());
     println!(
         "   {:<7} {}",
