@@ -125,7 +125,6 @@ fn parse_socket_addr(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
 }
 
 fn print_startup_info(url: &str, file: &str, overwrite: bool) {
-    println!();
     println!("{}", "======================================".cyan());
     println!("{}", "mocks server started!".green().bold());
     println!("{}", "======================================".cyan());
@@ -149,6 +148,7 @@ fn print_init_success(file_path: &str) {
     println!("{}", "======================================".cyan());
     println!();
     println!("{} {}", "Created:".bright_white(), file_path.bright_cyan());
+    println!();
 }
 
 fn print_init_aborted() {
@@ -157,6 +157,7 @@ fn print_init_aborted() {
     println!("{}", "======================================".cyan());
     println!();
     println!("{}", "Aborted.".yellow());
+    println!();
 }
 
 fn print_error(error: &MocksError) {
