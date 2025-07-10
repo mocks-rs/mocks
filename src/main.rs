@@ -64,7 +64,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let result = match cli.command {
         Commands::Run(args) => {
-            let socket_addr = match init(&args.host, args.port) {
+            let socket_addr = match parse_socket_addr(&args.host, args.port) {
                 Ok(addr) => addr,
                 Err(e) => {
                     print_error(&e);
@@ -104,7 +104,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
+fn parse_socket_addr(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
     let ip_addr = if host == "localhost" {
         "127.0.0.1"
     } else {
@@ -118,7 +118,6 @@ fn init(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
 }
 
 fn print_startup_info(url: &str, file: &str, overwrite: bool) {
-
     println!();
     println!("{}", "======================================".cyan());
     println!("{}", "mocks server started!".green().bold());
@@ -138,7 +137,6 @@ fn print_startup_info(url: &str, file: &str, overwrite: bool) {
 }
 
 fn get_styles() -> clap::builder::Styles {
-
     clap::builder::Styles::styled()
         .header(clap::builder::styling::AnsiColor::Blue.on_default().bold())
         .usage(clap::builder::styling::AnsiColor::Green.on_default().bold())
@@ -150,7 +148,6 @@ fn get_styles() -> clap::builder::Styles {
 }
 
 fn print_init_success(file_path: &str) {
-
     println!("{}", "======================================".cyan());
     println!("{}", "mocks initialized!".green().bold());
     println!("{}", "======================================".cyan());
@@ -159,7 +156,6 @@ fn print_init_success(file_path: &str) {
 }
 
 fn print_error(error: &MocksError) {
-
     eprintln!("{}: {}", "Error".red().bold(), error.to_string().red());
 
     // Print additional context for some error types
@@ -192,21 +188,21 @@ mod tests {
 
     #[test]
     fn test_init_with_localhost() {
-        let result = init("localhost", 3000).unwrap();
+        let result = parse_socket_addr("localhost", 3000).unwrap();
         assert_eq!(result.ip().to_string(), "127.0.0.1");
         assert_eq!(result.port(), 3000);
     }
 
     #[test]
     fn test_init_with_ip_address() {
-        let result = init("192.168.1.1", 8080).unwrap();
+        let result = parse_socket_addr("192.168.1.1", 8080).unwrap();
         assert_eq!(result.ip().to_string(), "192.168.1.1");
         assert_eq!(result.port(), 8080);
     }
 
     #[test]
     fn test_init_with_invalid_host() {
-        let result = init("invalid.host", 3000);
+        let result = parse_socket_addr("invalid.host", 3000);
         assert!(result.is_err());
     }
 }
