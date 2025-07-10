@@ -52,9 +52,23 @@ impl Storage {
     /// - `file_path` - The path where the storage file will be created
     /// - `empty` - Whether to create an empty structure or include sample data
     pub fn init_file(file_path: &str, empty: bool) -> Result<(), MocksError> {
+        Self::init_file_with_overwrite(file_path, empty, false)
+    }
+
+    /// Initialize a new storage file with overwrite control
+    ///
+    /// # Arguments
+    /// - `file_path` - The path where the storage file will be created
+    /// - `empty` - Whether to create an empty structure or include sample data
+    /// - `force_overwrite` - Whether to overwrite existing files without prompting
+    pub fn init_file_with_overwrite(
+        file_path: &str,
+        empty: bool,
+        force_overwrite: bool,
+    ) -> Result<(), MocksError> {
         let path = Path::new(file_path);
 
-        if path.exists() {
+        if path.exists() && !force_overwrite {
             print!("File {file_path} already exists. Overwrite? (y/N): ");
             io::stdout().flush().unwrap();
 
@@ -280,7 +294,51 @@ mod tests {
         fs::write(&file_path, "existing content").unwrap();
         assert!(file_path.exists());
 
-        let result = Storage::init_file(file_path_str, false);
+        // Test with force_overwrite = true to avoid interactive prompt
+        let result = Storage::init_file_with_overwrite(file_path_str, false, true);
         assert!(result.is_ok());
+
+        // Verify the file was overwritten with new content
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert!(content.contains("\"posts\""));
+        assert!(content.contains("\"profile\""));
+        assert!(!content.contains("existing content"));
+    }
+
+    #[test]
+    fn test_init_file_with_force_overwrite_false() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("existing.json");
+        let _file_path_str = file_path.to_str().unwrap();
+
+        fs::write(&file_path, "existing content").unwrap();
+        assert!(file_path.exists());
+
+        // Test with force_overwrite = false
+        // Note: This test would hang in a real scenario requiring user input,
+        // but we can't easily test the interactive behavior in unit tests
+        // The function should work correctly when force_overwrite is false
+        // and user input is provided through stdin
+    }
+
+    #[test]
+    fn test_init_file_with_empty_and_force_overwrite() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("existing.json");
+        let file_path_str = file_path.to_str().unwrap();
+
+        fs::write(&file_path, "existing content").unwrap();
+        assert!(file_path.exists());
+
+        // Test with empty = true and force_overwrite = true
+        let result = Storage::init_file_with_overwrite(file_path_str, true, true);
+        assert!(result.is_ok());
+
+        // Verify the file was overwritten with empty content
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert!(content.contains("\"posts\": []"));
+        assert!(content.contains("\"profile\": {}"));
+        assert!(!content.contains("existing content"));
+        assert!(!content.contains("Hello World"));
     }
 }
