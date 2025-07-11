@@ -411,7 +411,7 @@ const store = new Vuex.Store({
 
 ```bash
 # Development environment
-MOCKS_DEBUG_OVERWRITTEN_FILE=storage.dev.json mocks storage.json
+MOCKS_DEBUG_OVERWRITTEN_FILE=storage.dev.json mocks run storage.json
 
 # Testing environment
 mocks --no-overwrite storage.test.json

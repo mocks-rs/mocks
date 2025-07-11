@@ -112,7 +112,7 @@ Options available when starting the mocks server:
 By setting the `MOCKS_DEBUG_OVERWRITTEN_FILE` environment variable, you can save modified data to a separate file:
 
 ```bash
-MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks storage.json
+MOCKS_DEBUG_OVERWRITTEN_FILE=storage.debug.json mocks run storage.json
 ```
 
 This feature is useful for debugging during development.

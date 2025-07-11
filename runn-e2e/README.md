@@ -34,10 +34,9 @@ go install github.com/k1LoW/runn/cmd/runn@latest
 
 ```shell
 # From the project root
-cargo run -- -H 127.0.0.1 ./runn-e2e/storage.runn.json
+cargo run -- run -H 127.0.0.1 ./runn-e2e/storage.runn.json
 ```
 
 ```shell
-cd ./runn-e2e
-runn run runbooks/test.yml --verbose
+runn run ./runn-e2e/runbooks/test.yml --verbose
 ```

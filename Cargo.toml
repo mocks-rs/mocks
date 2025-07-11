@@ -1,6 +1,6 @@
 [package]
 name = "mocks"
-version = "0.4.6"
+version = "1.0.0"
 edition = "2021"
 authors = ["codemountains <codemountains@gmail.com>"]
 description = "Get a mock REST APIs with zero coding within seconds."
@@ -9,16 +9,20 @@ repository = "https://github.com/mocks-rs/mocks"
 documentation = "https://mocks-rs.github.io/mocks"
 readme = "README.md"
 license = "MIT"
-rust-version = "1.78.0"
+rust-version = "1.80.1"
 
 [dependencies]
 axum = "0.8.3"
-clap = { version = "4.5.40", features = ["derive"] }
+clap = { version = "4.5.40", features = ["derive", "color"] }
+colored = "3.0.0"
 serde_json = "1.0.140"
 tokio = { version = "1.45.1", features = ["full"] }
 
 [dev-dependencies]
 tempfile = "3.20.0"
+
+[lints.clippy]
+uninlined_format_args = "warn"
 
 [profile.release]
 lto = true
