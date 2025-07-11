@@ -43,28 +43,6 @@ jobs:
         with:
           components: ''
 
-      - name: Get version from release or input
-        id: get_version
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            VERSION="${{ github.event.inputs.version }}"
-          elif [[ "${{ github.event_name }}" == "workflow_call" ]]; then
-            VERSION="${{ inputs.version }}"
-          else
-            VERSION="${{ github.event.release.tag_name }}"
-          fi
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "tag=${VERSION}" >> $GITHUB_OUTPUT
-
-      - name: Verify version matches Cargo.toml
-        run: |
-          CARGO_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
-          if [ "${{ steps.get_version.outputs.version }}" != "$CARGO_VERSION" ]; then
-            echo "Version mismatch: tag ${{ steps.get_version.outputs.version }} vs Cargo.toml $CARGO_VERSION"
-            exit 1
-          fi
-
-
       - name: Dry run publish to crates.io
         if: github.event.inputs.dry_run == 'true'
         run: cargo publish --dry-run --token ${{ secrets.CRATES_TOKEN }}
@@ -72,7 +50,7 @@ jobs:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
 
       - name: Publish to crates.io
-        if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
+        if: github.event.inputs.dry_run == 'false'
         run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
