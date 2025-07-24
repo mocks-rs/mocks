@@ -76,7 +76,7 @@ jobs:
           cache-key: ${{ matrix.target }}
 
       - name: Install cross-compilation tools
-        if: matrix.target == 'x86_64-pc-windows-gnu' || matrix.target == 'x86_64-unknown-linux-musl' || matrix.target == 'aarch64-unknown-linux-musl'
+        if: contains(fromJSON('["x86_64-pc-windows-gnu", "x86_64-unknown-linux-musl", "aarch64-unknown-linux-musl"]'), matrix.target)
         shell: bash
         run: |
           sudo apt-get update
