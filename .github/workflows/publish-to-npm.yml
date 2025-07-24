@@ -36,10 +36,10 @@ jobs:
       matrix:
         include:
           - target: x86_64-unknown-linux-musl
-            os: ubuntu-20.04
+            os: ubuntu-latest
             platform: linux-x64
           - target: aarch64-unknown-linux-musl
-            os: ubuntu-20.04
+            os: ubuntu-latest
             platform: linux-arm64
           - target: x86_64-apple-darwin
             os: macos-latest
@@ -80,26 +80,7 @@ jobs:
         if: contains(matrix.target, 'musl')
         run: |
           sudo apt-get update
-          sudo apt-get install -y musl-tools musl-dev
-          if [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
-            # Install musl cross-compilation toolchain for aarch64
-            wget -q https://musl.cc/aarch64-linux-musl-cross.tgz
-            tar -xzf aarch64-linux-musl-cross.tgz
-            sudo mv aarch64-linux-musl-cross /opt/
-            echo "/opt/aarch64-linux-musl-cross/bin" >> $GITHUB_PATH
-            # Debug: List installed binaries
-            echo "=== aarch64 musl toolchain binaries ==="
-            ls -la /opt/aarch64-linux-musl-cross/bin/
-          elif [ "${{ matrix.target }}" = "x86_64-unknown-linux-musl" ]; then
-            # Install musl cross-compilation toolchain for x86_64
-            wget -q https://musl.cc/x86_64-linux-musl-cross.tgz
-            tar -xzf x86_64-linux-musl-cross.tgz
-            sudo mv x86_64-linux-musl-cross /opt/
-            echo "/opt/x86_64-linux-musl-cross/bin" >> $GITHUB_PATH
-            # Debug: List installed binaries
-            echo "=== x86_64 musl toolchain binaries ==="
-            ls -la /opt/x86_64-linux-musl-cross/bin/
-          fi
+          sudo apt-get install -y musl-tools
 
       - name: Install Windows cross-compilation tools
         if: matrix.target == 'x86_64-pc-windows-gnu'
@@ -107,17 +88,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-mingw-w64-x86-64
 
+      - name: Security audit
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: cargo audit
+
       - name: Build binary
-        run: cargo build --release --target ${{ matrix.target }}
         timeout-minutes: 30
+        run: cargo build --release --target ${{ matrix.target }}
         env:
           CARGO_TERM_COLOR: always
           RUST_BACKTRACE: 1
-          # Use full path to musl toolchain linkers
-          CC_aarch64_unknown_linux_musl: /opt/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: /opt/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
-          CC_x86_64_unknown_linux_musl: /opt/x86_64-linux-musl-cross/bin/x86_64-linux-musl-gcc
-          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: /opt/x86_64-linux-musl-cross/bin/x86_64-linux-musl-gcc
+          RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
 
       - name: Verify binary
         shell: bash
