@@ -76,12 +76,14 @@ jobs:
           cache-key: ${{ matrix.target }}
 
       - name: Install cross-compilation tools
-        if: matrix.target == 'x86_64-pc-windows-gnu' || matrix.target == 'aarch64-unknown-linux-musl'
+        if: contains(fromJSON('["x86_64-pc-windows-gnu", "x86_64-unknown-linux-musl", "aarch64-unknown-linux-musl"]'), matrix.target)
         shell: bash
         run: |
           sudo apt-get update
           if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
             sudo apt-get install -y gcc-mingw-w64-x86-64
+          elif [ "${{ matrix.target }}" = "x86_64-unknown-linux-musl" ]; then
+            sudo apt-get install -y musl-tools
           elif [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
             sudo apt-get install -y gcc-aarch64-linux-gnu musl-tools
           fi
@@ -92,6 +94,9 @@ jobs:
           if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
             export CC_x86_64_pc_windows_gnu=x86_64-w64-mingw32-gcc
             export CXX_x86_64_pc_windows_gnu=x86_64-w64-mingw32-g++
+          elif [ "${{ matrix.target }}" = "x86_64-unknown-linux-musl" ]; then
+            export CC_x86_64_unknown_linux_musl=musl-gcc
+            export CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc
           elif [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
             export CC_aarch64_unknown_linux_musl=aarch64-linux-gnu-gcc
             export CXX_aarch64_unknown_linux_musl=aarch64-linux-gnu-g++
