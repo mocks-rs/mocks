@@ -1,0 +1,41 @@
+{
+  "name": "@mocks-rs/mocks",
+  "version": "1.0.0",
+  "description": "Get a mock REST APIs with zero coding within seconds.",
+  "keywords": [
+    "mock",
+    "api",
+    "rest",
+    "json",
+    "server",
+    "cli",
+    "rust"
+  ],
+  "author": "codemountains <codemountains@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/mocks-rs/mocks",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mocks-rs/mocks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mocks-rs/mocks/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "bin": {
+    "mocks": "bin/mocks"
+  },
+  "files": [
+    "bin/mocks"
+  ],
+  "optionalDependencies": {
+    "@mocks-rs/mocks-linux-x64": "1.0.0",
+    "@mocks-rs/mocks-linux-arm64": "1.0.0",
+    "@mocks-rs/mocks-darwin-x64": "1.0.0",
+    "@mocks-rs/mocks-darwin-arm64": "1.0.0",
+    "@mocks-rs/mocks-win32-x64": "1.0.0",
+    "@mocks-rs/mocks-win32-arm64": "1.0.0"
+  }
+}

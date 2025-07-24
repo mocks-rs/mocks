@@ -61,11 +61,10 @@ jobs:
           echo "No version change detected. Skipping release creation."
         fi
 
-    # Publication to npm is being suspended.
-    # - name: Check version consistency
-    #   if: steps.check_version.outputs.version_changed == 'true'
-    #   run: |
-    #     node scripts/sync-versions.js check
+    - name: Check version consistency
+      if: steps.check_version.outputs.version_changed == 'true'
+      run: |
+        node scripts/sync-versions.js check
 
     - name: Check if tag exists
       id: check_tag
@@ -106,6 +105,15 @@ jobs:
     needs: create-release
     if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
     uses: ./.github/workflows/publish-to-cratesio.yml
+    with:
+      version: ${{ needs.create-release.outputs.version }}
+      dry_run: false
+    secrets: inherit
+
+  publish-to-npm:
+    needs: create-release
+    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
+    uses: ./.github/workflows/publish-to-npm.yml
     with:
       version: ${{ needs.create-release.outputs.version }}
       dry_run: false

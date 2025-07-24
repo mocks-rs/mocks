@@ -1,6 +1,17 @@
 name: Publish to NPM
 
 on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.0)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (do not actually publish)'
+        required: false
+        default: false
+        type: boolean
   workflow_dispatch:
     inputs:
       version:
@@ -110,13 +121,13 @@ jobs:
         run: |
           mkdir -p dist/${{ matrix.platform }}
           
-          # Check if npm-dist directory exists
-          if [ ! -d "npm-dist/mocks-${{ matrix.platform }}" ]; then
-            echo "npm-dist/mocks-${{ matrix.platform }} directory not found"
+          # Check if packages directory exists
+          if [ ! -d "packages/mocks-${{ matrix.platform }}" ]; then
+            echo "packages/mocks-${{ matrix.platform }} directory not found"
             exit 1
           fi
           
-          cp -r npm-dist/mocks-${{ matrix.platform }}/* dist/${{ matrix.platform }}/
+          cp -r packages/mocks-${{ matrix.platform }}/* dist/${{ matrix.platform }}/
           
           # Copy the binary to the platform package
           if [ "${{ matrix.platform }}" = "win32-x64" ] || [ "${{ matrix.platform }}" = "win32-arm64" ]; then
@@ -163,30 +174,30 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
-          cache-dependency-path: 'npm-dist/mocks/package.json'
+          cache-dependency-path: 'packages/mocks/package.json'
 
       - name: Verify main package
         shell: bash
         run: |
-          if [ ! -d "npm-dist/mocks" ]; then
-            echo "npm-dist/mocks directory not found"
+          if [ ! -d "packages/mocks" ]; then
+            echo "packages/mocks directory not found"
             exit 1
           fi
           
-          ls -la npm-dist/mocks/
+          ls -la packages/mocks/
 
       - name: Dry run publish main package
         if: github.event.inputs.dry_run == 'true'
         shell: bash
         run: |
-          cd npm-dist/mocks
+          cd packages/mocks
           npm publish --access public --dry-run
 
       - name: Publish main package
         if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
         shell: bash
         run: |
-          cd npm-dist/mocks
+          cd packages/mocks
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

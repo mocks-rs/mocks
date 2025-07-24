@@ -1,20 +1,15 @@
 {
   "name": "@mocks-rs/mocks-win32-x64",
-  "version": "0.4.5",
+  "version": "1.0.0",
   "description": "mocks Windows x64 binary",
-  "main": "index.js",
-  "os": [
-    "win32"
-  ],
-  "cpu": [
-    "x64"
-  ],
   "keywords": [
     "mock",
-    "rest",
     "api",
+    "rest",
+    "json",
     "server",
-    "binary"
+    "cli",
+    "rust"
   ],
   "author": "codemountains <codemountains@gmail.com>",
   "license": "MIT",
@@ -23,14 +18,16 @@
     "type": "git",
     "url": "https://github.com/mocks-rs/mocks.git"
   },
-  "bugs": {
-    "url": "https://github.com/mocks-rs/mocks/issues"
-  },
-  "files": [
-    "mocks.exe",
-    "index.js"
-  ],
   "engines": {
-    "node": ">=14.0.0"
-  }
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "mocks.exe"
+  ]
 }
