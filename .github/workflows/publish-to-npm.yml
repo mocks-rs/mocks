@@ -75,29 +75,50 @@ jobs:
           targets: ${{ matrix.target }}
           cache-key: ${{ matrix.target }}
 
-      - name: Install Rust target
-        run: rustup target add ${{ matrix.target }}
-
-      - name: Install musl toolchain
-        if: contains(matrix.target, 'musl')
+      - name: Install system dependencies
         run: |
+          echo "::group::Installing system dependencies for ${{ matrix.target }}"
+          set -x
           sudo apt-get update
-          sudo apt-get install -y musl-tools
-          if [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu
+          # Install musl toolchain
+          if [[ "${{ matrix.target }}" == *"musl"* ]]; then
+            echo "Installing musl toolchain..."
+            sudo apt-get install -y musl-tools
+            if [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
+              echo "Installing aarch64 cross-compilation tools..."
+              sudo apt-get install -y gcc-aarch64-linux-gnu
+            fi
           fi
+          # Install Windows cross-compilation tools
+          if [ "${{ matrix.target }}" = "x86_64-pc-windows-gnu" ]; then
+            echo "Installing Windows cross-compilation tools..."
+            sudo apt-get install -y gcc-mingw-w64-x86-64
+          fi
+          echo "::endgroup::"
 
-      - name: Install Windows cross-compilation tools
-        if: matrix.target == 'x86_64-pc-windows-gnu'
+      - name: Verify Rust installation
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-x86-64
+          echo "::group::Rust environment information"
+          rustc --version
+          cargo --version
+          rustup show
+          echo "Available targets:"
+          rustup target list --installed
+          echo "::endgroup::"
 
       - name: Build binary
-        run: cargo build --release --target ${{ matrix.target }}
+        run: |
+          echo "::group::Building binary for ${{ matrix.target }}"
+          set -x
+          echo "Starting build at $(date)"
+          cargo build --release --target ${{ matrix.target }} --verbose
+          echo "Build completed at $(date)"
+          echo "::endgroup::"
         env:
           RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
           CARGO_TERM_COLOR: always
+          # Set linker for aarch64-musl
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: aarch64-linux-gnu-gcc
 
       - name: Verify binary
         shell: bash
@@ -118,6 +139,7 @@ jobs:
       - name: Prepare platform package
         shell: bash
         run: |
+          echo "::group::Preparing platform package for ${{ matrix.platform }}"
           mkdir -p dist/${{ matrix.platform }}
           
           # Check if packages directory exists
@@ -134,6 +156,10 @@ jobs:
           else
             cp target/${{ matrix.target }}/release/mocks dist/${{ matrix.platform }}/
           fi
+          
+          echo "Package contents:"
+          ls -la dist/${{ matrix.platform }}/
+          echo "::endgroup::"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -147,15 +173,19 @@ jobs:
         if: github.event.inputs.dry_run == 'true'
         shell: bash
         run: |
+          echo "::group::Dry run publishing platform package ${{ matrix.platform }}"
           cd dist/${{ matrix.platform }}
           npm publish --access public --dry-run
+          echo "::endgroup::"
 
       - name: Publish platform package
         if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
         shell: bash
         run: |
+          echo "::group::Publishing platform package ${{ matrix.platform }}"
           cd dist/${{ matrix.platform }}
           npm publish --access public
+          echo "::endgroup::"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -178,25 +208,31 @@ jobs:
       - name: Verify main package
         shell: bash
         run: |
+          echo "::group::Verifying main package structure"
           if [ ! -d "packages/mocks" ]; then
             echo "packages/mocks directory not found"
             exit 1
           fi
           
           ls -la packages/mocks/
+          echo "::endgroup::"
 
       - name: Dry run publish main package
         if: github.event.inputs.dry_run == 'true'
         shell: bash
         run: |
+          echo "::group::Dry run publishing main package"
           cd packages/mocks
           npm publish --access public --dry-run
+          echo "::endgroup::"
 
       - name: Publish main package
         if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
         shell: bash
         run: |
+          echo "::group::Publishing main package"
           cd packages/mocks
           npm publish --access public
+          echo "::endgroup::"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
