@@ -1,6 +1,6 @@
 # mocks
 
-Get a mock REST APIs with zero coding within seconds.
+Get mock REST APIs with zero coding within seconds.
 
 [![npm version](https://img.shields.io/npm/v/@mocks-rs/mocks.svg)](https://www.npmjs.com/package/@mocks-rs/mocks)
 [![License](https://img.shields.io/github/license/mocks-rs/mocks)](https://github.com/mocks-rs/mocks/blob/main/LICENSE)

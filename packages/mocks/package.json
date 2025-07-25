@@ -1,7 +1,7 @@
 {
   "name": "@mocks-rs/mocks",
   "version": "1.0.2",
-  "description": "Get a mock REST APIs with zero coding within seconds.",
+  "description": "Get mock REST APIs with zero coding within seconds.",
   "keywords": [
     "mock",
     "api",
