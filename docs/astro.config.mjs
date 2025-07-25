@@ -18,6 +18,7 @@ export default defineConfig({
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/mocks-rs/mocks' },
 				{ icon: 'seti:rust', label: 'crates.io', href: 'https://crates.io/crates/mocks' },
+				{ icon: 'npm', label: 'npm', href: 'https://www.npmjs.com/package/@mocks-rs/mocks' },
 			],
 			sidebar: [
 				{
