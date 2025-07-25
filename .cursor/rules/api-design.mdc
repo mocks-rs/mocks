@@ -1,0 +1,527 @@
+---
+description: REST API design principles for mock endpoints
+globs:
+  - "src/server/handler/**/*.rs"
+alwaysApply: false
+---
+
+# REST API Design Principles
+
+This rule defines REST API design patterns and best practices for the mocks server handlers.
+
+## CRUD Endpoint Patterns
+
+### GET Operations (Read)
+
+#### Get All Resources
+```rust
+// GET /{resource} - List all items in a resource
+pub async fn get_all(
+    State(state): State<SharedState>,
+    Path(resource): Path<String>,
+    Query(params): Query<HashMap<String, String>>,
+) -> Result<Json<Value>, StatusCode> {
+    let state = state.lock().await;
+    
+    // Support filtering with query parameters
+    let data = if params.is_empty() {
+        select_all(&state.storage.data, &resource)
+    } else {
+        select_with_filter(&state.storage.data, &resource, &params)
+    };
+    
+    match data {
+        Ok(result) => Ok(Json(result)),
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
+}
+```
+
+#### Get Single Resource
+```rust
+// GET /{resource}/{id} - Get specific item by ID
+pub async fn get_one(
+    State(state): State<SharedState>,
+    Path((resource, id)): Path<(String, String)>,
+) -> Result<Json<Value>, StatusCode> {
+    let state = state.lock().await;
+    
+    match select_one(&state.storage.data, &resource, &id) {
+        Ok(item) => Ok(Json(item)),
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
+}
+```
+
+### POST Operations (Create)
+
+#### Create New Resource
+```rust
+// POST /{resource} - Create new item
+pub async fn post(
+    State(state): State<SharedState>,
+    Path(resource): Path<String>,
+    Json(input): Json<Value>,
+) -> Result<(StatusCode, Json<Value>), StatusCode> {
+    let mut state = state.lock().await;
+    
+    // Validate input before processing
+    if let Err(_) = validate_input(&input) {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    
+    match insert(&mut state.storage.data, &resource, input) {
+        Ok(created_item) => {
+            // Write to file if overwrite enabled
+            if state.storage.overwrite {
+                if let Err(_) = Writer::new(&state.storage.file)
+                    .write(&state.storage.data) {
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                }
+            }
+            Ok((StatusCode::CREATED, Json(created_item)))
+        }
+        Err(_) => Err(StatusCode::BAD_REQUEST),
+    }
+}
+```
+
+### PUT Operations (Replace)
+
+#### Replace Entire Resource
+```rust
+// PUT /{resource}/{id} - Replace entire item
+pub async fn put(
+    State(state): State<SharedState>,
+    Path((resource, id)): Path<(String, String)>,
+    Json(input): Json<Value>,
+) -> Result<Json<Value>, StatusCode> {
+    let mut state = state.lock().await;
+    
+    match replace(&mut state.storage.data, &resource, &id, input) {
+        Ok(updated_item) => {
+            if state.storage.overwrite {
+                let _ = Writer::new(&state.storage.file)
+                    .write(&state.storage.data);
+            }
+            Ok(Json(updated_item))
+        }
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
+}
+
+// PUT /{resource} - Replace entire collection (special case)
+pub async fn put_one(
+    State(state): State<SharedState>,
+    Path(resource): Path<String>,
+    Json(input): Json<Value>,
+) -> Result<Json<Value>, StatusCode> {
+    let mut state = state.lock().await;
+    
+    match replace_one(&mut state.storage.data, &resource, input) {
+        Ok(result) => {
+            if state.storage.overwrite {
+                let _ = Writer::new(&state.storage.file)
+                    .write(&state.storage.data);
+            }
+            Ok(Json(result))
+        }
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
+}
+```
+
+### PATCH Operations (Partial Update)
+
+#### Partial Update of Resource
+```rust
+// PATCH /{resource}/{id} - Partial update of item
+pub async fn patch(
+    State(state): State<SharedState>,
+    Path((resource, id)): Path<(String, String)>,
+    Json(input): Json<Value>,
+) -> Result<Json<Value>, StatusCode> {
+    let mut state = state.lock().await;
+    
+    match update(&mut state.storage.data, &resource, &id, input) {
+        Ok(updated_item) => {
+            if state.storage.overwrite {
+                let _ = Writer::new(&state.storage.file)
+                    .write(&state.storage.data);
+            }
+            Ok(Json(updated_item))
+        }
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
+}
+
+// PATCH /{resource} - Partial update of collection
+pub async fn patch_one(
+    State(state): State<SharedState>,
+    Path(resource): Path<String>,
+    Json(input): Json<Value>,
+) -> Result<Json<Value>, StatusCode> {
+    let mut state = state.lock().await;
+    
+    match update_one(&mut state.storage.data, &resource, input) {
+        Ok(result) => {
+            if state.storage.overwrite {
+                let _ = Writer::new(&state.storage.file)
+                    .write(&state.storage.data);
+            }
+            Ok(Json(result))
+        }
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
+}
+```
+
+### DELETE Operations (Remove)
+
+#### Delete Resource
+```rust
+// DELETE /{resource}/{id} - Delete specific item
+pub async fn delete(
+    State(state): State<SharedState>,
+    Path((resource, id)): Path<(String, String)>,
+) -> Result<StatusCode, StatusCode> {
+    let mut state = state.lock().await;
+    
+    match remove(&mut state.storage.data, &resource, &id) {
+        Ok(_) => {
+            if state.storage.overwrite {
+                let _ = Writer::new(&state.storage.file)
+                    .write(&state.storage.data);
+            }
+            Ok(StatusCode::NO_CONTENT)
+        }
+        Err(_) => Err(StatusCode::NOT_FOUND),
+    }
+}
+```
+
+## HTTP Status Code Mapping
+
+### Success Responses
+```rust
+// Use appropriate status codes for different operations
+match operation_type {
+    OperationType::Create => StatusCode::CREATED,        // 201
+    OperationType::Read => StatusCode::OK,               // 200
+    OperationType::Update => StatusCode::OK,             // 200
+    OperationType::Delete => StatusCode::NO_CONTENT,     // 204
+}
+```
+
+### Error Responses
+```rust
+// Map errors to appropriate HTTP status codes
+impl From<MocksError> for StatusCode {
+    fn from(error: MocksError) -> Self {
+        match error {
+            MocksError::ResourceNotFound(_) => StatusCode::NOT_FOUND,           // 404
+            MocksError::InvalidArgs(_) => StatusCode::BAD_REQUEST,              // 400
+            MocksError::InvalidJson(_) => StatusCode::BAD_REQUEST,              // 400
+            MocksError::FailedReadFile(_) => StatusCode::INTERNAL_SERVER_ERROR, // 500
+            MocksError::FailedWriteFile(_) => StatusCode::INTERNAL_SERVER_ERROR,// 500
+            MocksError::Exception(_) => StatusCode::INTERNAL_SERVER_ERROR,      // 500
+            MocksError::Aborted => StatusCode::CONFLICT,                        // 409
+            MocksError::InvalidDataStructure => StatusCode::UNPROCESSABLE_ENTITY, // 422
+        }
+    }
+}
+```
+
+## JSON Request/Response Handling
+
+### Input Validation
+```rust
+fn validate_input(input: &Value) -> Result<(), ValidationError> {
+    match input {
+        Value::Object(obj) => {
+            // Validate required fields
+            if obj.is_empty() {
+                return Err(ValidationError::EmptyObject);
+            }
+            
+            // Check for invalid field names
+            for key in obj.keys() {
+                if key.starts_with('_') {
+                    return Err(ValidationError::ReservedField(key.clone()));
+                }
+            }
+            
+            Ok(())
+        }
+        Value::Array(_) => Ok(()),
+        _ => Err(ValidationError::InvalidType),
+    }
+}
+```
+
+### Response Formatting
+```rust
+// Consistent response structure
+#[derive(Serialize)]
+struct ApiResponse<T> {
+    data: T,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    message: Option<String>,
+}
+
+impl<T> ApiResponse<T> {
+    fn success(data: T) -> Self {
+        Self {
+            data,
+            error: None,
+            message: None,
+        }
+    }
+    
+    fn error(error: String) -> ApiResponse<()> {
+        ApiResponse {
+            data: (),
+            error: Some(error),
+            message: None,
+        }
+    }
+}
+```
+
+### Content-Type Handling
+```rust
+// Ensure proper content-type headers
+use axum::http::{HeaderMap, HeaderValue};
+
+fn set_json_headers() -> HeaderMap {
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        "content-type", 
+        HeaderValue::from_static("application/json")
+    );
+    headers
+}
+```
+
+## Query Parameter Handling
+
+### Filtering Support
+```rust
+// Support common query parameters for filtering
+pub async fn get_all_with_query(
+    State(state): State<SharedState>,
+    Path(resource): Path<String>,
+    Query(params): Query<HashMap<String, String>>,
+) -> Result<Json<Value>, StatusCode> {
+    let state = state.lock().await;
+    
+    let mut data = select_all(&state.storage.data, &resource)?;
+    
+    // Apply filters
+    if let Some(filter_value) = params.get("filter") {
+        data = apply_filter(data, filter_value)?;
+    }
+    
+    // Apply sorting
+    if let Some(sort_field) = params.get("sort") {
+        data = apply_sort(data, sort_field, params.get("order"))?;
+    }
+    
+    // Apply pagination
+    if let (Some(page), Some(limit)) = (params.get("page"), params.get("limit")) {
+        data = apply_pagination(data, page, limit)?;
+    }
+    
+    Ok(Json(data))
+}
+```
+
+### Pagination Implementation
+```rust
+fn apply_pagination(
+    data: Value, 
+    page: &str, 
+    limit: &str
+) -> Result<Value, MocksError> {
+    let page: usize = page.parse()
+        .map_err(|_| MocksError::InvalidArgs("Invalid page number".to_string()))?;
+    let limit: usize = limit.parse()
+        .map_err(|_| MocksError::InvalidArgs("Invalid limit".to_string()))?;
+    
+    if let Value::Array(items) = data {
+        let start = (page - 1) * limit;
+        let end = start + limit;
+        
+        let paginated: Vec<Value> = items
+            .into_iter()
+            .skip(start)
+            .take(limit)
+            .collect();
+            
+        Ok(Value::Array(paginated))
+    } else {
+        Ok(data)
+    }
+}
+```
+
+## Health Check Implementation
+
+### Standard Health Check Endpoint
+```rust
+// GET /_hc - Health check endpoint
+pub async fn hc() -> StatusCode {
+    StatusCode::NO_CONTENT  // 204 indicates service is healthy
+}
+```
+
+### Detailed Health Check (Optional)
+```rust
+#[derive(Serialize)]
+struct HealthStatus {
+    status: String,
+    timestamp: String,
+    version: String,
+    storage: StorageHealth,
+}
+
+#[derive(Serialize)]
+struct StorageHealth {
+    accessible: bool,
+    file_path: String,
+    last_modified: Option<String>,
+}
+
+pub async fn detailed_health_check(
+    State(state): State<SharedState>,
+) -> Result<Json<HealthStatus>, StatusCode> {
+    let state = state.lock().await;
+    
+    let storage_health = StorageHealth {
+        accessible: std::path::Path::new(&state.storage.file).exists(),
+        file_path: state.storage.file.clone(),
+        last_modified: get_file_modified_time(&state.storage.file),
+    };
+    
+    let health = HealthStatus {
+        status: "ok".to_string(),
+        timestamp: chrono::Utc::now().to_rfc3339(),
+        version: env!("CARGO_PKG_VERSION").to_string(),
+        storage: storage_health,
+    };
+    
+    Ok(Json(health))
+}
+```
+
+## Error Response Formatting
+
+### Consistent Error Structure
+```rust
+#[derive(Serialize)]
+struct ErrorResponse {
+    error: String,
+    message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    details: Option<Value>,
+}
+
+impl ErrorResponse {
+    fn from_error(error: MocksError) -> Self {
+        Self {
+            error: error.error_type(),
+            message: error.to_string(),
+            details: error.details(),
+        }
+    }
+}
+
+impl MocksError {
+    fn error_type(&self) -> String {
+        match self {
+            MocksError::ResourceNotFound(_) => "NOT_FOUND".to_string(),
+            MocksError::InvalidArgs(_) => "INVALID_ARGS".to_string(),
+            MocksError::InvalidJson(_) => "INVALID_JSON".to_string(),
+            _ => "INTERNAL_ERROR".to_string(),
+        }
+    }
+    
+    fn details(&self) -> Option<Value> {
+        match self {
+            MocksError::InvalidJson(msg) => {
+                Some(json!({ "json_error": msg }))
+            }
+            _ => None,
+        }
+    }
+}
+```
+
+## Middleware Patterns
+
+### Request Logging Middleware
+```rust
+use axum::middleware::{self, Next};
+use axum::http::Request;
+
+pub async fn logging_middleware<B>(
+    request: Request<B>,
+    next: Next<B>,
+) -> Result<impl axum::response::IntoResponse, axum::http::StatusCode> {
+    let method = request.method().clone();
+    let uri = request.uri().clone();
+    
+    println!("{} {}", method, uri);
+    
+    let response = next.run(request).await;
+    
+    Ok(response)
+}
+```
+
+### CORS Headers Middleware
+```rust
+use axum::http::{HeaderValue, Method};
+use tower_http::cors::{CorsLayer, Any};
+
+pub fn cors_layer() -> CorsLayer {
+    CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::PATCH, Method::DELETE])
+        .allow_headers(Any)
+        .allow_origin(Any)
+}
+```
+
+## Request Context Pattern
+
+### Extracting Request Information
+```rust
+use axum::http::HeaderMap;
+
+pub struct RequestContext {
+    pub user_agent: Option<String>,
+    pub content_type: Option<String>,
+    pub accept: Option<String>,
+}
+
+impl RequestContext {
+    pub fn from_headers(headers: &HeaderMap) -> Self {
+        Self {
+            user_agent: headers
+                .get("user-agent")
+                .and_then(|h| h.to_str().ok())
+                .map(|s| s.to_string()),
+            content_type: headers
+                .get("content-type")
+                .and_then(|h| h.to_str().ok())
+                .map(|s| s.to_string()),
+            accept: headers
+                .get("accept")
+                .and_then(|h| h.to_str().ok())
+                .map(|s| s.to_string()),
+        }
+    }
+}
+```
