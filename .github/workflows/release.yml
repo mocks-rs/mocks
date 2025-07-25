@@ -46,19 +46,18 @@ jobs:
       run: |
         CURRENT_VERSION="${{ steps.get_version.outputs.version }}"
         
-        # Get the previous version from the last commit that changed Cargo.toml
-        PREVIOUS_VERSION=$(git log --oneline -n 2 --pretty=format:"%H" -- Cargo.toml | tail -1 | xargs git show --format="" --name-only | head -1 | xargs git show | grep "^version = " | cut -d'"' -f2 || echo "0.0.0")
+        # Get the previous version from the last commit
+        PREVIOUS_VERSION=$(git show HEAD~1:Cargo.toml | grep "^version = " | cut -d'"' -f2 2>/dev/null || echo "")
         
         echo "Previous version: $PREVIOUS_VERSION"
         echo "Current version: $CURRENT_VERSION"
         
-        if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+        if [ -n "$PREVIOUS_VERSION" ] && [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
           echo "version_changed=true" >> $GITHUB_OUTPUT
           echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
         else
           echo "version_changed=false" >> $GITHUB_OUTPUT
           echo "Version unchanged: $CURRENT_VERSION"
-          echo "No version change detected. Skipping release creation."
         fi
 
     - name: Check version consistency
@@ -103,7 +102,7 @@ jobs:
 
   publish-to-cratesio:
     needs: create-release
-    if: needs.create-release.outputs.version_changed == 'true'
+    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
     uses: ./.github/workflows/publish-to-cratesio.yml
     with:
       version: ${{ needs.create-release.outputs.version }}
@@ -112,7 +111,7 @@ jobs:
 
   publish-to-npm:
     needs: create-release
-    if: needs.create-release.outputs.version_changed == 'true'
+    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
     uses: ./.github/workflows/publish-to-npm.yml
     with:
       version: ${{ needs.create-release.outputs.version }}
