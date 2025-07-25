@@ -52,7 +52,7 @@ jobs:
         echo "Previous version: $PREVIOUS_VERSION"
         echo "Current version: $CURRENT_VERSION"
         
-        if [ -n "$PREVIOUS_VERSION" ] && [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+        if [ -n "$CURRENT_VERSION" ] && [ -n "$PREVIOUS_VERSION" ] && [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
           echo "version_changed=true" >> $GITHUB_OUTPUT
           echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
         else
