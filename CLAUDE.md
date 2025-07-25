@@ -100,12 +100,6 @@ mocks run -H 127.0.0.1 -p 8080 storage.json  # Custom host/port
 mocks run --no-overwrite storage.json       # Prevent file modifications
 ```
 
-## Key Dependencies
-- **axum 0.8.3**: HTTP server framework
-- **clap 4.5.39**: CLI argument parsing with derive macros
-- **serde_json 1.0.140**: JSON serialization
-- **tokio 1.45.1**: Async runtime
-
 ## Important Notes
 - Resource names in JSON must be unique (validation enforced)
 - Singleton objects vs arrays are handled differently in routing
