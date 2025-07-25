@@ -13,7 +13,8 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'mocks',
-			description: 'Get mock REST APIs with zero coding within seconds.',
+			description: 'Mock REST APIs from JSON with zero coding within seconds.',
+			favicon: '/favicon.ico',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/mocks-rs/mocks' },
 				{ icon: 'seti:rust', label: 'crates.io', href: 'https://crates.io/crates/mocks' },
