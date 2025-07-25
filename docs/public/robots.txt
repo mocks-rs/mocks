@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mocks-rs.github.io/mocks/sitemap-index.xml
