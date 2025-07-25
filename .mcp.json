@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {}
+    },
+    "rust": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mizchi/lsmcp",
+        "--bin=rust-analyzer"
+      ],
+      "env": {}
+    }
+  }
+}
