@@ -15,6 +15,32 @@ If you're using Homebrew on macOS, you can install from the dedicated tap:
 brew install mocks-rs/tap/mocks
 ```
 
+### npm (Node.js)
+
+If you're using Node.js, you can install mocks globally via npm:
+
+```bash
+npm install -g @mocks-rs/mocks
+```
+
+Or use it without installing:
+
+```bash
+npx @mocks-rs/mocks --help
+```
+
+Example usage with npx:
+
+```bash
+# Initialize a storage file
+npx @mocks-rs/mocks init storage.json
+
+# Run the mock server
+npx @mocks-rs/mocks run storage.json
+```
+
+**System Requirements**: Node.js 18.0.0 or higher
+
 ### Cargo (Rust)
 
 If you have a Rust development environment, you can install directly from cargo:
