@@ -166,7 +166,7 @@ jobs:
           npm publish --access public --dry-run
 
       - name: Publish platform package
-        if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
+        if: github.event.inputs.dry_run != 'true' || !inputs.dry_run
         shell: bash
         run: |
           cd dist/${{ matrix.platform }}
@@ -201,14 +201,14 @@ jobs:
           ls -la packages/mocks/
 
       - name: Dry run publish main package
-        if: github.event.inputs.dry_run == 'true'
+        if: github.event.inputs.dry_run == 'true' || inputs.dry_run
         shell: bash
         run: |
           cd packages/mocks
           npm publish --access public --dry-run
 
       - name: Publish main package
-        if: github.event.inputs.dry_run == 'false' || github.event_name == 'release'
+        if: github.event.inputs.dry_run != 'true' || !inputs.dry_run
         shell: bash
         run: |
           cd packages/mocks
