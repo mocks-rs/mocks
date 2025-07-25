@@ -21,6 +21,14 @@ You can also remove the tap if you no longer need it:
 brew untap mocks-rs/tap
 ```
 
+### npm (Node.js)
+
+If you installed mocks globally using npm, you can uninstall it with:
+
+```bash
+npm uninstall -g @mocks-rs/mocks
+```
+
 ### Cargo (Rust)
 
 If you installed mocks using Cargo, you can uninstall it with:

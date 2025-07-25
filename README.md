@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/mocks-rs/mocks/branch/main/graph/badge.svg?token=1WZ0YCZK9J)](https://codecov.io/gh/mocks-rs/mocks)
 [![License](https://img.shields.io/github/license/mocks-rs/mocks)](LICENSE)
 
-Get a mock REST APIs with zero coding within seconds.
+Mock REST APIs from JSON with zero coding within seconds.
 
 **[Complete Documentation](https://mocks-rs.github.io/mocks)** - For detailed usage, advanced features, and examples.
 
