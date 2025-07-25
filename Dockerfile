@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Optimize Rust settings
-RUN rustup component add rustfmt clippy llvm-tools-preview
+RUN rustup component add rustfmt clippy llvm-tools-preview rust-analyzer
 RUN cargo install cargo-llvm-cov
 
 # Oh My Zsh
