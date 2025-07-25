@@ -21,7 +21,8 @@
                 "ms-azuretools.vscode-docker",
                 "streetsidesoftware.code-spell-checker",
                 "github.vscode-github-actions",
-                "astro-build.astro-vscode"
+                "astro-build.astro-vscode",
+                "unifiedjs.vscode-mdx"
             ],
             "settings": {
                 "rust-analyzer.check.command": "clippy",
