@@ -5,13 +5,13 @@ const path = require('path');
 
 const CARGO_TOML_PATH = path.join(__dirname, '..', 'Cargo.toml');
 const PACKAGE_JSON_PATHS = [
-  path.join(__dirname, '..', 'packages', 'mocks', 'package.json'),
-  path.join(__dirname, '..', 'packages', 'mocks-linux-arm64', 'package.json'),
-  path.join(__dirname, '..', 'packages', 'mocks-linux-x64', 'package.json'),
-  path.join(__dirname, '..', 'packages', 'mocks-darwin-arm64', 'package.json'),
-  path.join(__dirname, '..', 'packages', 'mocks-darwin-x64', 'package.json'),
-  path.join(__dirname, '..', 'packages', 'mocks-win32-arm64', 'package.json'),
-  path.join(__dirname, '..', 'packages', 'mocks-win32-x64', 'package.json')
+  path.join(__dirname, '..', 'packages', '@mocks-rs', 'mocks', 'package.json'),
+  path.join(__dirname, '..', 'packages', '@mocks-rs', 'mocks-linux-arm64', 'package.json'),
+  path.join(__dirname, '..', 'packages', '@mocks-rs', 'mocks-linux-x64', 'package.json'),
+  path.join(__dirname, '..', 'packages', '@mocks-rs', 'mocks-darwin-arm64', 'package.json'),
+  path.join(__dirname, '..', 'packages', '@mocks-rs', 'mocks-darwin-x64', 'package.json'),
+  path.join(__dirname, '..', 'packages', '@mocks-rs', 'mocks-win32-arm64', 'package.json'),
+  path.join(__dirname, '..', 'packages', '@mocks-rs', 'mocks-win32-x64', 'package.json')
 ];
 
 function getRelativePackagePath(packagePath) {
