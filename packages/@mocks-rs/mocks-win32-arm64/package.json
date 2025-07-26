@@ -1,6 +1,6 @@
 {
   "name": "@mocks-rs/mocks-win32-arm64",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "mocks Windows ARM64 binary",
   "keywords": [
     "mock",
