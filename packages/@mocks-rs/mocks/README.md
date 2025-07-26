@@ -29,10 +29,22 @@ Create a JSON file using the `init` command:
 npx @mocks-rs/mocks init storage.json
 ```
 
+Or if installed globally:
+
+```shell
+mocks init storage.json
+```
+
 This creates a `storage.json` file with sample data. Use the `--empty` option to create an empty structure:
 
 ```shell
 npx @mocks-rs/mocks init --empty storage.json
+```
+
+Or if installed globally:
+
+```shell
+mocks init --empty storage.json
 ```
 
 ### 2. Run a REST API server
@@ -41,6 +53,12 @@ Start the mock server using your JSON file:
 
 ```shell
 npx @mocks-rs/mocks run storage.json
+```
+
+Or if installed globally:
+
+```shell
+mocks run storage.json
 ```
 
 Example JSON structure:

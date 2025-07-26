@@ -32,7 +32,8 @@ npm install -g mocks
 Alternatively, you can run `mocks` without installing using `npx`.
 
 ```shell
-npx mocks run storage.json
+npx @mocks-rs/mocks init storage.json
+npx @mocks-rs/mocks run storage.json
 ```
 
 ## Usage
