@@ -136,12 +136,12 @@ jobs:
           mkdir -p dist/${{ matrix.platform }}
           
           # Check if packages directory exists
-          if [ ! -d "packages/mocks-${{ matrix.platform }}" ]; then
-            echo "packages/mocks-${{ matrix.platform }} directory not found"
+          if [ ! -d "packages/@mocks-rs/mocks-${{ matrix.platform }}" ]; then
+            echo "packages/@mocks-rs/mocks-${{ matrix.platform }} directory not found"
             exit 1
           fi
           
-          cp -r packages/mocks-${{ matrix.platform }}/* dist/${{ matrix.platform }}/
+          cp -r packages/@mocks-rs/mocks-${{ matrix.platform }}/* dist/${{ matrix.platform }}/
           
           # Copy the binary to the platform package
           if [ "${{ matrix.platform }}" = "win32-x64" ] || [ "${{ matrix.platform }}" = "win32-arm64" ]; then
@@ -188,30 +188,30 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
-          cache-dependency-path: 'packages/mocks/package.json'
+          cache-dependency-path: 'packages/@mocks-rs/mocks/package.json'
 
       - name: Verify main package
         shell: bash
         run: |
-          if [ ! -d "packages/mocks" ]; then
-            echo "packages/mocks directory not found"
+          if [ ! -d "packages/@mocks-rs/mocks" ]; then
+            echo "packages/@mocks-rs/mocks directory not found"
             exit 1
           fi
           
-          ls -la packages/mocks/
+          ls -la packages/@mocks-rs/mocks/
 
       - name: Dry run publish main package
         if: github.event.inputs.dry_run == 'true' || inputs.dry_run == true
         shell: bash
         run: |
-          cd packages/mocks
+          cd packages/@mocks-rs/mocks
           npm publish --access public --dry-run
 
       - name: Publish main package
         if: github.event.inputs.dry_run == 'false' || inputs.dry_run == false
         shell: bash
         run: |
-          cd packages/mocks
+          cd packages/@mocks-rs/mocks
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

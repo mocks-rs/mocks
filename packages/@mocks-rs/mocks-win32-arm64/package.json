@@ -1,7 +1,7 @@
 {
-  "name": "@mocks-rs/mocks-linux-arm64",
-  "version": "1.0.2",
-  "description": "mocks Linux ARM64 binary",
+  "name": "@mocks-rs/mocks-win32-arm64",
+  "version": "1.0.3",
+  "description": "mocks Windows ARM64 binary",
   "keywords": [
     "mock",
     "api",
@@ -22,12 +22,12 @@
     "node": ">=18.0.0"
   },
   "os": [
-    "linux"
+    "win32"
   ],
   "cpu": [
     "arm64"
   ],
   "files": [
-    "mocks"
+    "mocks.exe"
   ]
 }

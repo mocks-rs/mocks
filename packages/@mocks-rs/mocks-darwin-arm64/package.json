@@ -1,7 +1,7 @@
 {
-  "name": "@mocks-rs/mocks-darwin-x64",
-  "version": "1.0.2",
-  "description": "mocks macOS x64 binary",
+  "name": "@mocks-rs/mocks-darwin-arm64",
+  "version": "1.0.3",
+  "description": "mocks macOS ARM64 binary",
   "keywords": [
     "mock",
     "api",
@@ -25,7 +25,7 @@
     "darwin"
   ],
   "cpu": [
-    "x64"
+    "arm64"
   ],
   "files": [
     "mocks"

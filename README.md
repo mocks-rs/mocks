@@ -23,6 +23,18 @@ If you're a Rust programmer, `mocks` can be installed with `cargo`.
 cargo install mocks
 ```
 
+If you're a Node.js user, you can install `mocks` globally with `npm`.
+
+```shell
+npm install -g mocks
+```
+
+Alternatively, you can run `mocks` without installing using `npx`.
+
+```shell
+npx mocks run storage.json
+```
+
 ## Usage
 
 ### Initialize a storage file
