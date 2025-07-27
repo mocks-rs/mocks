@@ -41,7 +41,6 @@ jobs:
       run: cargo test
 
     - name: Check MSRV compatibility
-      if: steps.changes.outputs.rust == 'true'
       run: |
         cargo install cargo-msrv --locked
         cargo msrv verify
