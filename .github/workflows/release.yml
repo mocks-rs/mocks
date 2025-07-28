@@ -117,3 +117,11 @@ jobs:
       version: ${{ needs.create-release.outputs.version }}
       dry_run: false
     secrets: inherit
+
+  build-release-binaries:
+    needs: create-release
+    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
+    uses: ./.github/workflows/build-release-binaries.yml
+    with:
+      version: ${{ needs.create-release.outputs.version }}
+    secrets: inherit
