@@ -1,6 +1,6 @@
 {
   "name": "@mocks-rs/mocks-linux-arm64",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "mocks Linux ARM64 binary",
   "keywords": [
     "mock",
