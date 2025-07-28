@@ -99,7 +99,6 @@ jobs:
         env:
           CARGO_TERM_COLOR: always
           RUST_BACKTRACE: 1
-          RUSTFLAGS: "-C strip=symbols -C codegen-units=1"
           # aarch64 cross-compilation linker
           CC_aarch64_unknown_linux_musl: aarch64-linux-gnu-gcc
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: aarch64-linux-gnu-gcc
