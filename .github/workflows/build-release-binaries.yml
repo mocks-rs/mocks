@@ -95,7 +95,7 @@ jobs:
 
       - name: Build binary
         timeout-minutes: 30
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release --target ${{ matrix.target }} --bin mocks
         env:
           CARGO_TERM_COLOR: always
           RUST_BACKTRACE: 1
