@@ -475,7 +475,7 @@ dependencies = [
 
 [[package]]
 name = "mocks"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "axum",
  "clap",
