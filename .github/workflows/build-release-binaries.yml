@@ -140,9 +140,14 @@ jobs:
           cp "$BINARY_PATH" archive/
           
           # Create archive
-          if [ "${{ matrix.archive_ext }}" = "zip" ]; then
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            # Use PowerShell Compress-Archive on Windows
+            powershell -Command "Compress-Archive -Path \"archive\\*\" -DestinationPath \"$ARCHIVE_NAME\""
+          elif [ "${{ matrix.archive_ext }}" = "zip" ]; then
+            # Use zip command on Unix-like systems
             cd archive && zip -r "../$ARCHIVE_NAME" . && cd ..
           else
+            # Use tar for non-zip archives
             tar -czf "$ARCHIVE_NAME" -C archive .
           fi
           
