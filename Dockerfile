@@ -11,8 +11,6 @@ RUN apt-get update && apt-get install -y \
     nano \
     zsh \
     procps \
-    nano \
-    vi \
     lsof \
     # Build tools
     build-essential \
