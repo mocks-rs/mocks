@@ -3,6 +3,7 @@
 [![Crates.io](https://img.shields.io/crates/v/mocks.svg)](https://crates.io/crates/mocks)
 [![msrv 1.80.1](https://img.shields.io/badge/msrv-1.80.1-dea584.svg?logo=rust)](https://github.com/rust-lang/rust/releases/tag/1.80.1)
 [![codecov](https://codecov.io/gh/mocks-rs/mocks/branch/main/graph/badge.svg?token=1WZ0YCZK9J)](https://codecov.io/gh/mocks-rs/mocks)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mocks-rs/mocks)
 [![License](https://img.shields.io/github/license/mocks-rs/mocks)](LICENSE)
 
 Mock REST APIs from JSON with zero coding within seconds.

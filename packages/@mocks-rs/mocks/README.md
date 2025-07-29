@@ -3,6 +3,8 @@
 Mock REST APIs from JSON with zero coding within seconds.
 
 [![npm version](https://img.shields.io/npm/v/@mocks-rs/mocks.svg)](https://www.npmjs.com/package/@mocks-rs/mocks)
+[![codecov](https://codecov.io/gh/mocks-rs/mocks/branch/main/graph/badge.svg?token=1WZ0YCZK9J)](https://codecov.io/gh/mocks-rs/mocks)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mocks-rs/mocks)
 [![License](https://img.shields.io/github/license/mocks-rs/mocks)](https://github.com/mocks-rs/mocks/blob/main/LICENSE)
 
 **[Complete Documentation](https://mocks-rs.github.io/mocks)** - For detailed usage, advanced features, and examples.
