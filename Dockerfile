@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y \
     vim \
     nano \
     zsh \
+    procps \
+    nano \
+    vi \
+    lsof \
     # Build tools
     build-essential \
     pkg-config \
