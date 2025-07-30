@@ -3,6 +3,8 @@ name: Release
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+        - 'CHANGELOG.md'
   workflow_call:
   workflow_dispatch:
 
