@@ -17,6 +17,7 @@ lldb
 mocks
 msrv
 msvc
+procps
 robbyrussell
 runbooks
 runn
