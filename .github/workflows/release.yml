@@ -125,3 +125,10 @@ jobs:
     with:
       version: ${{ needs.create-release.outputs.version }}
     secrets: inherit
+
+  generate-changelog:
+    needs: create-release
+    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
+    uses: ./.github/workflows/generate-changelog.yml
+    with:
+      dry_run: false
