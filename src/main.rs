@@ -18,7 +18,7 @@ struct Cli {
 
 #[derive(clap::Subcommand, Debug)]
 enum Commands {
-    /// Start the mock server
+    /// Start the mock api server
     Run(RunArgs),
     /// Initialize a new storage file
     Init(InitArgs),
