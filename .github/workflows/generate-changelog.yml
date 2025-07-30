@@ -43,7 +43,7 @@ jobs:
 
       - name: Commit changelog
         id: commit
-        if: ${{ !inputs.dry_run && github.event.inputs.dry_run != 'true' }}
+        if: github.event.inputs.dry_run == 'false' || inputs.dry_run == false
         run: |
           set -euo pipefail
           
