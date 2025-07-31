@@ -133,4 +133,5 @@ jobs:
     if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
     uses: ./.github/workflows/generate-changelog.yml
     with:
+      target_branch: 'main'
       dry_run: false
