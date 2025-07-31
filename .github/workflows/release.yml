@@ -107,7 +107,6 @@ jobs:
     if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
     uses: ./.github/workflows/publish-to-cratesio.yml
     with:
-      version: ${{ needs.create-release.outputs.version }}
       dry_run: false
     secrets: inherit
 
@@ -116,7 +115,6 @@ jobs:
     if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
     uses: ./.github/workflows/publish-to-npm.yml
     with:
-      version: ${{ needs.create-release.outputs.version }}
       dry_run: false
     secrets: inherit
 

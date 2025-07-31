@@ -3,10 +3,6 @@ name: Publish to npm
 on:
   workflow_call:
     inputs:
-      version:
-        description: 'Version to publish (e.g., 1.0.0)'
-        required: true
-        type: string
       dry_run:
         description: 'Dry run (do not actually publish)'
         required: false
@@ -14,10 +10,6 @@ on:
         type: boolean
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to publish (e.g., 1.0.0)'
-        required: true
-        type: string
       dry_run:
         description: 'Dry run (do not actually publish)'
         required: false
@@ -57,18 +49,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Get version from release or input
-        id: get_version
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            VERSION="${{ github.event.release.tag_name }}"
-          fi
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "tag=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Setup Rust
         uses: ./.github/actions/setup-rust
@@ -158,14 +138,14 @@ jobs:
           cache-dependency-path: 'dist/${{ matrix.platform }}/package.json'
 
       - name: Dry run publish platform package
-        if: github.event.inputs.dry_run == 'true' || inputs.dry_run == true
+        if: inputs.dry_run == true
         shell: bash
         run: |
           cd dist/${{ matrix.platform }}
           npm publish --access public --dry-run
 
       - name: Publish platform package
-        if: github.event.inputs.dry_run == 'false' || inputs.dry_run == false
+        if: inputs.dry_run == false
         shell: bash
         run: |
           cd dist/${{ matrix.platform }}
@@ -200,14 +180,14 @@ jobs:
           ls -la packages/@mocks-rs/mocks/
 
       - name: Dry run publish main package
-        if: github.event.inputs.dry_run == 'true' || inputs.dry_run == true
+        if: inputs.dry_run == true
         shell: bash
         run: |
           cd packages/@mocks-rs/mocks
           npm publish --access public --dry-run
 
       - name: Publish main package
-        if: github.event.inputs.dry_run == 'false' || inputs.dry_run == false
+        if: inputs.dry_run == false
         shell: bash
         run: |
           cd packages/@mocks-rs/mocks

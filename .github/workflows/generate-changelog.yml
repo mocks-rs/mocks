@@ -44,9 +44,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          BRANCH="${{ inputs.target_branch || github.event.inputs.target_branch || 'main' }}"
+          echo "inputs.target_branch=${{ inputs.target_branch }}"
+
+          BRANCH="${{ inputs.target_branch || 'main' }}"
           echo "Using branch: $BRANCH"
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+
           git checkout "$BRANCH"
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
@@ -62,7 +65,7 @@ jobs:
 
       - name: Commit changelog
         id: commit
-        if: github.event.inputs.dry_run == 'false' || inputs.dry_run == false
+        if: inputs.dry_run == false
         run: |
           set -euo pipefail
 
