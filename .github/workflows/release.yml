@@ -64,7 +64,7 @@ jobs:
       - name: Verify version consistency
         if: steps.check_version.outputs.version_changed == 'true'
         run: |
-          echo "🔍 Checking version consistency across package files"
+          echo "Checking version consistency across package files"
           node scripts/sync-versions.js check
 
       - name: Check if tag exists
@@ -95,10 +95,10 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: 'main'
 
       - name: Configure Git
         run: |
-          git checkout main
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
