@@ -80,6 +80,14 @@ jobs:
           echo "Tag $TAG does not exist"
         fi
 
+    - name: Generate changelog
+      if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
+      id: generate_changelog
+      uses: ./.github/workflows/generate-changelog.yml
+      with:
+        target_branch: 'main'
+        dry_run: false
+
     - name: Create GitHub Release
       if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
       id: create_release
@@ -88,19 +96,19 @@ jobs:
         tag_name: ${{ steps.get_version.outputs.version }}
         name: ${{ steps.get_version.outputs.version }}
         generate_release_notes: true
-        draft: true
+        draft: false
         prerelease: false
         make_latest: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Publish Release
-      if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
-      run: |
-        TAG="${{ steps.get_version.outputs.version }}"
-        gh release edit "$TAG" --draft=false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Publish Release
+    #   if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
+    #   run: |
+    #     TAG="${{ steps.get_version.outputs.version }}"
+    #     gh release edit "$TAG" --draft=false
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-to-cratesio:
     needs: create-release
@@ -125,11 +133,3 @@ jobs:
     with:
       version: ${{ needs.create-release.outputs.version }}
     secrets: inherit
-
-  generate-changelog:
-    needs: create-release
-    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
-    uses: ./.github/workflows/generate-changelog.yml
-    with:
-      target_branch: 'main'
-      dry_run: false
