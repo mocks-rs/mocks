@@ -39,7 +39,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Switch to target branch
         run: |
           set -euo pipefail
