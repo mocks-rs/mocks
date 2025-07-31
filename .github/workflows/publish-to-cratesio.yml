@@ -3,10 +3,6 @@ name: Publish to crates.io
 on:
   workflow_call:
     inputs:
-      version:
-        description: 'Version to publish (e.g., 1.0.0)'
-        required: true
-        type: string
       dry_run:
         description: 'Dry run (do not actually publish)'
         required: false
@@ -14,10 +10,6 @@ on:
         type: boolean
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to publish (e.g., 1.0.0)'
-        required: true
-        type: string
       dry_run:
         description: 'Dry run (do not actually publish)'
         required: false
@@ -42,13 +34,13 @@ jobs:
           components: ''
 
       - name: Dry run publish to crates.io
-        if: github.event.inputs.dry_run == 'true' || inputs.dry_run == true
+        if: inputs.dry_run == true
         run: cargo publish --dry-run --token ${{ secrets.CRATES_TOKEN }}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
 
       - name: Publish to crates.io
-        if: github.event.inputs.dry_run == 'false' || inputs.dry_run == false
+        if: inputs.dry_run == false
         run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}

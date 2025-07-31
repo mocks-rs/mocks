@@ -1,8 +1,8 @@
-name: Release
+name: Release v2
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
       - 'CHANGELOG.md'
   workflow_call:
@@ -12,126 +12,173 @@ permissions:
   contents: write
   actions: read
 
-jobs:
-  test-and-lint:
-    uses: ./.github/workflows/test-and-lint.yml
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
 
-  create-release:
-    needs: test-and-lint
+jobs:
+  version-check:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get_version.outputs.version }}
       version_changed: ${{ steps.check_version.outputs.version_changed }}
-      tag_exists: ${{ steps.check_tag.outputs.tag_exists }}
+      should_release: ${{ steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false' }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Get current version
-      id: get_version
-      run: |
-        CURRENT_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
-        echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-        echo "tag=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-        echo "Current version: $CURRENT_VERSION"
+      - name: Get current version
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
 
-    - name: Setup Node.js for version sync
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Check if version changed
+        id: check_version
+        run: |
+          CURRENT_VERSION="${{ steps.get_version.outputs.version }}"
+          PREVIOUS_VERSION=$(git show HEAD~1:Cargo.toml | grep "^version = " | cut -d'"' -f2 2>/dev/null || echo "")
 
-    - name: Check if version changed
-      id: check_version
-      run: |
-        CURRENT_VERSION="${{ steps.get_version.outputs.version }}"
-        
-        # Get the previous version from the last commit
-        PREVIOUS_VERSION=$(git show HEAD~1:Cargo.toml | grep "^version = " | cut -d'"' -f2 2>/dev/null || echo "")
-        
-        echo "Previous version: $PREVIOUS_VERSION"
-        echo "Current version: $CURRENT_VERSION"
-        
-        if [ -n "$CURRENT_VERSION" ] && [ -n "$PREVIOUS_VERSION" ] && [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-          echo "version_changed=true" >> $GITHUB_OUTPUT
-          echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
-        else
-          echo "version_changed=false" >> $GITHUB_OUTPUT
-          echo "Version unchanged: $CURRENT_VERSION"
-        fi
+          echo "Previous version: $PREVIOUS_VERSION"
+          echo "Current version: $CURRENT_VERSION"
 
-    - name: Check version consistency
-      if: steps.check_version.outputs.version_changed == 'true'
-      run: |
-        node scripts/sync-versions.js check
+          if [ -n "$CURRENT_VERSION" ] && [ -n "$PREVIOUS_VERSION" ] && [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+          else
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version unchanged: $CURRENT_VERSION"
+          fi
 
-    - name: Check if tag exists
-      id: check_tag
-      if: steps.check_version.outputs.version_changed == 'true'
-      run: |
-        TAG="${{ steps.get_version.outputs.version }}"
-        if git rev-parse "$TAG" >/dev/null 2>&1; then
-          echo "tag_exists=true" >> $GITHUB_OUTPUT
-          echo "Tag $TAG already exists"
-        else
-          echo "tag_exists=false" >> $GITHUB_OUTPUT
-          echo "Tag $TAG does not exist"
-        fi
+      - name: Setup Node.js for version sync check
+        if: steps.check_version.outputs.version_changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Create GitHub Release
-      if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
-      id: create_release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ steps.get_version.outputs.version }}
-        name: ${{ steps.get_version.outputs.version }}
-        generate_release_notes: true
-        draft: true
-        prerelease: false
-        make_latest: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify version consistency
+        if: steps.check_version.outputs.version_changed == 'true'
+        run: |
+          echo "Checking version consistency across package files"
+          node scripts/sync-versions.js check
 
-    - name: Publish Release
-      if: steps.check_version.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
-      run: |
-        TAG="${{ steps.get_version.outputs.version }}"
-        gh release edit "$TAG" --draft=false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check if tag exists
+        id: check_tag
+        if: steps.check_version.outputs.version_changed == 'true'
+        run: |
+          TAG="${{ steps.get_version.outputs.version }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $TAG already exists"
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $TAG does not exist, proceeding with release"
+          fi
 
-  publish-to-cratesio:
-    needs: create-release
-    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
+  test-and-lint:
+    if: needs.version-check.outputs.version_changed == 'true'
+    needs: version-check
+    uses: ./.github/workflows/test-and-lint.yml
+
+  update-changelog:
+    if: needs.version-check.outputs.should_release == 'true'
+    needs: [version-check, test-and-lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: 'main'
+
+      - name: Configure Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Commit and push changelog
+        run: |
+          set +e
+          git add CHANGELOG.md
+          if git diff --staged --quiet; then
+            echo "No changes to CHANGELOG.md"
+          else
+            git commit -m "chore(changelog): Update changelog for v${{ needs.version-check.outputs.version }}"
+            git push origin main
+            echo "CHANGELOG.md updated and pushed"
+          fi
+
+  create-release:
+    if: needs.version-check.outputs.should_release == 'true'
+    needs: [version-check, update-changelog]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version-check.outputs.version }}
+          name: ${{ needs.version-check.outputs.version }}
+          generate_release_notes: true
+          draft: false  
+          prerelease: false
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  publish-cargo:
+    if: needs.version-check.outputs.should_release == 'true'
+    needs: [version-check, create-release]
     uses: ./.github/workflows/publish-to-cratesio.yml
     with:
-      version: ${{ needs.create-release.outputs.version }}
       dry_run: false
     secrets: inherit
 
-  publish-to-npm:
-    needs: create-release
-    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
+  publish-npm:
+    if: needs.version-check.outputs.should_release == 'true'
+    needs: [version-check, create-release]
     uses: ./.github/workflows/publish-to-npm.yml
     with:
-      version: ${{ needs.create-release.outputs.version }}
       dry_run: false
     secrets: inherit
 
-  build-release-binaries:
-    needs: create-release
-    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
+  build-binaries:
+    if: needs.version-check.outputs.should_release == 'true'
+    needs: [version-check, create-release]
     uses: ./.github/workflows/build-release-binaries.yml
     with:
-      version: ${{ needs.create-release.outputs.version }}
+      version: ${{ needs.version-check.outputs.version }}
     secrets: inherit
 
-  generate-changelog:
-    needs: create-release
-    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
-    uses: ./.github/workflows/generate-changelog.yml
-    with:
-      target_branch: 'main'
-      dry_run: false
+  complete-release:
+    if: needs.version-check.outputs.should_release == 'true'
+    needs: [version-check, publish-cargo, publish-npm, build-binaries]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release completion summary
+        run: |
+          echo "Release v${{ needs.version-check.outputs.version }} completed successfully!"
+          echo "Published to:"
+          echo "  - crates.io"
+          echo "  - npm registry"  
+          echo "  - GitHub releases (with binaries)"
