@@ -54,25 +54,25 @@ jobs:
         if: github.event.inputs.dry_run == 'false' || inputs.dry_run == false
         run: |
           set -euo pipefail
-          
+
           BRANCH="${{ inputs.target_branch || github.event.inputs.target_branch || 'main' }}"
           echo "Using branch: $BRANCH"
-          
+
           git checkout "$BRANCH"
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          
+
           # Check if there are changes to CHANGELOG.md
           if git diff --quiet CHANGELOG.md; then
             echo "No changes to CHANGELOG.md, skipping commit"
             exit 0
           fi
-          
+
           git add CHANGELOG.md
           if git diff --staged --quiet; then
             echo "No staged changes, skipping commit"
             exit 0
           fi
-          
+
           git commit -m "chore(changelog): Update changelog"
           git push origin "$BRANCH"
