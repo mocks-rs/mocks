@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths-ignore:
-        - 'CHANGELOG.md'
+      - 'CHANGELOG.md'
   workflow_call:
   workflow_dispatch:
 
