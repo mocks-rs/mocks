@@ -3,6 +3,8 @@ name: Release
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'CHANGELOG.md'
   workflow_call:
   workflow_dispatch:
 
@@ -125,3 +127,11 @@ jobs:
     with:
       version: ${{ needs.create-release.outputs.version }}
     secrets: inherit
+
+  generate-changelog:
+    needs: create-release
+    if: needs.create-release.outputs.version_changed == 'true' && needs.create-release.outputs.tag_exists == 'false'
+    uses: ./.github/workflows/generate-changelog.yml
+    with:
+      target_branch: 'main'
+      dry_run: false

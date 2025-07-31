@@ -17,6 +17,9 @@ lldb
 mocks
 msrv
 msvc
+orhun
+pipefail
+postprocessors
 procps
 robbyrussell
 runbooks

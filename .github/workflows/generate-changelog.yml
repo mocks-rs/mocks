@@ -1,0 +1,82 @@
+name: Generate Changelog
+
+on:
+  workflow_call:
+    inputs:
+      target_branch:
+        description: 'Target branch to commit to (defaults to main)'
+        required: false
+        default: 'main'
+        type: string
+      dry_run:
+        description: 'Dry run (do not actually publish)'
+        required: false
+        default: false
+        type: boolean
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Target branch to commit to (defaults to main)'
+        required: false
+        default: 'main'
+        type: string
+      dry_run:
+        description: 'Dry run (do not actually publish)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  changelog:
+    name: Generate changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Switch to target branch
+        run: |
+          set -euo pipefail
+
+          BRANCH="${{ inputs.target_branch || github.event.inputs.target_branch || 'main' }}"
+          echo "Using branch: $BRANCH"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          git checkout "$BRANCH"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Commit changelog
+        id: commit
+        if: github.event.inputs.dry_run == 'false' || inputs.dry_run == false
+        run: |
+          set -euo pipefail
+
+          # Check if there are changes to CHANGELOG.md
+          if git diff --quiet CHANGELOG.md; then
+            echo "No changes to CHANGELOG.md, skipping commit"
+            exit 0
+          fi
+
+          git add CHANGELOG.md
+          if git diff --staged --quiet; then
+            echo "No staged changes, skipping commit"
+            exit 0
+          fi
+
+          git commit -m "chore(changelog): Update changelog"
+          git push origin "$BRANCH"
