@@ -29,7 +29,7 @@
         "--context",
         "ide-assistant",
         "--project",
-        "${WORKSPACE_DIR}"
+        "/workspace"
       ],
       "env": {}
     }
