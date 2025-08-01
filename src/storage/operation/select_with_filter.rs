@@ -36,7 +36,7 @@ fn parse_query_params(params: &HashMap<String, String>) -> Result<Vec<FilterCrit
 
     for (key, value) in params {
         let filter_criteria = if key.contains('.') {
-            // フィールド名.マッチタイプ の形式
+            // Format: field_name.match_type
             let parts: Vec<&str> = key.rsplitn(2, '.').collect();
             if parts.len() != 2 {
                 return Err(MocksError::InvalidQueryParam);
@@ -50,7 +50,7 @@ fn parse_query_params(params: &HashMap<String, String>) -> Result<Vec<FilterCrit
                 value: value.clone(),
             }
         } else {
-            // フィールド名のみの場合はエラーを返す（マッチタイプが必須）
+            // Return error if only field name provided (match type is required)
             return Err(MocksError::MatchTypeRequired);
         };
 
@@ -71,7 +71,7 @@ pub fn select_with_filter(
         .get(&search_resource_key)
         .ok_or(MocksError::ResourceNotFound)?;
 
-    // クエリパラメータを解析
+    // Parse query parameters
     let criteria = parse_query_params(filters)?;
 
     match resource_value {
@@ -80,14 +80,14 @@ pub fn select_with_filter(
             for item in array {
                 match matches_filters(item, &criteria) {
                     Ok(true) => filtered_items.push(item.clone()),
-                    Ok(false) => {}          // マッチしない場合は何もしない
-                    Err(e) => return Err(e), // エラーの場合は即座に返す
+                    Ok(false) => {}          // Do nothing if no match
+                    Err(e) => return Err(e), // Return error immediately
                 }
             }
             Ok(Value::Array(filtered_items))
         }
         Value::Object(_) => {
-            // オブジェクト型リソースの場合はクエリパラメータが指定されていればエラーを返す
+            // Return error if query parameters are specified for object-type resources
             if filters.is_empty() {
                 Ok(resource_value.clone())
             } else {
@@ -117,7 +117,7 @@ fn matches_filters(item: &Value, criteria: &[FilterCriteria]) -> Result<bool, Mo
                     return Ok(false);
                 }
             } else {
-                // フィールドが存在しない場合はマッチしない
+                // No match if field doesn't exist
                 return Ok(false);
             }
         }
@@ -324,7 +324,7 @@ mod tests {
 
         match select_with_filter(&data, "profile", &filters) {
             Ok(value) => {
-                // オブジェクト型でクエリパラメータがない場合は通常通り動作
+                // Normal operation for object type with no query parameters
                 assert_eq!(value, json!({"id": "1", "name": "John Smith", "age": 25}));
             }
             _ => panic!("Expected object result"),
