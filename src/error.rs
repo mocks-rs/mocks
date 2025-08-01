@@ -91,18 +91,18 @@ mod tests {
 
     #[test]
     fn test_display_implementation() {
-        let read_error = MocksError::FailedReadFile("ファイルの読み込みに失敗しました".to_string());
-        assert_eq!(read_error.to_string(), "ファイルの読み込みに失敗しました");
+        let read_error = MocksError::FailedReadFile("Failed to read file".to_string());
+        assert_eq!(read_error.to_string(), "Failed to read file");
 
         let write_error =
-            MocksError::FailedWriteFile("ファイルの書き込みに失敗しました".to_string());
-        assert_eq!(write_error.to_string(), "ファイルの書き込みに失敗しました");
+            MocksError::FailedWriteFile("Failed to write file".to_string());
+        assert_eq!(write_error.to_string(), "Failed to write file");
 
-        let invalid_args = MocksError::InvalidArgs("無効な引数です".to_string());
-        assert_eq!(invalid_args.to_string(), "無効な引数です");
+        let invalid_args = MocksError::InvalidArgs("Invalid arguments".to_string());
+        assert_eq!(invalid_args.to_string(), "Invalid arguments");
 
-        let exception = MocksError::Exception("予期せぬエラーが発生しました".to_string());
-        assert_eq!(exception.to_string(), "予期せぬエラーが発生しました");
+        let exception = MocksError::Exception("Unexpected error occurred".to_string());
+        assert_eq!(exception.to_string(), "Unexpected error occurred");
 
         assert_eq!(
             MocksError::ResourceNotFound.to_string(),
@@ -119,27 +119,27 @@ mod tests {
 
     #[test]
     fn test_into_response_implementation() {
-        // 内部エラー系のテスト
-        let read_error = MocksError::FailedReadFile("ファイルの読み込みに失敗しました".to_string());
+        // Internal error tests
+        let read_error = MocksError::FailedReadFile("Failed to read file".to_string());
         let response = read_error.into_response();
         assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
 
-        // 404エラーのテスト
+        // 404 error test
         let not_found = MocksError::ResourceNotFound;
         let response = not_found.into_response();
         assert_eq!(response.status(), StatusCode::NOT_FOUND);
 
-        // 405エラーのテスト
+        // 405 error test
         let method_not_allowed = MocksError::MethodNotAllowed;
         let response = method_not_allowed.into_response();
         assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
 
-        // 400エラーのテスト
+        // 400 error test
         let invalid_request = MocksError::InvalidRequest;
         let response = invalid_request.into_response();
         assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 
-        // 409エラーのテスト
+        // 409 error test
         let duplicate_id = MocksError::DuplicateId;
         let response = duplicate_id.into_response();
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -166,7 +166,7 @@ mod tests {
         let error = MocksError::ResourceNotFound;
         let response = error.into_response();
 
-        // レスポンスボディの内容を確認
+        // Verify response body content
         let (parts, _) = response.into_parts();
         assert_eq!(parts.status, StatusCode::NOT_FOUND);
     }

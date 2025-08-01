@@ -33,7 +33,7 @@ pub async fn get_one(
     Query(params): Query<HashMap<String, String>>,
     state: State<SharedState>,
 ) -> Result<impl IntoResponse, MocksError> {
-    // IDエンドポイントではクエリパラメータを禁止
+    // Prohibit query parameters for ID endpoints
     if !params.is_empty() {
         return Err(MocksError::QueryParamsNotAllowed);
     }

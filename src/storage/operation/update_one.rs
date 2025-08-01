@@ -21,7 +21,7 @@ fn update_target_with_input(value: &mut Value, input: &Input) -> Result<Value, M
             if let Value::Object(input_map) = input {
                 map.extend(input_map.iter().map(|(k, v)| (k.clone(), v.clone())));
             } else {
-                // フォーマットエラー
+                // Format error
                 return Err(MocksError::Exception(EXCEPTION_ERROR_MESSAGE.to_string()));
             }
 
