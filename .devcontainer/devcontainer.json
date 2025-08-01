@@ -55,9 +55,11 @@
         "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
         "ghcr.io/jungaretti/features/ripgrep:1": {},
         "ghcr.io/devcontainers/features/github-cli:1": {},
-        "ghcr.io/devcontainers/features/go:1": {}
+        "ghcr.io/devcontainers/features/go:1": {},
+        "ghcr.io/devcontainers/features/python:1": {},
+        "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {}
     },
-    "forwardPorts": [3000, 4321],
+    "forwardPorts": [3000, 4321, 4966, 24282],
     "portsAttributes": {
         "3000": {
             "label": "mocks API",
@@ -65,6 +67,14 @@
         },
         "4321": {
             "label": "Astro docs",
+            "onAutoForward": "notify"
+        },
+        "4966": {
+            "label": "difit browser",
+            "onAutoForward": "notify"
+        },
+        "24282": {
+            "label": "serena-dashboard-server",
             "onAutoForward": "notify"
         }
     }
