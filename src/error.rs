@@ -94,8 +94,7 @@ mod tests {
         let read_error = MocksError::FailedReadFile("Failed to read file".to_string());
         assert_eq!(read_error.to_string(), "Failed to read file");
 
-        let write_error =
-            MocksError::FailedWriteFile("Failed to write file".to_string());
+        let write_error = MocksError::FailedWriteFile("Failed to write file".to_string());
         assert_eq!(write_error.to_string(), "Failed to write file");
 
         let invalid_args = MocksError::InvalidArgs("Invalid arguments".to_string());
