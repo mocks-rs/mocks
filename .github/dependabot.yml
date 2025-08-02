@@ -15,9 +15,6 @@ updates:
       include: "scope"
     versioning-strategy: auto
     rebase-strategy: "auto"
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
 
   # Configuration for GitHub Actions
   - package-ecosystem: "github-actions"
