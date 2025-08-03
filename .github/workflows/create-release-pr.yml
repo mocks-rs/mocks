@@ -36,7 +36,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get current version
-        if: steps.changes.outputs.rust == 'true'
         id: get_version
         run: |
           CURRENT_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
