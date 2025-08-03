@@ -133,12 +133,24 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate release notes from changelog
+        run: |
+          # Install git-cliff if not available
+          if ! command -v git-cliff &> /dev/null; then
+            curl -L https://github.com/orhun/git-cliff/releases/latest/download/git-cliff-$(uname -m)-unknown-linux-gnu.tar.gz | tar xz
+            sudo mv git-cliff /usr/local/bin/
+          fi
+          
+          # Generate release notes for the latest version only
+          git-cliff --latest --output release-notes.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.version-check.outputs.version }}
           name: ${{ needs.version-check.outputs.version }}
-          generate_release_notes: true
+          body_path: release-notes.md
+          generate_release_notes: false
           draft: false  
           prerelease: false
           make_latest: true
