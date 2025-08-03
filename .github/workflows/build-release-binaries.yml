@@ -54,22 +54,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get version from tag or input
-        id: get_version
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          elif [ "${{ github.event_name }}" = "workflow_call" ]; then
-            VERSION="${{ inputs.version }}"
-          else
-            # Extract version from tag (remove 'v' prefix if present)
-            TAG_NAME="${GITHUB_REF#refs/tags/}"
-            VERSION="${TAG_NAME#v}"
-          fi
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "Building version: ${VERSION}"
-
       - name: Setup Rust
         uses: ./.github/actions/setup-rust
         with:
@@ -123,7 +107,7 @@ jobs:
       - name: Create archive
         shell: bash
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
+          VERSION="${{ inputs.version }}"
           
           if [[ "${{ matrix.platform }}" == win32-* ]]; then
             BINARY_NAME="mocks.exe"
@@ -172,7 +156,7 @@ jobs:
       - name: Upload archive to release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.get_version.outputs.version }}
+          tag_name: ${{ inputs.version }}
           files: |
             ${{ steps.create_archive.outputs.archive_name }}
             ${{ steps.create_archive.outputs.hash_file }}
