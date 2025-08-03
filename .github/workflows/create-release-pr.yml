@@ -1,15 +1,14 @@
-name: Release
+name: Create Release PR
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'CHANGELOG.md'
   workflow_dispatch:
 
 permissions:
   contents: write
   actions: read
+  pull-requests: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -29,7 +28,16 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Check for Rust file changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+            filters: |
+              rust:
+                - 'Cargo.toml'
+
       - name: Get current version
+        if: steps.changes.outputs.rust == 'true'
         id: get_version
         run: |
           CURRENT_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
@@ -37,6 +45,7 @@ jobs:
           echo "Current version: $CURRENT_VERSION"
 
       - name: Check if version changed
+        if: steps.changes.outputs.rust == 'true'
         id: check_version
         run: |
           CURRENT_VERSION="${{ steps.get_version.outputs.version }}"
@@ -54,20 +63,20 @@ jobs:
           fi
 
       - name: Setup Node.js for version sync check
-        if: steps.check_version.outputs.version_changed == 'true'
+        if: steps.check_version.outputs.version_changed == 'true' && steps.changes.outputs.rust == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Verify version consistency
-        if: steps.check_version.outputs.version_changed == 'true'
+        if: steps.check_version.outputs.version_changed == 'true' && steps.changes.outputs.rust == 'true'
         run: |
           echo "Checking version consistency across package files"
           node scripts/sync-versions.js check
 
       - name: Check if tag exists
         id: check_tag
-        if: steps.check_version.outputs.version_changed == 'true'
+        if: steps.check_version.outputs.version_changed == 'true' && steps.changes.outputs.rust == 'true'
         run: |
           TAG="${{ steps.get_version.outputs.version }}"
           if git rev-parse "$TAG" >/dev/null 2>&1; then
@@ -83,9 +92,9 @@ jobs:
     needs: version-check
     uses: ./.github/workflows/test-and-lint.yml
 
-  create-release:
+  update-changelog:
     if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check]
+    needs: [version-check, test-and-lint]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -93,65 +102,44 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: 'main'
 
-      - name: Generate release notes from changelog
+      - name: Configure Git
         run: |
-          # Install git-cliff if not available
-          if ! command -v git-cliff &> /dev/null; then
-            curl -L https://github.com/orhun/git-cliff/releases/latest/download/git-cliff-$(uname -m)-unknown-linux-gnu.tar.gz | tar xz
-            sudo mv git-cliff /usr/local/bin/
-          fi
-          
-          # Generate release notes for the latest version only
-          git-cliff --latest --output release-notes.md
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Create changelog update branch
+        run: |
+          BRANCH_NAME="changelog-update-v${{ needs.version-check.outputs.version }}"
+          git checkout -b "$BRANCH_NAME"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
         with:
-          tag_name: ${{ needs.version-check.outputs.version }}
-          name: ${{ needs.version-check.outputs.version }}
-          body_path: release-notes.md
-          generate_release_notes: false
-          draft: false  
-          prerelease: false
-          make_latest: true
+          config: cliff.toml
+          args: --verbose
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
 
-
-  publish-cargo:
-    if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check, create-release]
-    uses: ./.github/workflows/publish-to-cratesio.yml
-    with:
-      dry_run: false
-    secrets: inherit
-
-  publish-npm:
-    if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check, create-release]
-    uses: ./.github/workflows/publish-to-npm.yml
-    with:
-      dry_run: false
-    secrets: inherit
-
-  build-binaries:
-    if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check, create-release]
-    uses: ./.github/workflows/build-release-binaries.yml
-    with:
-      version: ${{ needs.version-check.outputs.version }}
-    secrets: inherit
-
-  complete-release:
-    if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check, publish-cargo, publish-npm, build-binaries]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Release completion summary
+      - name: Commit and create PR
         run: |
-          echo "Release v${{ needs.version-check.outputs.version }} completed successfully!"
-          echo "Published to:"
-          echo "  - crates.io"
-          echo "  - npm registry"  
-          echo "  - GitHub releases (with binaries)"
+          git add CHANGELOG.md
+          if git diff --staged --quiet; then
+            echo "No changes to CHANGELOG.md"
+          else
+            git commit -m "chore(changelog): Update changelog for v${{ needs.version-check.outputs.version }}"
+            git push origin "$BRANCH_NAME"
+            
+            gh pr create \
+              --title "chore(changelog): Update changelog for v${{ needs.version-check.outputs.version }}" \
+              --body "Automated changelog update for version ${{ needs.version-check.outputs.version }}" \
+              --base main \
+              --head "$BRANCH_NAME"
+            
+            echo "Changelog update PR created successfully"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
