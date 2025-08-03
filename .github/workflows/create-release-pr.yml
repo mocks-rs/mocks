@@ -5,6 +5,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: release-pr-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   actions: read
