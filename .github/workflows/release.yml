@@ -84,47 +84,47 @@ jobs:
     needs: version-check
     uses: ./.github/workflows/test-and-lint.yml
 
-  update-changelog:
-    if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check, test-and-lint]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: 'main'
+  # update-changelog:
+  #   if: needs.version-check.outputs.should_release == 'true'
+  #   needs: [version-check, test-and-lint]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         ref: 'main'
 
-      - name: Configure Git
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
+  #     - name: Configure Git
+  #       run: |
+  #         git config user.name 'github-actions[bot]'
+  #         git config user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Generate changelog
-        uses: orhun/git-cliff-action@v4
-        with:
-          config: cliff.toml
-          args: --verbose
-        env:
-          OUTPUT: CHANGELOG.md
-          GITHUB_REPO: ${{ github.repository }}
+  #     - name: Generate changelog
+  #       uses: orhun/git-cliff-action@v4
+  #       with:
+  #         config: cliff.toml
+  #         args: --verbose
+  #       env:
+  #         OUTPUT: CHANGELOG.md
+  #         GITHUB_REPO: ${{ github.repository }}
 
-      - name: Commit and push changelog
-        run: |
-          set +e
-          git add CHANGELOG.md
-          if git diff --staged --quiet; then
-            echo "No changes to CHANGELOG.md"
-          else
-            git commit -m "chore(changelog): Update changelog for v${{ needs.version-check.outputs.version }}"
-            git push origin main
-            echo "CHANGELOG.md updated and pushed"
-          fi
+  #     - name: Commit and push changelog
+  #       run: |
+  #         set +e
+  #         git add CHANGELOG.md
+  #         if git diff --staged --quiet; then
+  #           echo "No changes to CHANGELOG.md"
+  #         else
+  #           git commit -m "chore(changelog): Update changelog for v${{ needs.version-check.outputs.version }}"
+  #           git push origin main
+  #           echo "CHANGELOG.md updated and pushed"
+  #         fi
 
   create-release:
     if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check, update-changelog]
+    needs: [version-check]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
