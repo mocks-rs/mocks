@@ -111,7 +111,7 @@ jobs:
 
       - name: Create changelog update branch
         run: |
-          BRANCH_NAME="changelog-update-v${{ needs.version-check.outputs.version }}"
+          BRANCH_NAME="chore/changelog-update-v${{ needs.version-check.outputs.version }}"
           git checkout -b "$BRANCH_NAME"
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 

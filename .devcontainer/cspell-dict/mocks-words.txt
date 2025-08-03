@@ -5,6 +5,7 @@ codemountains
 cratesio
 dependi
 devcontainers
+dorny
 dtolnay
 elif
 endswith
