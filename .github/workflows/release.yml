@@ -95,15 +95,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate release notes from changelog
-        run: |
-          # Install git-cliff if not available
-          if ! command -v git-cliff &> /dev/null; then
-            curl -L https://github.com/orhun/git-cliff/releases/latest/download/git-cliff-$(uname -m)-unknown-linux-gnu.tar.gz | tar xz
-            sudo mv git-cliff /usr/local/bin/
-          fi
-          
-          # Generate release notes for the latest version only
-          git-cliff --latest --output release-notes.md
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --verbose --latest --output release-notes.md
+        env:
+          OUTPUT: release-notes.md
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
