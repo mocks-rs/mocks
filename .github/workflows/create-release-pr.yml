@@ -133,13 +133,13 @@ jobs:
           else
             git commit -m "chore(changelog): Update changelog for v${{ needs.version-check.outputs.version }}"
             git push origin "$BRANCH_NAME"
-            
+
             gh pr create \
               --title "chore(changelog): Update changelog for v${{ needs.version-check.outputs.version }}" \
               --body "Automated changelog update for version ${{ needs.version-check.outputs.version }}" \
               --base main \
               --head "$BRANCH_NAME"
-            
+
             echo "Changelog update PR created successfully"
           fi
         env:
