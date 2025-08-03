@@ -32,9 +32,10 @@ jobs:
         uses: dorny/paths-filter@v3
         id: changes
         with:
-            filters: |
-              rust:
-                - 'Cargo.toml'
+          filters: |
+            rust:
+              - 'Cargo.toml'
+              - 'Cargo.lock'
 
       - name: Get current version
         if: steps.changes.outputs.rust == 'true'
