@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
 
 # Optimize Rust settings
 RUN rustup component add rustfmt clippy llvm-tools-preview rust-analyzer
-RUN cargo install cargo-llvm-cov
+RUN cargo install cargo-llvm-cov git-cliff
 
 # Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
