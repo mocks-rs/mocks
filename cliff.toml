@@ -88,7 +88,7 @@ commit_parsers = [
     { message = "^revert", group = "Revert" },
     { message = "^cargo\\(deps\\)", group = "Dependencies" },
     { message = "^github-actions", group = "GitHub Actions", skip = true },
-    { message = "^version", group = "Version" },
+    { message = "^version", group = "Version", skip = true },
 ]
 # Protect breaking changes from being skipped due to matching a skipping commit_parser.
 protect_breaking_commits = false
