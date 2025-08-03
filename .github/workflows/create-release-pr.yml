@@ -3,6 +3,9 @@ name: Create Release PR
 on:
   push:
     branches: [main]
+    paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
   workflow_dispatch:
 
 concurrency:
@@ -32,17 +35,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check for Rust file changes
-        uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            rust:
-              - 'Cargo.toml'
-              - 'Cargo.lock'
-
       - name: Get current version
-        if: steps.changes.outputs.rust == 'true'
         id: get_version
         run: |
           CURRENT_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
@@ -50,7 +43,6 @@ jobs:
           echo "Current version: $CURRENT_VERSION"
 
       - name: Check if version changed
-        if: steps.changes.outputs.rust == 'true'
         id: check_version
         run: |
           CURRENT_VERSION="${{ steps.get_version.outputs.version }}"
@@ -68,20 +60,20 @@ jobs:
           fi
 
       - name: Setup Node.js for version sync check
-        if: steps.check_version.outputs.version_changed == 'true' && steps.changes.outputs.rust == 'true'
+        if: steps.check_version.outputs.version_changed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Verify version consistency
-        if: steps.check_version.outputs.version_changed == 'true' && steps.changes.outputs.rust == 'true'
+        if: steps.check_version.outputs.version_changed == 'true'
         run: |
           echo "Checking version consistency across package files"
           node scripts/sync-versions.js check
 
       - name: Check if tag exists
         id: check_tag
-        if: steps.check_version.outputs.version_changed == 'true' && steps.changes.outputs.rust == 'true'
+        if: steps.check_version.outputs.version_changed == 'true'
         run: |
           TAG="${{ steps.get_version.outputs.version }}"
           if git rev-parse "$TAG" >/dev/null 2>&1; then
@@ -124,7 +116,7 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
-          args: --verbose
+          args: --verbose --tag ${{ needs.version-check.outputs.version }}
         env:
           OUTPUT: CHANGELOG.md
           GITHUB_REPO: ${{ github.repository }}
