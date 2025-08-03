@@ -131,7 +131,7 @@ jobs:
             git push origin "$BRANCH_NAME"
 
             gh pr create \
-              --title "chore(changelog): Update changelog for v${{ needs.version-check.outputs.version }}" \
+              --title "Update changelog for v${{ needs.version-check.outputs.version }}" \
               --body "Automated changelog update for version ${{ needs.version-check.outputs.version }}" \
               --base main \
               --head "$BRANCH_NAME"

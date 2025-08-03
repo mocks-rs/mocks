@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [1.0.7](https://github.com/mocks-rs/mocks/compare/1.0.6..1.0.7) - 2025-08-03
 
 ### Dependencies
 
