@@ -3,24 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-
-const CARGO_TOML_PATH = path.join(__dirname, '..', 'Cargo.toml');
-
-function extractCargoVersion() {
-  try {
-    const cargoToml = fs.readFileSync(CARGO_TOML_PATH, 'utf8');
-    const versionMatch = cargoToml.match(/^version\s*=\s*"([^"]+)"/m);
-    
-    if (!versionMatch) {
-      throw new Error('Could not find version in Cargo.toml');
-    }
-    
-    return versionMatch[1];
-  } catch (error) {
-    console.error('Error reading Cargo.toml:', error.message);
-    process.exit(1);
-  }
-}
+const { extractCargoVersion } = require('./sync-versions');
 
 function checkGitStatus() {
   try {
