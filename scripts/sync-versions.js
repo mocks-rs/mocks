@@ -145,17 +145,20 @@ if (require.main === module) {
   const command = process.argv[2];
 
   switch (command) {
-    case 'sync':
+    case 'sync': {
       checkVersionConsistency();
       break;
-    case 'check':
+    }
+    case 'check': {
       const isConsistent = verifyVersionConsistency();
       process.exit(isConsistent ? 0 : 1);
       break;
-    default:
+    }
+    default: {
       console.log('Usage:');
       console.log('  node sync-versions.js sync   - Synchronize all package.json versions with Cargo.toml');
       console.log('  node sync-versions.js check  - Check version consistency (exits with error if inconsistent)');
       process.exit(1);
+    }
   }
 }
