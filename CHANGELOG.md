@@ -1,9 +1,10 @@
 # Changelog
 
-## [1.0.7](https://github.com/mocks-rs/mocks/compare/1.0.6..1.0.7) - 2025-08-03
+## [1.0.7](https://github.com/mocks-rs/mocks/compare/1.0.6..1.0.7) - 2025-08-04
 
 ### Dependencies
 
+- *(deps)* Bump clap from 4.5.40 to 4.5.42 - ([7c0949d](https://github.com/mocks-rs/mocks/commit/7c0949da028b4aec6e88539177a764968ccf8a68))
 - *(deps)* Bump serde_json from 1.0.140 to 1.0.142 - ([db2fe76](https://github.com/mocks-rs/mocks/commit/db2fe76e8beb2646a7d724adc65de54cd78013a0))
 
 ## [1.0.6](https://github.com/mocks-rs/mocks/compare/1.0.5..1.0.6) - 2025-08-02
