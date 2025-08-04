@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      skip_version_check:
+        description: 'Skip version check'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -16,6 +22,7 @@ env:
 jobs:
   version-check:
     runs-on: ubuntu-latest
+    if: inputs.skip_version_check != true
     outputs:
       version: ${{ steps.get_version.outputs.version }}
       version_changed: ${{ steps.check_version.outputs.version_changed }}
