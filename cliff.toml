@@ -62,6 +62,7 @@ footer = """
 """
 
 postprocessors = []
+output = "CHANGELOG.md"
 
 [git]
 # Parse the commits based on https://www.conventionalcommits.org

@@ -133,20 +133,32 @@ function verifyVersionConsistency() {
   }
 }
 
-// Main logic
-const command = process.argv[2];
+// Export functions for reuse
+module.exports = {
+  extractCargoVersion,
+  checkVersionConsistency,
+  verifyVersionConsistency
+};
 
-switch (command) {
-  case 'sync':
-    checkVersionConsistency();
-    break;
-  case 'check':
-    const isConsistent = verifyVersionConsistency();
-    process.exit(isConsistent ? 0 : 1);
-    break;
-  default:
-    console.log('Usage:');
-    console.log('  node sync-versions.js sync   - Synchronize all package.json versions with Cargo.toml');
-    console.log('  node sync-versions.js check  - Check version consistency (exits with error if inconsistent)');
-    process.exit(1);
+// Main logic (only run if this script is executed directly)
+if (require.main === module) {
+  const command = process.argv[2];
+
+  switch (command) {
+    case 'sync': {
+      checkVersionConsistency();
+      break;
+    }
+    case 'check': {
+      const isConsistent = verifyVersionConsistency();
+      process.exit(isConsistent ? 0 : 1);
+      break;
+    }
+    default: {
+      console.log('Usage:');
+      console.log('  node sync-versions.js sync   - Synchronize all package.json versions with Cargo.toml');
+      console.log('  node sync-versions.js check  - Check version consistency (exits with error if inconsistent)');
+      process.exit(1);
+    }
+  }
 }

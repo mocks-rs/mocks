@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.7](https://github.com/mocks-rs/mocks/compare/1.0.6..1.0.7) - 2025-08-03
+
+### Dependencies
+
+- *(deps)* Bump serde_json from 1.0.140 to 1.0.142 - ([db2fe76](https://github.com/mocks-rs/mocks/commit/db2fe76e8beb2646a7d724adc65de54cd78013a0))
+
 ## [1.0.6](https://github.com/mocks-rs/mocks/compare/1.0.5..1.0.6) - 2025-08-02
 
 ### Dependencies
