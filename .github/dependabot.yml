@@ -21,12 +21,27 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "wednesday"
+      day: "thursday"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "github-actions"
     commit-message:
       prefix: "github-actions"
+      include: "scope"
+    rebase-strategy: "auto"
+
+  # Configuration for docs(npm) dependencies
+  - package-ecosystem: "npm"
+    directory: "/docs"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "docs"
       include: "scope"
     rebase-strategy: "auto"
