@@ -77,6 +77,7 @@ commit_preprocessors = []
 commit_parsers = [
     { message = "^feat", group = "Features" },
     { message = "^fix", group = "Bug Fixes" },
+    { message = "^docs\\(deps\\)", group = "Dependencies (docs)", skip = true },
     { message = "^docs", group = "Documentation" },
     { message = "^perf", group = "Performance" },
     { message = "^refactor", group = "Refactoring" },
@@ -87,7 +88,7 @@ commit_parsers = [
     { message = "^chore", group = "Miscellaneous Tasks", skip = true },
     { body = ".*security", group = "Security" },
     { message = "^revert", group = "Revert" },
-    { message = "^cargo\\(deps\\)", group = "Dependencies" },
+    { message = "^cargo\\(deps\\)", group = "Dependencies (cargo)", skip = true },
     { message = "^github-actions", group = "GitHub Actions", skip = true },
     { message = "^version", group = "Version", skip = true },
 ]
