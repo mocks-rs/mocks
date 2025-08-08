@@ -51,3 +51,8 @@ updates:
       prefix: "docs"
       include: "scope"
     rebase-strategy: "auto"
+    groups:
+      astro:
+        patterns:
+          - "astro"
+          - "@astrojs/*"
