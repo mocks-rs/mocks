@@ -88,7 +88,7 @@ commit_parsers = [
     { message = "^chore", group = "Miscellaneous Tasks", skip = true },
     { body = ".*security", group = "Security" },
     { message = "^revert", group = "Revert" },
-    { message = "^cargo\\(deps\\)", group = "Dependencies (cargo)", skip = true },
+    { message = "^cargo\\(deps\\)", group = "Dependencies" },
     { message = "^github-actions", group = "GitHub Actions", skip = true },
     { message = "^version", group = "Version", skip = true },
 ]
