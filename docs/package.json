@@ -13,8 +13,8 @@
     "docs:preview": "npm run preview"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.4.1",
-    "@astrojs/starlight": "^0.34.4",
+    "@astrojs/sitemap": "^3.4.2",
+    "@astrojs/starlight": "^0.35.2",
     "astro": "^5.12.8",
     "sharp": "^0.34.2"
   }
