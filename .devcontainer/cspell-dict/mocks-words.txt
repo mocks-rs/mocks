@@ -1,4 +1,5 @@
 anthropics
+astrojs
 clippy
 codegen
 codemountains
