@@ -3,8 +3,10 @@ name: Code Coverage
 on:
   pull_request:
     branches: [ '*' ]
+    paths: [ '**/*.rs', 'Cargo.toml', 'Cargo.lock' ]
   push:
     branches: [ main ]
+    paths: [ '**/*.rs', 'Cargo.toml', 'Cargo.lock' ]
   workflow_dispatch:
 
 permissions:
