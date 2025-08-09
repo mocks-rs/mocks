@@ -1,0 +1,70 @@
+name: Check the latest version of changelog
+
+on:
+  pull_request:
+    branches: [ '*' ]
+    paths: [ 'Cargo.toml' ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+    
+      - name: Get current version
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(grep "^version = " Cargo.toml | cut -d'"' -f2)
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Check if version changed
+        id: check_version
+        run: |
+          CURRENT_VERSION="${{ steps.get_version.outputs.version }}"
+          PREVIOUS_VERSION=$(git show HEAD~1:Cargo.toml | grep "^version = " | cut -d'"' -f2 2>/dev/null || echo "")
+
+          echo "Previous version: $PREVIOUS_VERSION"
+          echo "Current version: $CURRENT_VERSION"
+
+          if [ -n "$CURRENT_VERSION" ] && [ -n "$PREVIOUS_VERSION" ] && [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+          else
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version unchanged: $CURRENT_VERSION"
+          fi
+
+      - name: Setup Node.js for version sync check
+        if: steps.check_version.outputs.version_changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify version consistency
+        if: steps.check_version.outputs.version_changed == 'true'
+        run: |
+          echo "Checking version consistency across package files"
+          node scripts/sync-versions.js check
+
+      - name: Check CHANGELOG.md entry
+        id: check_changelog
+        if: steps.check_version.outputs.version_changed == 'true'
+        run: |
+          CURRENT_VERSION="${{ steps.get_version.outputs.version }}"
+          
+          # Check if CHANGELOG.md contains the version entry
+          if grep -q "^## \[${CURRENT_VERSION}\]" CHANGELOG.md; then
+            echo "changelog_entry_exists=true" >> $GITHUB_OUTPUT
+            echo "CHANGELOG.md contains entry for version $CURRENT_VERSION"
+          else
+            echo "changelog_entry_exists=false" >> $GITHUB_OUTPUT
+            echo "CHANGELOG.md does not contain entry for version $CURRENT_VERSION"
+            echo "Please run 'git-cliff --tag $CURRENT_VERSION' to update CHANGELOG.md"
+            exit 1
+          fi
