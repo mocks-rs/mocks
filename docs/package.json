@@ -4,13 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "docs:dev": "npm run dev",
-    "docs:build": "npm run build",
-    "docs:preview": "npm run preview"
+    "astro": "astro check"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.4.1",
