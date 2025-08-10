@@ -115,9 +115,16 @@ jobs:
           BRANCH_NAME="release/v${{ github.event.inputs.version }}"
           git push origin "$BRANCH_NAME"
 
+      - name: Generate token for mocks-rs
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_PR_CREATOR_APP_ID }}
+          private-key: ${{ secrets.RELEASE_PR_CREATOR_PRIVATE_KEY }}
+
       - name: Create Pull Request
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           VERSION="${{ github.event.inputs.version }}"
           BRANCH_NAME="release/v$VERSION"
