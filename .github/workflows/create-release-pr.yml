@@ -57,10 +57,6 @@ jobs:
         with:
           components: ''
 
-      - name: Install git-cliff
-        run: |
-          cargo install git-cliff
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
