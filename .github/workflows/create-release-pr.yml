@@ -122,11 +122,11 @@ jobs:
           VERSION="${{ github.event.inputs.version }}"
           BRANCH_NAME="release/v$VERSION"
 
-          # Create PR with owners team as reviewers
+          # Create PR with individual user as reviewer
           gh pr create \
             --head "$BRANCH_NAME" \
             --base "main" \
-            --reviewer "mocks-rs/owners" \
+            --reviewer "codemountains" \
             --title "Release v$VERSION" \
             --body "# Release version $VERSION
 
