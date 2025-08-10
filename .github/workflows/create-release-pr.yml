@@ -117,16 +117,16 @@ jobs:
 
       - name: Create Pull Request
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           VERSION="${{ github.event.inputs.version }}"
           BRANCH_NAME="release/v$VERSION"
 
-          # Create PR with individual user as reviewer
+          # Create PR with owners team as reviewers
           gh pr create \
             --head "$BRANCH_NAME" \
             --base "main" \
-            --reviewer "codemountains" \
+            --reviewer "mocks-rs/owners" \
             --title "Release v$VERSION" \
             --body "# Release version $VERSION
 
