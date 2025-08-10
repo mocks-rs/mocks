@@ -52,9 +52,13 @@ jobs:
           git checkout -b "$BRANCH_NAME"
 
       - name: Setup Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: ./.github/actions/setup-rust
         with:
-          cache: true
+          components: ''
+
+      - name: Install git-cliff
+        run: |
+          cargo install git-cliff
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -83,6 +87,15 @@ jobs:
 
       - name: Sync versions across package.json files
         run: node scripts/sync-versions.js sync
+
+      - name: Update CHANGELOG.md
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --verbose --tag ${{ github.event.inputs.version }}
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Commit changes
         run: |
