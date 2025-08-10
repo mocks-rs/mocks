@@ -94,7 +94,7 @@ jobs:
           fi
 
   test-and-lint:
-    if: needs.version-check.outputs.version_changed == 'true'
+    if: needs.version-check.outputs.should_release == 'true'
     needs: version-check
     uses: ./.github/workflows/test-and-lint.yml
 
