@@ -94,13 +94,13 @@ jobs:
           fi
 
   test-and-lint:
-    if: needs.version-check.outputs.version_changed == 'true'
+    if: needs.version-check.outputs.should_release == 'true'
     needs: version-check
     uses: ./.github/workflows/test-and-lint.yml
 
   create-release:
     if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check]
+    needs: [version-check, test-and-lint]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
