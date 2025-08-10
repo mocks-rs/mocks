@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 const CARGO_TOML_PATH = path.join(__dirname, '..', 'Cargo.toml');
 const PACKAGE_JSON_PATHS = [
