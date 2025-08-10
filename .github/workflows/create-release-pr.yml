@@ -76,8 +76,10 @@ jobs:
 
           echo "Updated Cargo.toml version to $VERSION"
 
-      - name: Build and test
-        run: cargo build --release
+      - name: Test and build
+        run: |
+          cargo test
+          cargo build --release
 
       - name: Sync versions across package.json files
         run: node scripts/sync-versions.js sync
