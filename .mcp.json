@@ -29,8 +29,7 @@
         "--context",
         "ide-assistant",
         "--project",
-        "/workspace",
-        "--enable-web-dashboard"
+        "/workspace"
       ],
       "env": {}
     }
