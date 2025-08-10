@@ -24,14 +24,6 @@ jobs:
 
           echo "Version format is valid: $VERSION"
 
-      - name: Check if release branch already exists
-        run: |
-          BRANCH_NAME="release/v${{ github.event.inputs.version }}"
-          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
-            echo "Error: Release branch $BRANCH_NAME already exists"
-            exit 1
-          fi
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -41,6 +33,14 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check if release branch already exists
+        run: |
+          BRANCH_NAME="release/v${{ github.event.inputs.version }}"
+          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            echo "Error: Release branch $BRANCH_NAME already exists"
+            exit 1
+          fi
 
       - name: Create and checkout release branch
         run: |
