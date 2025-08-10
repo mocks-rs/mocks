@@ -31,6 +31,15 @@ fn print_info(text: &str) {
     println!("{}", text.yellow());
 }
 
+/// Print a startup banner and server information to stdout.
+///
+/// # Arguments
+/// * `url`: The URL the server is listening on (e.g., "http://127.0.0.1:3000").
+/// * `file`: Path of the storage file used by the server.
+/// * `overwrite`: Whether storage writes will overwrite existing data.
+///
+/// # Notes
+/// * Colors are applied when enabled; honored by NO_COLOR in main.
 pub fn print_startup_info(url: &str, file: &str, overwrite: bool) {
     print_banner("mocks server started!".green().bold());
     print_info("Press CTRL-C to stop");
@@ -46,18 +55,27 @@ pub fn print_startup_info(url: &str, file: &str, overwrite: bool) {
     print_blank();
 }
 
+/// Print a success message after initializing a storage file.
+///
+/// # Arguments
+/// * `file_path`: The created storage file path.
 pub fn print_init_success(file_path: &str) {
     print_banner("mocks initialized!".green().bold());
     print_kv("Created", file_path.bright_cyan());
     print_blank();
 }
 
+/// Print a message indicating initialization was aborted.
 pub fn print_init_aborted() {
     print_banner("mocks init aborted!".red().bold());
     println!("{}", "Aborted.".yellow());
     print_blank();
 }
 
+/// Print a formatted error to stderr and optional hints for certain error types.
+///
+/// # Arguments
+/// * `error`: The error to display.
 pub fn print_error(error: &MocksError) {
     eprintln!("{}: {}", "Error".red().bold(), error.to_string().red());
 
