@@ -19,6 +19,10 @@ fn print_heading(text: &str) {
     println!("{}", text.blue().bold());
 }
 
+fn print_kv(label: &str, value: impl std::fmt::Display) {
+    println!("{}: {}", label.bright_white(), value);
+}
+
 fn print_kv_with_indent(label: &str, value: impl std::fmt::Display) {
     println!("   {}: {}", label.bright_white(), value);
 }
@@ -44,7 +48,7 @@ pub fn print_startup_info(url: &str, file: &str, overwrite: bool) {
 
 pub fn print_init_success(file_path: &str) {
     print_banner("mocks initialized!".green().bold());
-    println!("{} {}", "Created:".bright_white(), file_path.bright_cyan());
+    print_kv("Created", file_path.bright_cyan());
     print_blank();
 }
 
@@ -103,6 +107,11 @@ mod tests {
     #[test]
     fn test_print_heading() {
         print_heading("Test Heading");
+    }
+
+    #[test]
+    fn test_print_kv() {
+        print_kv("Label", "Value");
     }
 
     #[test]
