@@ -32,6 +32,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
@@ -55,10 +56,6 @@ jobs:
         uses: ./.github/actions/setup-rust
         with:
           components: ''
-
-      - name: Install git-cliff
-        run: |
-          cargo install git-cliff
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -89,7 +86,7 @@ jobs:
         run: node scripts/sync-versions.js sync
 
       - name: Update CHANGELOG.md
-        uses: orhun/git-cliff-action@v3
+        uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
           args: --verbose --tag ${{ github.event.inputs.version }}
