@@ -100,7 +100,7 @@ jobs:
 
   create-release:
     if: needs.version-check.outputs.should_release == 'true'
-    needs: [version-check]
+    needs: [version-check, test-and-lint]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
