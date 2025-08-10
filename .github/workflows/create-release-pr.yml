@@ -88,6 +88,15 @@ jobs:
       - name: Sync versions across package.json files
         run: node scripts/sync-versions.js sync
 
+      - name: Update CHANGELOG.md
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --verbose --tag ${{ github.event.inputs.version }}
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
+
       - name: Commit changes
         run: |
           VERSION="${{ github.event.inputs.version }}"

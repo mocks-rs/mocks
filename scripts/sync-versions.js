@@ -134,27 +134,12 @@ function verifyVersionConsistency() {
   }
 }
 
-function updateChangelog(version) {
-  try {
-    console.log(`Updating CHANGELOG.md for version ${version}...`);
-    execSync(`git-cliff --tag ${version}`, { stdio: 'inherit' });
-    console.log('✓ CHANGELOG.md updated successfully');
-  } catch (error) {
-    console.error('Error updating CHANGELOG:', error.message);
-    console.error('Make sure git-cliff is installed: cargo install git-cliff');
-    process.exit(1);
-  }
-}
-
 if (require.main === module) {
   const command = process.argv[2];
 
   switch (command) {
     case 'sync': {
-      const { hasChanges, cargoVersion } = checkVersionConsistency();
-      if (hasChanges) {
-        updateChangelog(cargoVersion);
-      }
+      checkVersionConsistency();
       break;
     }
     case 'check': {
