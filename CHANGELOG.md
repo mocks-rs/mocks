@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.8](https://github.com/mocks-rs/mocks/compare/1.0.7..1.0.8) - 2025-08-10
+
+### Dependencies
+
+- *(deps)* Bump clap from 4.5.42 to 4.5.43 - ([70b42d7](https://github.com/mocks-rs/mocks/commit/70b42d7f0f14f8cb40d671d91065d6130984b2e4))
+
 ## [1.0.7](https://github.com/mocks-rs/mocks/compare/1.0.6..1.0.7) - 2025-08-04
 
 ### Dependencies

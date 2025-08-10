@@ -1,6 +1,6 @@
 {
   "name": "@mocks-rs/mocks",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Mock REST APIs from JSON with zero coding within seconds.",
   "keywords": [
     "mock",
@@ -31,11 +31,11 @@
     "bin/mocks"
   ],
   "optionalDependencies": {
-    "@mocks-rs/mocks-linux-x64": "1.0.7",
-    "@mocks-rs/mocks-linux-arm64": "1.0.7",
-    "@mocks-rs/mocks-darwin-x64": "1.0.7",
-    "@mocks-rs/mocks-darwin-arm64": "1.0.7",
-    "@mocks-rs/mocks-win32-x64": "1.0.7",
-    "@mocks-rs/mocks-win32-arm64": "1.0.7"
+    "@mocks-rs/mocks-linux-x64": "1.0.8",
+    "@mocks-rs/mocks-linux-arm64": "1.0.8",
+    "@mocks-rs/mocks-darwin-x64": "1.0.8",
+    "@mocks-rs/mocks-darwin-arm64": "1.0.8",
+    "@mocks-rs/mocks-win32-x64": "1.0.8",
+    "@mocks-rs/mocks-win32-arm64": "1.0.8"
   }
 }
