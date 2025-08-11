@@ -80,7 +80,7 @@ commit_parsers = [
     { message = "^docs\\(deps\\)", group = "Dependencies (docs)", skip = true },
     { message = "^docs", group = "Documentation" },
     { message = "^perf", group = "Performance" },
-    { message = "^refactor", group = "Refactoring" },
+    { message = "^refactor", group = "Refactoring", skip = true },
     { message = "^style", group = "Styling" },
     { message = "^test", group = "Testing" },
     { message = "^ci", group = "CI/CD", skip = true },
