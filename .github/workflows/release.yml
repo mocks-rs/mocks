@@ -113,7 +113,7 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
-          args: --verbose --unreleased --tag ${{ needs.version-check.outputs.version }}
+          args: --verbose --unreleased --tag ${{ needs.version-check.outputs.version }} --output ${{ env.OUTPUT }}
         env:
           OUTPUT: release-notes.md
           GITHUB_REPO: ${{ github.repository }}
