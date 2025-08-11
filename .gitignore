@@ -58,3 +58,6 @@ CLAUDE.local.md
 
 # temp dir
 temp/
+
+# Serena MCP
+.serena/
