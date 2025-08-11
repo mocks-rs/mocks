@@ -1,12 +1,13 @@
+mod console;
 mod error;
 mod server;
 mod storage;
 
+use crate::console::{print_error, print_init_aborted, print_init_success, print_startup_info};
 use crate::error::MocksError;
 use crate::server::Server;
 use crate::storage::Storage;
 use clap::Parser;
-use colored::*;
 use std::net::{IpAddr, SocketAddr};
 
 #[derive(Parser, Debug)]
@@ -124,69 +125,6 @@ fn parse_socket_addr(host: &str, port: u16) -> Result<SocketAddr, MocksError> {
         .map_err(|e| MocksError::InvalidArgs(e.to_string()))
 }
 
-fn print_startup_info(url: &str, file: &str, overwrite: bool) {
-    println!("{}", "======================================".cyan());
-    println!("{}", "mocks server started!".green().bold());
-    println!("{}", "======================================".cyan());
-    println!("{}", "Press CTRL-C to stop".yellow());
-    println!();
-
-    println!("{}", "Server Information:".blue().bold());
-    println!("   {}: {}", "URL".bright_white(), url.bright_cyan());
-    println!("   {}: {}", "Storage".bright_white(), file.bright_cyan());
-    println!(
-        "   {}: {}",
-        "Overwrite".bright_white(),
-        if overwrite { "YES".green() } else { "NO".red() }
-    );
-    println!();
-}
-
-fn print_init_success(file_path: &str) {
-    println!("{}", "======================================".cyan());
-    println!("{}", "mocks initialized!".green().bold());
-    println!("{}", "======================================".cyan());
-    println!();
-    println!("{} {}", "Created:".bright_white(), file_path.bright_cyan());
-    println!();
-}
-
-fn print_init_aborted() {
-    println!("{}", "======================================".cyan());
-    println!("{}", "mocks init aborted!".red().bold());
-    println!("{}", "======================================".cyan());
-    println!();
-    println!("{}", "Aborted.".yellow());
-    println!();
-}
-
-fn print_error(error: &MocksError) {
-    eprintln!("{}: {}", "Error".red().bold(), error.to_string().red());
-
-    // Print additional context for some error types
-    match error {
-        MocksError::FailedReadFile(_) => {
-            eprintln!(
-                "{}: Check if the file exists and is readable",
-                "Hint".bright_yellow()
-            );
-        }
-        MocksError::FailedWriteFile(_) => {
-            eprintln!(
-                "{}: Check file permissions and disk space",
-                "Hint".bright_yellow()
-            );
-        }
-        MocksError::InvalidArgs(_) => {
-            eprintln!(
-                "{}: Run with --help to see usage information",
-                "Hint".bright_yellow()
-            );
-        }
-        _ => {}
-    }
-}
-
 fn get_styles() -> clap::builder::Styles {
     clap::builder::Styles::styled()
         .header(clap::builder::styling::AnsiColor::Blue.on_default().bold())
@@ -220,40 +158,6 @@ mod tests {
     fn test_init_with_invalid_host() {
         let result = parse_socket_addr("invalid.host", 3000);
         assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_print_startup_info() {
-        let url = "http://localhost:3000";
-        let file = "storage.json";
-        let overwrite = true;
-        print_startup_info(url, file, overwrite);
-    }
-
-    #[test]
-    fn test_print_init_success() {
-        let file_path = "storage.json";
-        print_init_success(file_path);
-    }
-
-    #[test]
-    fn test_print_init_aborted() {
-        print_init_aborted();
-    }
-
-    #[test]
-    fn test_print_error() {
-        let error = MocksError::InvalidArgs("Invalid argument".to_string());
-        print_error(&error);
-
-        let error = MocksError::FailedReadFile("Failed to read file".to_string());
-        print_error(&error);
-
-        let error = MocksError::FailedWriteFile("Failed to write file".to_string());
-        print_error(&error);
-
-        let error = MocksError::Exception("Exception".to_string());
-        print_error(&error);
     }
 
     #[test]
