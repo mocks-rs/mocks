@@ -30,6 +30,9 @@ RUN cargo install cargo-llvm-cov git-cliff
 # Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
+# Install Cursor CLI
+RUN curl https://cursor.com/install -fsS | bash
+
 # Set working directory
 WORKDIR /workspace
 
