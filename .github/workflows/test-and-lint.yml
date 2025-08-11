@@ -3,6 +3,10 @@ name: Test and Lint
 on:
   pull_request:
     branches: [ '*' ]
+    paths:
+      - 'src/**/*.rs'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
   workflow_dispatch:
   workflow_call:
 
@@ -15,22 +19,12 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
-    - name: Check for Rust file changes
-      uses: dorny/paths-filter@v3
-      id: changes
-      with:
-        filters: |
-          rust:
-            - '**/*.rs'
-            - 'Cargo.toml'
-            - 'Cargo.lock'
-    
+
     - name: Setup Rust
       uses: ./.github/actions/setup-rust
       with:
         components: rustfmt, clippy
-    
+
     - name: Check formatting
       run: cargo fmt -- --check
 
@@ -41,7 +35,6 @@ jobs:
       run: cargo test
 
     - name: Check MSRV compatibility
-      if: steps.changes.outputs.rust == 'true'
       run: |
         cargo install cargo-msrv --locked
         cargo msrv verify
