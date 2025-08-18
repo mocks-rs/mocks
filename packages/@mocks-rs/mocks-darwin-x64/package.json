@@ -1,6 +1,6 @@
 {
   "name": "@mocks-rs/mocks-darwin-x64",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "mocks macOS x64 binary",
   "keywords": [
     "mock",
