@@ -45,7 +45,7 @@ jobs:
         verbose: true
     
     - name: Upload coverage report as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: coverage-report
         path: lcov.info
