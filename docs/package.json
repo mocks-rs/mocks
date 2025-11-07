@@ -13,7 +13,7 @@
     "@astrojs/sitemap": "^3.5.0",
     "@astrojs/starlight": "^0.35.2",
     "astro": "^5.13.0",
-    "sharp": "^0.34.3"
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "typescript": "^5.9.2"
