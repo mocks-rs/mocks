@@ -93,6 +93,10 @@ For detailed information about available routes, query parameters, advanced conf
 
 For development information, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
+## Author
+
+codemountains <https://github.com/codemountains>
+
 ## LICENSE
 
 This project is licensed under the [MIT license](LICENSE).
